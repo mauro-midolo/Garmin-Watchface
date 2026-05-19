@@ -55,6 +55,7 @@ class FenixWatchfaceView extends Ui.WatchFace {
         drawWeather(dc, cx, cy);
         drawSun(dc, cx, cy);
         drawSteps(dc, cx, cy, width, height);
+        drawAltitude(dc, cx, cy, width, height);
         drawBattery(dc, cx, cy, width, height);
         drawFloors(dc, cx, cy, width, height);
     }
@@ -218,6 +219,52 @@ class FenixWatchfaceView extends Ui.WatchFace {
             Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
     }
 
+    hidden function drawAltitude(dc, cx, cy, width, height) {
+        var alt = null;
+        var info = Activity.getActivityInfo();
+        if (info != null && info has :altitude && info.altitude != null) {
+            alt = info.altitude;
+        }
+
+        var altStr = "--";
+        var unit = "m";
+        if (alt != null) {
+            if (Sys.getDeviceSettings().elevationUnits == Sys.UNIT_STATUTE) {
+                alt = alt * 3.28084;
+                unit = "ft";
+            }
+            altStr = alt.toNumber().toString() + unit;
+        }
+
+        var y = height - 22;
+        drawMountainIcon(dc, cx - 22, y - 1, 12);
+
+        dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(cx - 8, y, Gfx.FONT_TINY, altStr,
+            Gfx.TEXT_JUSTIFY_LEFT | Gfx.TEXT_JUSTIFY_VCENTER);
+    }
+
+    hidden function drawMountainIcon(dc, cx, cy, size) {
+        dc.setColor(Gfx.COLOR_DK_GREEN, Gfx.COLOR_TRANSPARENT);
+        var h = size;
+        var w = size + 4;
+        var baseY = cy + h / 2;
+        var pts = [
+            [cx - w / 2, baseY],
+            [cx,         cy - h / 2],
+            [cx + w / 2, baseY]
+        ];
+        dc.fillPolygon(pts);
+        // piccolo picco innevato
+        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+        var tipPts = [
+            [cx - 2, cy - h / 2 + 4],
+            [cx,     cy - h / 2],
+            [cx + 2, cy - h / 2 + 4]
+        ];
+        dc.fillPolygon(tipPts);
+    }
+
     hidden function drawBattery(dc, cx, cy, width, height) {
         var stats = Sys.getSystemStats();
         var batt = (stats != null && stats.battery != null) ? stats.battery : 0.0;
@@ -231,11 +278,11 @@ class FenixWatchfaceView extends Ui.WatchFace {
         }
 
         // Bottom-left: battery icon (larger, white outline) + percent
-        var bw = 36;
-        var bh = 16;
+        var bw = 28;
+        var bh = 14;
         var tipW = 3;
-        var tipH = 8;
-        var bx = 22;
+        var tipH = 6;
+        var bx = 40;
         var by = height - 28;
 
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
@@ -251,7 +298,7 @@ class FenixWatchfaceView extends Ui.WatchFace {
         }
 
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(bx + bw + tipW + 6, by + bh / 2, Gfx.FONT_TINY,
+        dc.drawText(bx + bw + tipW + 4, by + bh / 2, Gfx.FONT_XTINY,
             battInt.toString() + "%",
             Gfx.TEXT_JUSTIFY_LEFT | Gfx.TEXT_JUSTIFY_VCENTER);
     }
@@ -270,14 +317,14 @@ class FenixWatchfaceView extends Ui.WatchFace {
         }
 
         // Bottom-right
-        var rightX = width - 20;
+        var rightX = width - 40;
         var valueY = height - 22;
 
         dc.setColor(Gfx.COLOR_BLUE, Gfx.COLOR_TRANSPARENT);
         var floorStr = (floorGoal > 0)
             ? Lang.format("$1$/$2$", [floors, floorGoal])
             : floors.toString();
-        dc.drawText(rightX, valueY, Gfx.FONT_TINY, floorStr,
+        dc.drawText(rightX, valueY, Gfx.FONT_XTINY, floorStr,
             Gfx.TEXT_JUSTIFY_RIGHT | Gfx.TEXT_JUSTIFY_VCENTER);
     }
 
