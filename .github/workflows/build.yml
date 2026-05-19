@@ -1,0 +1,246 @@
+name: Build & Simulator Test
+
+on:
+  push:
+    branches: [main, "claude/**"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  DEVICE: fenix6pro
+  APP_NAME: FenixWatchface
+
+jobs:
+  build:
+    name: Build .iq / .prg
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Cache Connect IQ SDK
+        id: cache-sdk
+        uses: actions/cache@v4
+        with:
+          path: ~/ciq-sdk
+          key: ciq-sdk-${{ hashFiles('.github/workflows/build.yml') }}-${{ secrets.CIQ_SDK_URL && 'has-url' || 'no-url' }}
+
+      - name: Download Connect IQ SDK
+        if: steps.cache-sdk.outputs.cache-hit != 'true'
+        env:
+          SDK_URL: ${{ secrets.CIQ_SDK_URL }}
+        run: |
+          set -e
+          if [ -z "$SDK_URL" ]; then
+            echo "::error::Secret CIQ_SDK_URL non impostato."
+            echo "::error::Vai su https://developer.garmin.com/connect-iq/sdk/ ,"
+            echo "::error::scarica l'ultimo SDK per Linux e ospitalo in un"
+            echo "::error::posto raggiungibile via HTTPS, poi imposta il"
+            echo "::error::secret CIQ_SDK_URL (Settings → Secrets → Actions)."
+            exit 1
+          fi
+          mkdir -p ~/ciq-sdk
+          curl -fsSL "$SDK_URL" -o /tmp/ciq-sdk.zip
+          unzip -q /tmp/ciq-sdk.zip -d ~/ciq-sdk
+          chmod +x ~/ciq-sdk/bin/* || true
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-0 libgl1 libglu1-mesa \
+            libusb-1.0-0 libqt5gui5 libqt5network5 \
+            libqt5widgets5 libqt5positioning5 libqt5sensors5 \
+            libqt5multimedia5 libqt5quick5 libqt5svg5 \
+            libqt5xml5 libqt5sql5 libqt5opengl5 || true
+
+      - name: Prepare developer key
+        env:
+          DEV_KEY_B64: ${{ secrets.CIQ_DEVELOPER_KEY }}
+        run: |
+          if [ -n "$DEV_KEY_B64" ]; then
+            echo "$DEV_KEY_B64" | base64 -d > developer_key.der
+            echo "Usando developer key da secret CIQ_DEVELOPER_KEY"
+          else
+            echo "::warning::Secret CIQ_DEVELOPER_KEY non impostato, ne genero una temporanea (artefatto non pubblicabile sullo store)."
+            openssl genrsa -out /tmp/dev.pem 4096
+            openssl pkcs8 -topk8 -inform PEM -outform DER \
+              -in /tmp/dev.pem -out developer_key.der -nocrypt
+          fi
+
+      - name: Locate monkeyc
+        id: tools
+        run: |
+          MONKEYC="$HOME/ciq-sdk/bin/monkeyc"
+          if [ ! -x "$MONKEYC" ]; then
+            MONKEYC=$(find "$HOME/ciq-sdk" -name monkeyc -type f | head -n1)
+          fi
+          if [ -z "$MONKEYC" ] || [ ! -e "$MONKEYC" ]; then
+            echo "::error::Eseguibile monkeyc non trovato nello SDK."
+            exit 1
+          fi
+          chmod +x "$MONKEYC"
+          echo "monkeyc=$MONKEYC" >> "$GITHUB_OUTPUT"
+          echo "sdk_bin=$(dirname $MONKEYC)" >> "$GITHUB_OUTPUT"
+
+      - name: Build .prg (debug, device $DEVICE)
+        run: |
+          export PATH="${{ steps.tools.outputs.sdk_bin }}:$PATH"
+          "${{ steps.tools.outputs.monkeyc }}" \
+            -d "$DEVICE" \
+            -f monkey.jungle \
+            -o "$APP_NAME.prg" \
+            -y developer_key.der \
+            -w
+
+      - name: Build .iq (release, tutti i device del manifest)
+        run: |
+          export PATH="${{ steps.tools.outputs.sdk_bin }}:$PATH"
+          "${{ steps.tools.outputs.monkeyc }}" \
+            -e \
+            -f monkey.jungle \
+            -o "$APP_NAME.iq" \
+            -y developer_key.der \
+            -w
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: connectiq-build
+          path: |
+            ${{ env.APP_NAME }}.prg
+            ${{ env.APP_NAME }}.iq
+          if-no-files-found: error
+
+      - name: Pass SDK path to next job
+        run: |
+          tar czf /tmp/ciq-sdk.tgz -C "$HOME" ciq-sdk
+
+      - name: Upload SDK as artifact (per simulator job)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ciq-sdk
+          path: /tmp/ciq-sdk.tgz
+          retention-days: 1
+
+  simulator-test:
+    name: Smoke test sul simulatore
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: connectiq-build
+          path: ./build
+
+      - name: Download SDK
+        uses: actions/download-artifact@v4
+        with:
+          name: ciq-sdk
+          path: /tmp
+
+      - name: Restore SDK
+        run: |
+          tar xzf /tmp/ciq-sdk.tgz -C "$HOME"
+          chmod +x "$HOME/ciq-sdk/bin/"* || true
+
+      - name: Install Xvfb and Qt deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            xvfb x11-utils \
+            libwebkit2gtk-4.1-0 libgl1 libglu1-mesa libusb-1.0-0 \
+            libqt5gui5 libqt5network5 libqt5widgets5 \
+            libqt5positioning5 libqt5sensors5 libqt5multimedia5 \
+            libqt5quick5 libqt5svg5 libqt5xml5 libqt5sql5 \
+            libqt5opengl5 imagemagick
+
+      - name: Locate simulator binaries
+        id: simbin
+        run: |
+          CIQ=$(find "$HOME/ciq-sdk" -name connectiq -type f | head -n1)
+          MDO=$(find "$HOME/ciq-sdk" -name monkeydo -type f | head -n1)
+          if [ -z "$CIQ" ] || [ -z "$MDO" ]; then
+            echo "::error::Simulatore o monkeydo non trovati."
+            exit 1
+          fi
+          chmod +x "$CIQ" "$MDO"
+          echo "connectiq=$CIQ" >> "$GITHUB_OUTPUT"
+          echo "monkeydo=$MDO"  >> "$GITHUB_OUTPUT"
+
+      - name: Avvia simulatore (Xvfb headless)
+        run: |
+          export DISPLAY=:99
+          Xvfb :99 -screen 0 1024x768x24 &
+          XVFB_PID=$!
+          sleep 2
+          "${{ steps.simbin.outputs.connectiq }}" &
+          SIM_PID=$!
+          echo "XVFB_PID=$XVFB_PID" >> "$GITHUB_ENV"
+          echo "SIM_PID=$SIM_PID" >> "$GITHUB_ENV"
+          # attendi che la GUI risponda
+          for i in $(seq 1 20); do
+            sleep 2
+            if xdpyinfo -display :99 >/dev/null 2>&1; then
+              echo "Simulator OK dopo $((i*2))s"
+              break
+            fi
+          done
+
+      - name: Carica la watchface (smoke test)
+        run: |
+          export DISPLAY=:99
+          set -e
+          "${{ steps.simbin.outputs.monkeydo }}" \
+            "./build/$APP_NAME.prg" "$DEVICE" &
+          MDO_PID=$!
+          # lascia girare la watchface per 15s
+          sleep 15
+          # se nessuno è morto a sorpresa, è un pass
+          if ! kill -0 "$MDO_PID" 2>/dev/null; then
+            echo "::error::monkeydo è uscito prematuramente"
+            exit 1
+          fi
+          if ! kill -0 "$SIM_PID" 2>/dev/null; then
+            echo "::error::Il simulatore è crashato"
+            exit 1
+          fi
+          echo "Smoke test passato"
+
+      - name: Cattura screenshot del simulatore
+        if: always()
+        run: |
+          export DISPLAY=:99
+          mkdir -p screenshots
+          import -window root "screenshots/${APP_NAME}-${DEVICE}.png" || true
+
+      - name: Upload screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: simulator-screenshot
+          path: screenshots/
+          if-no-files-found: ignore
+
+      - name: Stop simulatore
+        if: always()
+        run: |
+          kill ${SIM_PID:-0} 2>/dev/null || true
+          kill ${XVFB_PID:-0} 2>/dev/null || true
