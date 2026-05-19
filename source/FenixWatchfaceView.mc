@@ -230,26 +230,30 @@ class FenixWatchfaceView extends Ui.WatchFace {
             color = Gfx.COLOR_YELLOW;
         }
 
-        // Bottom-left: battery icon + percent
-        var bx = 20;
-        var by = height - 22;
-        var bw = 26;
-        var bh = 12;
+        // Bottom-left: battery icon (larger, white outline) + percent
+        var bw = 36;
+        var bh = 16;
+        var tipW = 3;
+        var tipH = 8;
+        var bx = 22;
+        var by = height - 28;
 
-        dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_TRANSPARENT);
-        dc.drawRectangle(bx, by, bw, bh);
-        dc.fillRectangle(bx + bw, by + 3, 3, bh - 6);
+        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+        dc.setPenWidth(2);
+        dc.drawRoundedRectangle(bx, by, bw, bh, 2);
+        dc.setPenWidth(1);
+        dc.fillRectangle(bx + bw, by + (bh - tipH) / 2, tipW, tipH);
 
         dc.setColor(color, Gfx.COLOR_TRANSPARENT);
-        var fillW = (bw - 2) * battInt / 100;
+        var fillW = (bw - 4) * battInt / 100;
         if (fillW > 0) {
-            dc.fillRectangle(bx + 1, by + 1, fillW, bh - 2);
+            dc.fillRectangle(bx + 2, by + 2, fillW, bh - 4);
         }
 
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(bx + bw / 2 + 5, by - 14, Gfx.FONT_XTINY,
+        dc.drawText(bx + bw + tipW + 6, by + bh / 2, Gfx.FONT_TINY,
             battInt.toString() + "%",
-            Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
+            Gfx.TEXT_JUSTIFY_LEFT | Gfx.TEXT_JUSTIFY_VCENTER);
     }
 
     hidden function drawFloors(dc, cx, cy, width, height) {
