@@ -5,8 +5,10 @@ using Toybox.Lang;
 using Toybox.Time;
 using Toybox.Time.Gregorian;
 using Toybox.ActivityMonitor;
+using Toybox.Activity;
 using Toybox.Position;
 using Toybox.Application as App;
+using Toybox.Weather;
 
 class FenixWatchfaceView extends Ui.WatchFace {
 
@@ -48,6 +50,8 @@ class FenixWatchfaceView extends Ui.WatchFace {
 
         drawTime(dc, cx, cy);
         drawDate(dc, cx, cy);
+        drawHeartRate(dc, cx, cy);
+        drawWeather(dc, cx, cy);
         drawSun(dc, cx, cy);
         drawSteps(dc, cx, cy, width, height);
         drawBattery(dc, cx, cy, width, height);
@@ -100,7 +104,7 @@ class FenixWatchfaceView extends Ui.WatchFace {
         }
 
         // Sunrise on left, Sunset on right under date
-        var y = cy + 18;
+        var y = cy + 45;
         dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
         dc.drawText(cx - 50, y, Gfx.FONT_XTINY, "ALBA",
             Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
@@ -112,6 +116,79 @@ class FenixWatchfaceView extends Ui.WatchFace {
             Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
         dc.drawText(cx + 50, y + 16, Gfx.FONT_TINY, sunsetStr,
             Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
+    }
+
+    hidden function drawHeartRate(dc, cx, cy) {
+        var hr = null;
+
+        var actInfo = Activity.getActivityInfo();
+        if (actInfo != null && actInfo.currentHeartRate != null) {
+            hr = actInfo.currentHeartRate;
+        }
+
+        if (hr == null) {
+            var iter = ActivityMonitor.getHeartRateHistory(1, true);
+            if (iter != null) {
+                var sample = iter.next();
+                if (sample != null
+                        && sample.heartRate != null
+                        && sample.heartRate != ActivityMonitor.INVALID_HR_SAMPLE) {
+                    hr = sample.heartRate;
+                }
+            }
+        }
+
+        var x = cx - 55;
+        var y = cy + 18;
+
+        drawHeartIcon(dc, x - 14, y, 10);
+
+        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+        var hrStr = (hr != null) ? hr.toString() : "--";
+        dc.drawText(x + 4, y, Gfx.FONT_TINY, hrStr,
+            Gfx.TEXT_JUSTIFY_LEFT | Gfx.TEXT_JUSTIFY_VCENTER);
+    }
+
+    hidden function drawHeartIcon(dc, cx, cy, size) {
+        dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT);
+        var r = size / 2;
+        dc.fillCircle(cx - r / 2, cy - r / 3, r);
+        dc.fillCircle(cx + r / 2, cy - r / 3, r);
+        var pts = [
+            [cx - r - 1, cy - 1],
+            [cx + r + 1, cy - 1],
+            [cx,         cy + r + 2]
+        ];
+        dc.fillPolygon(pts);
+    }
+
+    hidden function drawWeather(dc, cx, cy) {
+        var cond = null;
+        var tempStr = "--";
+
+        if (Toybox has :Weather) {
+            var current = Weather.getCurrentConditions();
+            if (current != null) {
+                cond = current.condition;
+                if (current.temperature != null) {
+                    var t = current.temperature;
+                    if (Sys.getDeviceSettings().temperatureUnits
+                            == Sys.UNIT_STATUTE) {
+                        t = (t * 9.0 / 5.0) + 32.0;
+                    }
+                    tempStr = t.toNumber().toString() + "°";
+                }
+            }
+        }
+
+        var x = cx + 38;
+        var y = cy + 18;
+
+        WeatherIcons.draw(dc, x, y, 22, cond);
+
+        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(x + 16, y, Gfx.FONT_TINY, tempStr,
+            Gfx.TEXT_JUSTIFY_LEFT | Gfx.TEXT_JUSTIFY_VCENTER);
     }
 
     hidden function drawSteps(dc, cx, cy, width, height) {

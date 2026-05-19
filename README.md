@@ -4,6 +4,8 @@ Watchface Connect IQ per **Garmin Fenix 6 Pro** che mostra:
 
 - Orario corrente (24h o 12h secondo le impostazioni dell'orologio)
 - Data (giorno settimana, giorno, mese)
+- **Frequenza cardiaca** corrente (con icona cuore)
+- **Icona meteo** + temperatura (da `Toybox.Weather`)
 - Ora di **alba** e **tramonto** (calcolate dalla posizione GPS dell'orologio)
 - **Passi** effettuati + obiettivo giornaliero
 - **Batteria** residua (icona + percentuale)
@@ -15,6 +17,7 @@ Watchface Connect IQ per **Garmin Fenix 6 Pro** che mostra:
                 +----------------------+
                 |       12:34          |   <- orario grande
                 |   LUN 19 MAG         |   <- data
+                |  ❤ 72      ☀ 22°    |   <- HR / meteo
                 |  ALBA       TRAM     |
                 |  06:12      20:45    |   <- alba / tramonto
                 |       PASSI          |
@@ -37,6 +40,7 @@ source/
   FenixWatchfaceApp.mc        -> entry point AppBase
   FenixWatchfaceView.mc       -> rendering watchface
   SunCalc.mc                  -> calcolo alba/tramonto
+  WeatherIcons.mc             -> icone meteo vettoriali
 ```
 
 ## Build
@@ -75,3 +79,8 @@ In **VS Code** con l'estensione "Monkey C", basta aprire la cartella ed eseguire
 - Il calcolo astronomico è basato sull'algoritmo NOAA (precisione ~1 minuto).
 - I "piani" usano `ActivityMonitor.floorsClimbed`, supportato dal Fenix 6 Pro
   grazie all'altimetro barometrico.
+- La frequenza cardiaca usa `Activity.getActivityInfo().currentHeartRate` con
+  fallback a `ActivityMonitor.getHeartRateHistory` (ultimo campione).
+- Il meteo arriva da `Toybox.Weather.getCurrentConditions()` (richiede che
+  l'orologio sia sincronizzato con Garmin Connect, CIQ >= 3.2.0). La
+  temperatura segue l'unità impostata sull'orologio (°C / °F).
