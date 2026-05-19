@@ -6,7 +6,8 @@ Watchface Connect IQ per **Garmin Fenix 6 Pro** che mostra:
 - Data (giorno settimana, giorno, mese)
 - **Frequenza cardiaca** corrente (con icona cuore)
 - **Icona meteo** + temperatura (da `Toybox.Weather`)
-- Ora di **alba** e **tramonto** (calcolate dalla posizione GPS dell'orologio)
+- Prossimo evento solare: **alba** o **tramonto** (a seconda di quale viene
+  prima rispetto all'ora attuale; dopo il tramonto mostra l'alba di domani)
 - **Passi** effettuati + obiettivo giornaliero
 - **Batteria** residua (icona + percentuale)
 - **Piani saliti** (floors climbed) + obiettivo
@@ -18,12 +19,10 @@ Watchface Connect IQ per **Garmin Fenix 6 Pro** che mostra:
                 |       12:34          |   <- orario grande
                 |   LUN 19 MAG         |   <- data
                 |  ❤ 72      ☀ 22°    |   <- HR / meteo
-                |  ALBA       TRAM     |
-                |  06:12      20:45    |   <- alba / tramonto
-                |       PASSI          |
-                |     7421 / 10000     |
-                |  [■■■  ] 65%  PIANI  |
-                |               12/10  |
+                |       TRAMONTO       |
+                |        20:45         |   <- prossimo evento solare
+                |     7421 / 10000     |   <- passi / obiettivo
+                |  [■■■  ] 65%  12/10  |   <- batteria / piani
                 +----------------------+
 ```
 

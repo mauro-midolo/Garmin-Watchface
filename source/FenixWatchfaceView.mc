@@ -15,6 +15,7 @@ class FenixWatchfaceView extends Ui.WatchFace {
     hidden var lastSunCalcDay = -1;
     hidden var cachedSunrise = null;
     hidden var cachedSunset = null;
+    hidden var cachedTomorrowSunrise = null;
     hidden var cachedLat = null;
     hidden var cachedLon = null;
 
@@ -89,33 +90,46 @@ class FenixWatchfaceView extends Ui.WatchFace {
     }
 
     hidden function drawSun(dc, cx, cy) {
-        var sunriseStr = "--:--";
-        var sunsetStr  = "--:--";
+        var label = "ALBA";
+        var timeStr = "--:--";
+        var isSunrise = true;
 
         var loc = getLocation();
         if (loc != null) {
             updateSunCache(loc[0], loc[1]);
-            if (cachedSunrise != null) {
-                sunriseStr = formatLocalHM(cachedSunrise);
-            }
-            if (cachedSunset != null) {
-                sunsetStr = formatLocalHM(cachedSunset);
+            var next = nextSunEvent();
+            if (next != null) {
+                isSunrise = next[:isSunrise];
+                label = isSunrise ? "ALBA" : "TRAMONTO";
+                timeStr = formatLocalHM(next[:moment]);
             }
         }
 
-        // Sunrise on left, Sunset on right under date
         var y = cy + 45;
-        dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx - 50, y, Gfx.FONT_XTINY, "ALBA",
-            Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
-        dc.drawText(cx + 50, y, Gfx.FONT_XTINY, "TRAM",
+        var color = isSunrise ? Gfx.COLOR_YELLOW : Gfx.COLOR_ORANGE;
+
+        dc.setColor(color, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(cx, y, Gfx.FONT_XTINY, label,
             Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
 
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx - 50, y + 16, Gfx.FONT_TINY, sunriseStr,
+        dc.drawText(cx, y + 16, Gfx.FONT_TINY, timeStr,
             Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
-        dc.drawText(cx + 50, y + 16, Gfx.FONT_TINY, sunsetStr,
-            Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
+    }
+
+    // Restituisce il prossimo evento solare (alba/tramonto) rispetto ad ora.
+    hidden function nextSunEvent() {
+        var nowVal = Time.now().value();
+        if (cachedSunrise != null && nowVal < cachedSunrise.value()) {
+            return { :isSunrise => true, :moment => cachedSunrise };
+        }
+        if (cachedSunset != null && nowVal < cachedSunset.value()) {
+            return { :isSunrise => false, :moment => cachedSunset };
+        }
+        if (cachedTomorrowSunrise != null) {
+            return { :isSunrise => true, :moment => cachedTomorrowSunrise };
+        }
+        return null;
     }
 
     hidden function drawHeartRate(dc, cx, cy) {
@@ -196,15 +210,11 @@ class FenixWatchfaceView extends Ui.WatchFace {
         var steps = (info != null && info.steps != null) ? info.steps : 0;
         var goal  = (info != null && info.stepGoal != null) ? info.stepGoal : 0;
 
-        dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx, height - 58, Gfx.FONT_XTINY, "PASSI",
-            Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
-
         dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT);
         var stepStr = (goal > 0)
             ? Lang.format("$1$ / $2$", [steps, goal])
             : steps.toString();
-        dc.drawText(cx, height - 42, Gfx.FONT_TINY, stepStr,
+        dc.drawText(cx, height - 48, Gfx.FONT_TINY, stepStr,
             Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
     }
 
@@ -257,17 +267,13 @@ class FenixWatchfaceView extends Ui.WatchFace {
 
         // Bottom-right
         var rightX = width - 20;
-        var labelY = height - 36;
-
-        dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(rightX, labelY, Gfx.FONT_XTINY, "PIANI",
-            Gfx.TEXT_JUSTIFY_RIGHT | Gfx.TEXT_JUSTIFY_VCENTER);
+        var valueY = height - 22;
 
         dc.setColor(Gfx.COLOR_BLUE, Gfx.COLOR_TRANSPARENT);
         var floorStr = (floorGoal > 0)
             ? Lang.format("$1$/$2$", [floors, floorGoal])
             : floors.toString();
-        dc.drawText(rightX, labelY + 16, Gfx.FONT_TINY, floorStr,
+        dc.drawText(rightX, valueY, Gfx.FONT_TINY, floorStr,
             Gfx.TEXT_JUSTIFY_RIGHT | Gfx.TEXT_JUSTIFY_VCENTER);
     }
 
@@ -312,6 +318,11 @@ class FenixWatchfaceView extends Ui.WatchFace {
             var res = SunCalc.compute(lat, lon, now);
             cachedSunrise = res.get("sunrise");
             cachedSunset  = res.get("sunset");
+
+            var tomorrow = now.add(new Time.Duration(86400));
+            var resT = SunCalc.compute(lat, lon, tomorrow);
+            cachedTomorrowSunrise = resT.get("sunrise");
+
             lastSunCalcDay = dayKey;
         }
     }
