@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<properties>
+    <property id="lastLat" type="float">0.0</property>
+    <property id="lastLon" type="float">0.0</property>
+</properties>

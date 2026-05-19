@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<strings>
+    <string id="AppName">Fenix 6 Pro Watchface</string>
+    <string id="StepsLabel">PASSI</string>
+    <string id="BatteryLabel">BATT</string>
+    <string id="FloorsLabel">PIANI</string>
+    <string id="SunriseLabel">ALBA</string>
+    <string id="SunsetLabel">TRAM</string>
+    <string id="NoData">--:--</string>
+</strings>
