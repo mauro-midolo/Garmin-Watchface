@@ -17,6 +17,8 @@ class FenixWatchfaceView extends Ui.WatchFace {
     hidden var cachedSunrise = null;
     hidden var cachedSunset = null;
     hidden var cachedTomorrowSunrise = null;
+    hidden var cachedAstroDawn = null;
+    hidden var cachedAstroDusk = null;
 
     // Raggio del cerchio su cui sono distribuiti i campi dati.
     hidden const FIELD_RADIUS = 88;
@@ -42,15 +44,15 @@ class FenixWatchfaceView extends Ui.WatchFace {
         dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
         dc.clear();
 
+        // Aggiorna alba/tramonto/crepuscolo per la posizione corrente.
+        ensureSunData();
+
         // Centro: orario grande + data dd/mm/yy
         drawCenterTime(dc, cx, cy);
         drawCenterDate(dc, cx, cy);
 
-        // Cornice circolare sottile per richiamare il profilo dell'orologio
-        dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_TRANSPARENT);
-        dc.setPenWidth(1);
-        dc.drawCircle(cx, cy, FIELD_RADIUS + 18);
-        dc.setPenWidth(1);
+        // Anello 24h: archi colorati per fase del giorno + indicatore ora.
+        drawPhaseRing(dc, cx, cy);
 
         // Campi dati radiali alle 8 posizioni (45° tra l'una e l'altra).
         // L'angolo è misurato dal nord, in senso orario.
@@ -72,6 +74,88 @@ class FenixWatchfaceView extends Ui.WatchFace {
 
     hidden function polarY(cy, deg) {
         return cy - FIELD_RADIUS * Math.cos(deg * Math.PI / 180.0);
+    }
+
+    // ----- Anello 24h delle fasi del giorno -----
+
+    // Disegna l'anello con archi colorati proporzionali a ciascuna fase:
+    //   blu   = notte (buio)
+    //   rosso = crepuscolo (mattutino e serale)
+    //   giallo= luce piena (alba -> tramonto)
+    // Mezzanotte in alto, il tempo scorre in senso orario. Sopra, l'indicatore
+    // dell'ora corrente (barretta bianca con bordo nero).
+    hidden function drawPhaseRing(dc, cx, cy) {
+        var r = FIELD_RADIUS + 18;
+        dc.setPenWidth(3);
+
+        if (cachedSunrise == null || cachedSunset == null) {
+            // Nessun dato solare: anello interamente blu.
+            dc.setColor(Gfx.COLOR_BLUE, Gfx.COLOR_TRANSPARENT);
+            dc.drawCircle(cx, cy, r);
+            drawNowIndicator(dc, cx, cy, r);
+            return;
+        }
+
+        var sr = momentToLocalMin(cachedSunrise);
+        var ss = momentToLocalMin(cachedSunset);
+        // Bordi del crepuscolo astronomico; se assenti (es. estate alle alte
+        // latitudini) coincidono con alba/tramonto -> nessuna fascia rossa.
+        var dawn = (cachedAstroDawn != null) ? momentToLocalMin(cachedAstroDawn) : sr;
+        var dusk = (cachedAstroDusk != null) ? momentToLocalMin(cachedAstroDusk) : ss;
+
+        // notte | crepuscolo mattutino | luce piena | crepuscolo serale | notte
+        drawPhaseArc(dc, cx, cy, r, 0,    dawn, Gfx.COLOR_BLUE);
+        drawPhaseArc(dc, cx, cy, r, dawn, sr,   Gfx.COLOR_RED);
+        drawPhaseArc(dc, cx, cy, r, sr,   ss,   Gfx.COLOR_YELLOW);
+        drawPhaseArc(dc, cx, cy, r, ss,   dusk, Gfx.COLOR_RED);
+        drawPhaseArc(dc, cx, cy, r, dusk, 1440, Gfx.COLOR_BLUE);
+
+        drawNowIndicator(dc, cx, cy, r);
+    }
+
+    // Arco fra due minuti del giorno [0..1440]. Con mezzanotte in alto e tempo
+    // orario l'angolo bussola (da nord, orario) vale min/4; drawArc usa invece
+    // 0°=ore 3, crescente in senso antiorario, da cui la conversione 90 - C.
+    hidden function drawPhaseArc(dc, cx, cy, radius, startMin, endMin, color) {
+        if (endMin - startMin < 1) { return; }
+        var ga = normDeg(90.0 - (startMin / 4.0));
+        var gb = normDeg(90.0 - (endMin   / 4.0));
+        dc.setColor(color, Gfx.COLOR_TRANSPARENT);
+        dc.drawArc(cx, cy, radius, Gfx.ARC_CLOCKWISE, ga, gb);
+    }
+
+    // Barretta bianca con bordo nero, radiale, posizionata sull'ora corrente.
+    hidden function drawNowIndicator(dc, cx, cy, radius) {
+        var clock = Sys.getClockTime();
+        var nowMin = clock.hour * 60 + clock.min;
+        var rad = (nowMin / 4.0) * Math.PI / 180.0;
+        var sinA = Math.sin(rad);
+        var cosA = Math.cos(rad);
+
+        // Bordo nero (penna più larga).
+        dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
+        dc.setPenWidth(7);
+        dc.drawLine(cx + (radius - 8) * sinA, cy - (radius - 8) * cosA,
+                    cx + (radius + 8) * sinA, cy - (radius + 8) * cosA);
+
+        // Barretta bianca al centro.
+        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+        dc.setPenWidth(3);
+        dc.drawLine(cx + (radius - 6) * sinA, cy - (radius - 6) * cosA,
+                    cx + (radius + 6) * sinA, cy - (radius + 6) * cosA);
+
+        dc.setPenWidth(1);
+    }
+
+    hidden function momentToLocalMin(moment) {
+        var info = Gregorian.info(moment, Time.FORMAT_SHORT);
+        return info.hour * 60 + info.min;
+    }
+
+    hidden function normDeg(d) {
+        while (d < 0.0)    { d += 360.0; }
+        while (d >= 360.0) { d -= 360.0; }
+        return d;
     }
 
     // ----- Centro: orario + data -----
@@ -167,15 +251,11 @@ class FenixWatchfaceView extends Ui.WatchFace {
         var timeStr = "--:--";
         var isSunrise = true;
 
-        var loc = getLocation();
-        if (loc != null) {
-            updateSunCache(loc[0], loc[1]);
-            var next = nextSunEvent();
-            if (next != null) {
-                isSunrise = next[:isSunrise];
-                label = isSunrise ? "ALBA" : "TRAM";
-                timeStr = formatLocalHM(next[:moment]);
-            }
+        var next = nextSunEvent();
+        if (next != null) {
+            isSunrise = next[:isSunrise];
+            label = isSunrise ? "ALBA" : "TRAM";
+            timeStr = formatLocalHM(next[:moment]);
         }
 
         var color = isSunrise ? Gfx.COLOR_YELLOW : Gfx.COLOR_ORANGE;
@@ -356,6 +436,13 @@ class FenixWatchfaceView extends Ui.WatchFace {
         app.setProperty("lastLon", lon);
     }
 
+    hidden function ensureSunData() {
+        var loc = getLocation();
+        if (loc != null) {
+            updateSunCache(loc[0], loc[1]);
+        }
+    }
+
     hidden function updateSunCache(lat, lon) {
         var now = Time.now();
         var info = Gregorian.info(now, Time.FORMAT_SHORT);
@@ -364,6 +451,11 @@ class FenixWatchfaceView extends Ui.WatchFace {
             var res = SunCalc.compute(lat, lon, now);
             cachedSunrise = res.get("sunrise");
             cachedSunset  = res.get("sunset");
+
+            var resTw = SunCalc.computeWithZenith(
+                lat, lon, now, SunCalc.ZENITH_ASTRONOMICAL);
+            cachedAstroDawn = resTw.get("sunrise");
+            cachedAstroDusk = resTw.get("sunset");
 
             var tomorrow = now.add(new Time.Duration(86400));
             var resT = SunCalc.compute(lat, lon, tomorrow);
