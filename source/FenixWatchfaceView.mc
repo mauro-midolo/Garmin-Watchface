@@ -63,7 +63,7 @@ class FenixWatchfaceView extends Ui.WatchFace {
         drawFieldAltitude  (dc, polarX(cx, 180), polarY(cy, 180));   // 6
         drawFieldSteps     (dc, polarX(cx, 225), polarY(cy, 225));   // 7:30
         drawFieldBattery   (dc, polarX(cx, 270), polarY(cy, 270));   // 9
-        // 10:30 (315°) lasciato libero per simmetria visiva
+        drawFieldTempRange (dc, polarX(cx, 315), polarY(cy, 315));   // 10:30
     }
 
     // ----- Geometria radiale -----
@@ -225,6 +225,35 @@ class FenixWatchfaceView extends Ui.WatchFace {
             Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
     }
 
+    // Massima e minima previste per la giornata corrente (Toybox.Weather),
+    // su un'unica riga "max°/min°". Stesso stile icona+valore degli altri campi.
+    hidden function drawFieldTempRange(dc, cx, cy) {
+        var hiStr = "--";
+        var loStr = "--";
+        if (Toybox has :Weather) {
+            var current = Weather.getCurrentConditions();
+            if (current != null) {
+                var statute = (Sys.getDeviceSettings().temperatureUnits
+                        == Sys.UNIT_STATUTE);
+                if (current.highTemperature != null) {
+                    var hi = current.highTemperature;
+                    if (statute) { hi = (hi * 9.0 / 5.0) + 32.0; }
+                    hiStr = hi.toNumber().toString();
+                }
+                if (current.lowTemperature != null) {
+                    var lo = current.lowTemperature;
+                    if (statute) { lo = (lo * 9.0 / 5.0) + 32.0; }
+                    loStr = lo.toNumber().toString();
+                }
+            }
+        }
+        drawThermometerIcon(dc, cx, cy - 8, 12);
+        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(cx, cy + 10, Gfx.FONT_XTINY,
+            hiStr + "°/" + loStr + "°",
+            Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
+    }
+
     hidden function drawFieldFloors(dc, cx, cy) {
         var info = ActivityMonitor.getInfo();
         var floors = 0;
@@ -364,6 +393,24 @@ class FenixWatchfaceView extends Ui.WatchFace {
             [cx + 2, cy - h / 2 + 4]
         ];
         dc.fillPolygon(tipPts);
+    }
+
+    hidden function drawThermometerIcon(dc, cx, cy, size) {
+        var stemW  = size / 4;
+        var bulbR  = size / 4 + 1;
+        var topY   = cy - size / 2;
+        var bulbCy = cy + size / 2 - bulbR;
+
+        // Involucro bianco: stelo + bulbo
+        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+        dc.fillRoundedRectangle(cx - stemW / 2, topY, stemW, bulbCy - topY,
+            stemW / 2);
+        dc.fillCircle(cx, bulbCy, bulbR);
+
+        // Mercurio rosso: bulbo pieno + colonnina
+        dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT);
+        dc.fillCircle(cx, bulbCy, bulbR - 1);
+        dc.fillRectangle(cx - 1, cy - size / 4, 2, bulbCy - (cy - size / 4));
     }
 
     hidden function drawStairsIcon(dc, cx, cy, size) {
