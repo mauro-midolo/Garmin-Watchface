@@ -12,6 +12,11 @@ Watchface Connect IQ per **Garmin Fenix 6 Pro** che mostra:
 - **Passi** effettuati + obiettivo giornaliero
 - **Batteria** residua (icona + percentuale)
 - **Piani saliti** (floors climbed) + obiettivo
+- **Anello 24h delle fasi del giorno**: archi colorati proporzionali alla
+  durata di ciascuna fase — blu per la notte, rosso per il crepuscolo
+  (astronomico, mattutino e serale), giallo per la luce piena (alba→tramonto).
+  Mezzanotte in alto, tempo in senso orario; una barretta bianca bordata di
+  nero indica radialmente l'ora corrente.
 
 ## Layout (260x260, Fenix 6 Pro)
 
