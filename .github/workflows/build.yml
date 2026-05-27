@@ -48,6 +48,9 @@ jobs:
             -f monkey.jungle \
             -o "$APP_NAME.prg" \
             -y developer_key.der \
+            -a sdk/api.db \
+            -b sdk/api.mir \
+            -i sdk/api.debug.xml \
             -w
 
       - name: Build .iq (release)
@@ -57,6 +60,9 @@ jobs:
             -f monkey.jungle \
             -o "$APP_NAME.iq" \
             -y developer_key.der \
+            -a sdk/api.db \
+            -b sdk/api.mir \
+            -i sdk/api.debug.xml \
             -w
 
       - name: Upload artifacts
