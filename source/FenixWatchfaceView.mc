@@ -64,10 +64,7 @@ class FenixWatchfaceView extends Ui.WatchFace {
 
         ensureSunData();
 
-        // Layer 1: anello blu esterno + tacche orarie
-        drawOuterDecorations(dc, cx, cy);
-
-        // Layer 2: anello 24h fasi del giorno + indicatore ora
+        // Layer 1: anello fasi del giorno (esterno) + tacche orarie + indicatore ora
         drawPhaseRing(dc, cx, cy);
 
         // Layer 3: orario, separatore blu, data
@@ -100,48 +97,16 @@ class FenixWatchfaceView extends Ui.WatchFace {
         return cy - FIELD_RADIUS * Math.cos(deg * Math.PI / 180.0);
     }
 
-    // ----- Decorazioni esterne -----
-
-    hidden function drawOuterDecorations(dc, cx, cy) {
-        dc.setColor(0x0055BB, Gfx.COLOR_TRANSPARENT);
-        dc.setPenWidth(3);
-        dc.drawCircle(cx, cy, cx - 5);
-
-        dc.setColor(0x002266, Gfx.COLOR_TRANSPARENT);
-        dc.setPenWidth(1);
-        dc.drawCircle(cx, cy, cx - 10);
-
-        for (var i = 0; i < 12; i++) {
-            var rad = i * 30.0 * Math.PI / 180.0;
-            var sinA = Math.sin(rad);
-            var cosA = Math.cos(rad);
-            var isCardinal = (i % 3 == 0);
-            var outerR = cx - 11;
-            var innerR = isCardinal ? (cx - 22) : (cx - 16);
-            var x1 = (cx + outerR * sinA).toNumber();
-            var y1 = (cy - outerR * cosA).toNumber();
-            var x2 = (cx + innerR * sinA).toNumber();
-            var y2 = (cy - innerR * cosA).toNumber();
-            if (isCardinal) {
-                dc.setColor(0x0088EE, Gfx.COLOR_TRANSPARENT);
-                dc.setPenWidth(2);
-            } else {
-                dc.setColor(0x334455, Gfx.COLOR_TRANSPARENT);
-                dc.setPenWidth(1);
-            }
-            dc.drawLine(x1, y1, x2, y2);
-        }
-    }
-
-    // ----- Anello 24h delle fasi del giorno -----
+    // ----- Anello 24h delle fasi del giorno (cerchio esterno unico) -----
 
     hidden function drawPhaseRing(dc, cx, cy) {
-        var r = FIELD_RADIUS + 18;
-        dc.setPenWidth(3);
+        var r = cx - 8;  // raggio esterno unico
+        dc.setPenWidth(5);
 
         if (cachedSunrise == null || cachedSunset == null) {
             dc.setColor(Gfx.COLOR_BLUE, Gfx.COLOR_TRANSPARENT);
             dc.drawCircle(cx, cy, r);
+            drawHourTicks(dc, cx, cy);
             drawNowIndicator(dc, cx, cy, r);
             return;
         }
@@ -157,7 +122,28 @@ class FenixWatchfaceView extends Ui.WatchFace {
         drawPhaseArc(dc, cx, cy, r, ss,   dusk, Gfx.COLOR_RED);
         drawPhaseArc(dc, cx, cy, r, dusk, 1440, Gfx.COLOR_BLUE);
 
+        // Tacche orarie bianche sopra i colori + indicatore ora corrente
+        drawHourTicks(dc, cx, cy);
         drawNowIndicator(dc, cx, cy, r);
+    }
+
+    hidden function drawHourTicks(dc, cx, cy) {
+        for (var i = 0; i < 12; i++) {
+            var rad = i * 30.0 * Math.PI / 180.0;
+            var sinA = Math.sin(rad);
+            var cosA = Math.cos(rad);
+            var isCardinal = (i % 3 == 0);
+            var outerR = cx - 4;
+            var innerR = isCardinal ? (cx - 16) : (cx - 11);
+            var x1 = (cx + outerR * sinA).toNumber();
+            var y1 = (cy - outerR * cosA).toNumber();
+            var x2 = (cx + innerR * sinA).toNumber();
+            var y2 = (cy - innerR * cosA).toNumber();
+            dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+            dc.setPenWidth(isCardinal ? 2 : 1);
+            dc.drawLine(x1, y1, x2, y2);
+        }
+        dc.setPenWidth(1);
     }
 
     hidden function drawPhaseArc(dc, cx, cy, radius, startMin, endMin, color) {
