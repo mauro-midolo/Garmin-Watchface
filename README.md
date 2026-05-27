@@ -80,6 +80,32 @@ monkeydo FenixWatchface.prg fenix6pro
 In **VS Code** con l'estensione "Monkey C", basta aprire la cartella ed eseguire
 *Monkey C: Build for Device* → *fenix6pro*.
 
+## CI / GitHub Actions
+
+Il workflow `.github/workflows/build.yml` esegue due job ad ogni push su
+`main` e `claude/**` (e su PR verso `main`):
+
+1. **build** — scarica il Connect IQ SDK, compila il `.prg` per `fenix6pro`
+   (debug) e il `.iq` per lo store (release), e li carica come artefatto
+   `connectiq-build`.
+2. **simulator-test** — avvia il simulatore Garmin in headless (Xvfb),
+   carica il `.prg` con `monkeydo` e fa girare la watchface per 15s come
+   smoke test. Cattura uno screenshot e lo carica come artefatto
+   `simulator-screenshot`.
+
+### Secret richiesti
+
+Da impostare in *Settings → Secrets and variables → Actions*:
+
+| Secret               | Cosa                                                                                          |
+|----------------------|-----------------------------------------------------------------------------------------------|
+| `CIQ_SDK_URL`        | URL HTTPS diretto allo zip del Connect IQ SDK per Linux (richiede login al developer portal). |
+| `CIQ_DEVELOPER_KEY`  | Contenuto del file `developer_key.der` codificato in base64 (`base64 developer_key.der`).     |
+
+Senza `CIQ_DEVELOPER_KEY` il workflow genera una chiave temporanea: la
+build funziona ma l'artefatto **non** può essere pubblicato sullo store.
+Senza `CIQ_SDK_URL` la build fallisce con un messaggio esplicativo.
+
 ## Note
 
 - L'orario di alba/tramonto richiede una posizione GPS valida. Alla prima

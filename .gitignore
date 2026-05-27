@@ -2,6 +2,7 @@ bin/
 *.prg
 *.iq
 *.debug.xml
+!sdk/api.debug.xml
 developer_key
 developer_key.der
 developer_key.pem
