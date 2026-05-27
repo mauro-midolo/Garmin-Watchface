@@ -28,6 +28,11 @@ jobs:
       - name: Make monkeyc executable
         run: chmod +x sdk/monkeyc
 
+      - name: Set up Connect IQ devices
+        run: |
+          mkdir -p "$HOME/.Garmin/ConnectIQ/Devices"
+          cp -r sdk/devices/* "$HOME/.Garmin/ConnectIQ/Devices/"
+
       - name: Prepare developer key
         env:
           DEVELOPER_KEY: ${{ secrets.DEVELOPER_KEY }}

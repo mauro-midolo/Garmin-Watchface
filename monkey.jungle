@@ -1,7 +1,5 @@
 project.manifest = manifest.xml
 
-devicesPath = sdk/devices
-
 base.sourcePath = source
 base.resourcePath = resources
 
