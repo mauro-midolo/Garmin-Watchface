@@ -57,7 +57,7 @@ class FenixWatchfaceView extends Ui.WatchFace {
         var cx = width / 2;
         var cy = height / 2;
 
-        FIELD_RADIUS = (cx * 0.68).toNumber();
+        FIELD_RADIUS = (cx * 0.75).toNumber();
 
         dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
         dc.clear();
@@ -281,7 +281,7 @@ class FenixWatchfaceView extends Ui.WatchFace {
             }
         }
         drawThermometerIcon(dc, x, y - 8, 12);
-        drawValue(dc, x, y + 10, hiStr + "°/" + loStr + "°", Gfx.COLOR_WHITE);
+        drawValue(dc, x, y + 10, loStr + "°/" + hiStr + "°", Gfx.COLOR_WHITE);
     }
 
     hidden function drawFieldFloors(dc, x, y) {
@@ -448,22 +448,48 @@ class FenixWatchfaceView extends Ui.WatchFace {
         dc.fillPolygon(tipPts);
     }
 
+    // Termometro con sole – fedele alla SVG: stelo+bulbo a sinistra, sole con raggi a destra.
     hidden function drawThermometerIcon(dc, cx, cy, size) {
-        var stemW  = size / 4;
-        var bulbR  = size / 4 + 1;
-        var topY   = cy - size / 2;
-        var bulbCy = cy + size / 2 - bulbR;
+        var s = size.toFloat();
 
-        // Involucro bianco: stelo + bulbo
+        // Termometro (lato sinistro)
+        var tx    = cx - (s * 0.30).toNumber();
+        var topY  = cy - (s * 0.50).toNumber();
+        var bulbR = (s * 0.22).toNumber();
+        if (bulbR < 2) { bulbR = 2; }
+        var bulbY = cy + (s * 0.28).toNumber();
+
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-        dc.fillRoundedRectangle(cx - stemW / 2, topY, stemW, bulbCy - topY,
-            stemW / 2);
-        dc.fillCircle(cx, bulbCy, bulbR);
+        dc.fillRoundedRectangle(tx - 1, topY, 2, bulbY - topY, 1);
+        dc.fillCircle(tx, bulbY, bulbR);
 
-        // Mercurio rosso: bulbo pieno + colonnina
         dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT);
-        dc.fillCircle(cx, bulbCy, bulbR - 1);
-        dc.fillRectangle(cx - 1, cy - size / 4, 2, bulbCy - (cy - size / 4));
+        dc.fillCircle(tx, bulbY, bulbR - 1);
+        var fillTop = cy - (s * 0.08).toNumber();
+        dc.fillRectangle(tx, fillTop, 1, bulbY - fillTop);
+
+        // Sole (lato destro) – raggi su / su-dx / dx / giù-dx come nella SVG
+        var sx = cx + (s * 0.12).toNumber();
+        var sy = cy - (s * 0.15).toNumber();
+        var sr = (s * 0.22).toNumber();
+        if (sr < 2) { sr = 2; }
+
+        dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
+        dc.fillCircle(sx, sy, sr);
+
+        dc.setPenWidth(1);
+        var rIn  = (sr + 1).toFloat();
+        var rOut = (sr + 3).toFloat();
+        var angles = [ -90, -45, 0, 45 ];
+        for (var i = 0; i < angles.size(); i++) {
+            var a = angles[i].toFloat() * Math.PI / 180.0;
+            dc.drawLine(
+                (sx + rIn  * Math.cos(a)).toNumber(),
+                (sy + rIn  * Math.sin(a)).toNumber(),
+                (sx + rOut * Math.cos(a)).toNumber(),
+                (sy + rOut * Math.sin(a)).toNumber()
+            );
+        }
     }
 
     hidden function drawStairsIcon(dc, cx, cy, size) {
