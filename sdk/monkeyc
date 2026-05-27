@@ -1,0 +1,4 @@
+#!/bin/sh
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+exec java -Xms1g -Dfile.encoding=UTF-8 -Dapple.awt.UIElement=true \
+  -cp "$SCRIPT_DIR/monkeybrains.jar" com.garmin.monkeybrains.Monkeybrains "$@"
