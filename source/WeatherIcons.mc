@@ -106,7 +106,7 @@ module WeatherIcons {
         else                                  { drawUnknown(dc, cx, cy, size); }
     }
 
-    hidden function drawSun(dc, cx, cy, size) {
+    function drawSun(dc, cx, cy, size) {
         var r = size / 4;
         dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
         dc.fillCircle(cx, cy, r);
@@ -123,7 +123,7 @@ module WeatherIcons {
         dc.setPenWidth(1);
     }
 
-    hidden function drawCloud(dc, cx, cy, size, color) {
+    function drawCloud(dc, cx, cy, size, color) {
         dc.setColor(color, Gfx.COLOR_TRANSPARENT);
         var r1 = size / 4;
         var r2 = size / 3;
@@ -134,12 +134,12 @@ module WeatherIcons {
         dc.fillRectangle(cx - r2, cy, 2 * r2, r1 + 1);
     }
 
-    hidden function drawSunCloud(dc, cx, cy, size) {
+    function drawSunCloud(dc, cx, cy, size) {
         drawSun(dc, cx - size / 5, cy - size / 5, size * 3 / 4);
         drawCloud(dc, cx + size / 8, cy + size / 8, size * 3 / 4, Gfx.COLOR_LT_GRAY);
     }
 
-    hidden function drawRain(dc, cx, cy, size) {
+    function drawRain(dc, cx, cy, size) {
         drawCloud(dc, cx, cy - size / 6, size, Gfx.COLOR_LT_GRAY);
         dc.setColor(Gfx.COLOR_BLUE, Gfx.COLOR_TRANSPARENT);
         var dy = cy + size / 4;
@@ -153,7 +153,7 @@ module WeatherIcons {
         }
     }
 
-    hidden function drawSnow(dc, cx, cy, size) {
+    function drawSnow(dc, cx, cy, size) {
         drawCloud(dc, cx, cy - size / 6, size, Gfx.COLOR_LT_GRAY);
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
         var dy = cy + size / 4 + 1;
@@ -164,7 +164,7 @@ module WeatherIcons {
         }
     }
 
-    hidden function drawThunder(dc, cx, cy, size) {
+    function drawThunder(dc, cx, cy, size) {
         drawCloud(dc, cx, cy - size / 6, size, Gfx.COLOR_DK_GRAY);
         dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_YELLOW);
         var pts = [
@@ -179,7 +179,7 @@ module WeatherIcons {
         dc.fillPolygon(pts);
     }
 
-    hidden function drawFog(dc, cx, cy, size) {
+    function drawFog(dc, cx, cy, size) {
         dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
         dc.setPenWidth(2);
         var step = size / 5;
@@ -191,7 +191,7 @@ module WeatherIcons {
         dc.setPenWidth(1);
     }
 
-    hidden function drawWind(dc, cx, cy, size) {
+    function drawWind(dc, cx, cy, size) {
         dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
         dc.setPenWidth(2);
         var half = size / 2;
@@ -201,7 +201,7 @@ module WeatherIcons {
         dc.setPenWidth(1);
     }
 
-    hidden function drawUnknown(dc, cx, cy, size) {
+    function drawUnknown(dc, cx, cy, size) {
         dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_TRANSPARENT);
         dc.drawText(cx, cy, Gfx.FONT_TINY, "?",
             Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
