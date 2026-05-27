@@ -8,3 +8,4 @@ developer_key.pem
 .idea/
 .vscode/
 *.log
+.claude/

@@ -57,17 +57,14 @@ class FenixWatchfaceView extends Ui.WatchFace {
         var cx = width / 2;
         var cy = height / 2;
 
-        FIELD_RADIUS = (cx * 0.74).toNumber();
+        FIELD_RADIUS = (cx * 0.75).toNumber();
 
         dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
         dc.clear();
 
         ensureSunData();
 
-        // Layer 1: anello blu esterno + tacche orarie
-        drawOuterDecorations(dc, cx, cy);
-
-        // Layer 2: anello 24h fasi del giorno + indicatore ora
+        // Layer 1: anello fasi del giorno (esterno) + tacche orarie + indicatore ora
         drawPhaseRing(dc, cx, cy);
 
         // Layer 3: orario, separatore blu, data
@@ -79,12 +76,12 @@ class FenixWatchfaceView extends Ui.WatchFace {
 
         // Layer 4: campi dati radiali (slot da 30°, posizionati tra le tacche)
         drawFieldWeather     (dc, polarX(cx,  45), polarY(cy,  45));  // 1-2
-        drawFieldFloors      (dc, polarX(cx,  75), polarY(cy,  75));  // 2-3
+        drawFieldTempRange   (dc, polarX(cx,  75), polarY(cy,  75));  // 2-3
         drawFieldAltitude    (dc, polarX(cx, 105), polarY(cy, 105));  // 3-4
         drawFieldSteps       (dc, polarX(cx, 135), polarY(cy, 135));  // 4-5
         drawFieldSunset      (dc, polarX(cx, 165), polarY(cy, 165));  // 5-6
         drawFieldSun         (dc, polarX(cx, 195), polarY(cy, 195));  // 6-7
-        drawFieldTempRange   (dc, polarX(cx, 225), polarY(cy, 225));  // 7-8
+        drawFieldFloors      (dc, polarX(cx, 225), polarY(cy, 225));  // 7-8
         drawFieldBatteryDays (dc, polarX(cx, 255), polarY(cy, 255));  // 8-9
         drawFieldBattery     (dc, polarX(cx, 285), polarY(cy, 285));  // 9-10
         drawFieldHR          (dc, polarX(cx, 315), polarY(cy, 315));  // 10-11
@@ -100,48 +97,16 @@ class FenixWatchfaceView extends Ui.WatchFace {
         return cy - FIELD_RADIUS * Math.cos(deg * Math.PI / 180.0);
     }
 
-    // ----- Decorazioni esterne -----
-
-    hidden function drawOuterDecorations(dc, cx, cy) {
-        dc.setColor(0x0055BB, Gfx.COLOR_TRANSPARENT);
-        dc.setPenWidth(3);
-        dc.drawCircle(cx, cy, cx - 5);
-
-        dc.setColor(0x002266, Gfx.COLOR_TRANSPARENT);
-        dc.setPenWidth(1);
-        dc.drawCircle(cx, cy, cx - 10);
-
-        for (var i = 0; i < 12; i++) {
-            var rad = i * 30.0 * Math.PI / 180.0;
-            var sinA = Math.sin(rad);
-            var cosA = Math.cos(rad);
-            var isCardinal = (i % 3 == 0);
-            var outerR = cx - 11;
-            var innerR = isCardinal ? (cx - 22) : (cx - 16);
-            var x1 = (cx + outerR * sinA).toNumber();
-            var y1 = (cy - outerR * cosA).toNumber();
-            var x2 = (cx + innerR * sinA).toNumber();
-            var y2 = (cy - innerR * cosA).toNumber();
-            if (isCardinal) {
-                dc.setColor(0x0088EE, Gfx.COLOR_TRANSPARENT);
-                dc.setPenWidth(2);
-            } else {
-                dc.setColor(0x334455, Gfx.COLOR_TRANSPARENT);
-                dc.setPenWidth(1);
-            }
-            dc.drawLine(x1, y1, x2, y2);
-        }
-    }
-
-    // ----- Anello 24h delle fasi del giorno -----
+    // ----- Anello 24h delle fasi del giorno (cerchio esterno unico) -----
 
     hidden function drawPhaseRing(dc, cx, cy) {
-        var r = FIELD_RADIUS + 18;
-        dc.setPenWidth(3);
+        var r = cx - 3;  // bordo esterno del ring a cx (tocca il bezel)
+        dc.setPenWidth(5);
 
         if (cachedSunrise == null || cachedSunset == null) {
             dc.setColor(Gfx.COLOR_BLUE, Gfx.COLOR_TRANSPARENT);
             dc.drawCircle(cx, cy, r);
+            drawHourTicks(dc, cx, cy);
             drawNowIndicator(dc, cx, cy, r);
             return;
         }
@@ -157,7 +122,28 @@ class FenixWatchfaceView extends Ui.WatchFace {
         drawPhaseArc(dc, cx, cy, r, ss,   dusk, Gfx.COLOR_RED);
         drawPhaseArc(dc, cx, cy, r, dusk, 1440, Gfx.COLOR_BLUE);
 
+        // Tacche orarie bianche sopra i colori + indicatore ora corrente
+        drawHourTicks(dc, cx, cy);
         drawNowIndicator(dc, cx, cy, r);
+    }
+
+    hidden function drawHourTicks(dc, cx, cy) {
+        for (var i = 0; i < 12; i++) {
+            var rad = i * 30.0 * Math.PI / 180.0;
+            var sinA = Math.sin(rad);
+            var cosA = Math.cos(rad);
+            var isCardinal = (i % 3 == 0);
+            var outerR = cx - 6;
+            var innerR = isCardinal ? (cx - 17) : (cx - 11);
+            var x1 = (cx + outerR * sinA).toNumber();
+            var y1 = (cy - outerR * cosA).toNumber();
+            var x2 = (cx + innerR * sinA).toNumber();
+            var y2 = (cy - innerR * cosA).toNumber();
+            dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+            dc.setPenWidth(isCardinal ? 2 : 1);
+            dc.drawLine(x1, y1, x2, y2);
+        }
+        dc.setPenWidth(1);
     }
 
     hidden function drawPhaseArc(dc, cx, cy, radius, startMin, endMin, color) {
@@ -295,7 +281,7 @@ class FenixWatchfaceView extends Ui.WatchFace {
             }
         }
         drawThermometerIcon(dc, x, y - 8, 12);
-        drawValue(dc, x, y + 10, hiStr + "°/" + loStr + "°", Gfx.COLOR_WHITE);
+        drawValue(dc, x, y + 10, loStr + "°/" + hiStr + "°", Gfx.COLOR_WHITE);
     }
 
     hidden function drawFieldFloors(dc, x, y) {
@@ -462,22 +448,48 @@ class FenixWatchfaceView extends Ui.WatchFace {
         dc.fillPolygon(tipPts);
     }
 
+    // Termometro con sole – fedele alla SVG: stelo+bulbo a sinistra, sole con raggi a destra.
     hidden function drawThermometerIcon(dc, cx, cy, size) {
-        var stemW  = size / 4;
-        var bulbR  = size / 4 + 1;
-        var topY   = cy - size / 2;
-        var bulbCy = cy + size / 2 - bulbR;
+        var s = size.toFloat();
 
-        // Involucro bianco: stelo + bulbo
+        // Termometro (lato sinistro)
+        var tx    = cx - (s * 0.30).toNumber();
+        var topY  = cy - (s * 0.50).toNumber();
+        var bulbR = (s * 0.22).toNumber();
+        if (bulbR < 2) { bulbR = 2; }
+        var bulbY = cy + (s * 0.28).toNumber();
+
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-        dc.fillRoundedRectangle(cx - stemW / 2, topY, stemW, bulbCy - topY,
-            stemW / 2);
-        dc.fillCircle(cx, bulbCy, bulbR);
+        dc.fillRoundedRectangle(tx - 1, topY, 2, bulbY - topY, 1);
+        dc.fillCircle(tx, bulbY, bulbR);
 
-        // Mercurio rosso: bulbo pieno + colonnina
         dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT);
-        dc.fillCircle(cx, bulbCy, bulbR - 1);
-        dc.fillRectangle(cx - 1, cy - size / 4, 2, bulbCy - (cy - size / 4));
+        dc.fillCircle(tx, bulbY, bulbR - 1);
+        var fillTop = cy - (s * 0.08).toNumber();
+        dc.fillRectangle(tx, fillTop, 1, bulbY - fillTop);
+
+        // Sole (lato destro) – raggi su / su-dx / dx / giù-dx come nella SVG
+        var sx = cx + (s * 0.12).toNumber();
+        var sy = cy - (s * 0.15).toNumber();
+        var sr = (s * 0.22).toNumber();
+        if (sr < 2) { sr = 2; }
+
+        dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
+        dc.fillCircle(sx, sy, sr);
+
+        dc.setPenWidth(1);
+        var rIn  = (sr + 1).toFloat();
+        var rOut = (sr + 3).toFloat();
+        var angles = [ -90, -45, 0, 45 ];
+        for (var i = 0; i < angles.size(); i++) {
+            var a = angles[i].toFloat() * Math.PI / 180.0;
+            dc.drawLine(
+                (sx + rIn  * Math.cos(a)).toNumber(),
+                (sy + rIn  * Math.sin(a)).toNumber(),
+                (sx + rOut * Math.cos(a)).toNumber(),
+                (sy + rOut * Math.sin(a)).toNumber()
+            );
+        }
     }
 
     hidden function drawStairsIcon(dc, cx, cy, size) {
