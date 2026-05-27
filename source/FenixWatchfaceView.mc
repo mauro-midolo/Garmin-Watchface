@@ -20,8 +20,9 @@ class FenixWatchfaceView extends Ui.WatchFace {
     hidden var cachedAstroDawn = null;
     hidden var cachedAstroDusk = null;
 
-    // Raggio del cerchio su cui sono distribuiti i campi dati.
-    hidden const FIELD_RADIUS = 88;
+    // Raggio dinamico dei campi: calcolato in onUpdate in base alle dimensioni
+    // reali dello schermo. Tenuto leggermente dentro le tacche orarie.
+    hidden var FIELD_RADIUS = 88;
 
     function initialize() {
         WatchFace.initialize();
@@ -35,35 +36,58 @@ class FenixWatchfaceView extends Ui.WatchFace {
         Ui.requestUpdate();
     }
 
+    function onPartialUpdate(dc) {
+        var cx = dc.getWidth() / 2;
+        var cy = dc.getHeight() / 2;
+
+        // Cancella solo l'area centrale (orario + separatore + data)
+        dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
+        dc.fillRectangle(cx - 55, cy - 35, 110, 80);
+
+        drawCenterTime(dc, cx, cy);
+        dc.setColor(0x0066CC, Gfx.COLOR_TRANSPARENT);
+        dc.setPenWidth(1);
+        dc.drawLine(cx - 38, cy + 19, cx + 38, cy + 19);
+        drawCenterDate(dc, cx, cy);
+    }
+
     function onUpdate(dc) {
         var width  = dc.getWidth();
         var height = dc.getHeight();
         var cx = width / 2;
         var cy = height / 2;
 
+        FIELD_RADIUS = (cx * 0.74).toNumber();
+
         dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
         dc.clear();
 
-        // Aggiorna alba/tramonto/crepuscolo per la posizione corrente.
         ensureSunData();
 
-        // Centro: orario grande + data dd/mm/yy
-        drawCenterTime(dc, cx, cy);
-        drawCenterDate(dc, cx, cy);
+        // Layer 1: anello blu esterno + tacche orarie
+        drawOuterDecorations(dc, cx, cy);
 
-        // Anello 24h: archi colorati per fase del giorno + indicatore ora.
+        // Layer 2: anello 24h fasi del giorno + indicatore ora
         drawPhaseRing(dc, cx, cy);
 
-        // Campi dati radiali alle 8 posizioni (45° tra l'una e l'altra).
-        // L'angolo è misurato dal nord, in senso orario.
-        drawFieldHR        (dc, polarX(cx,   0), polarY(cy,   0));   // 12
-        drawFieldWeather   (dc, polarX(cx,  45), polarY(cy,  45));   // 1:30
-        drawFieldFloors    (dc, polarX(cx,  90), polarY(cy,  90));   // 3
-        drawFieldSun       (dc, polarX(cx, 135), polarY(cy, 135));   // 4:30
-        drawFieldAltitude  (dc, polarX(cx, 180), polarY(cy, 180));   // 6
-        drawFieldSteps     (dc, polarX(cx, 225), polarY(cy, 225));   // 7:30
-        drawFieldBattery   (dc, polarX(cx, 270), polarY(cy, 270));   // 9
-        drawFieldTempRange (dc, polarX(cx, 315), polarY(cy, 315));   // 10:30
+        // Layer 3: orario, separatore blu, data
+        drawCenterTime(dc, cx, cy);
+        dc.setColor(0x0066CC, Gfx.COLOR_TRANSPARENT);
+        dc.setPenWidth(1);
+        dc.drawLine(cx - 38, cy + 19, cx + 38, cy + 19);
+        drawCenterDate(dc, cx, cy);
+
+        // Layer 4: campi dati radiali (slot da 30°, posizionati tra le tacche)
+        drawFieldWeather     (dc, polarX(cx,  45), polarY(cy,  45));  // 1-2
+        drawFieldFloors      (dc, polarX(cx,  75), polarY(cy,  75));  // 2-3
+        drawFieldAltitude    (dc, polarX(cx, 105), polarY(cy, 105));  // 3-4
+        drawFieldSteps       (dc, polarX(cx, 135), polarY(cy, 135));  // 4-5
+        drawFieldSunset      (dc, polarX(cx, 165), polarY(cy, 165));  // 5-6
+        drawFieldSun         (dc, polarX(cx, 195), polarY(cy, 195));  // 6-7
+        drawFieldTempRange   (dc, polarX(cx, 225), polarY(cy, 225));  // 7-8
+        drawFieldBatteryDays (dc, polarX(cx, 255), polarY(cy, 255));  // 8-9
+        drawFieldBattery     (dc, polarX(cx, 285), polarY(cy, 285));  // 9-10
+        drawFieldHR          (dc, polarX(cx, 315), polarY(cy, 315));  // 10-11
     }
 
     // ----- Geometria radiale -----
@@ -76,34 +100,57 @@ class FenixWatchfaceView extends Ui.WatchFace {
         return cy - FIELD_RADIUS * Math.cos(deg * Math.PI / 180.0);
     }
 
+    // ----- Decorazioni esterne -----
+
+    hidden function drawOuterDecorations(dc, cx, cy) {
+        dc.setColor(0x0055BB, Gfx.COLOR_TRANSPARENT);
+        dc.setPenWidth(3);
+        dc.drawCircle(cx, cy, cx - 5);
+
+        dc.setColor(0x002266, Gfx.COLOR_TRANSPARENT);
+        dc.setPenWidth(1);
+        dc.drawCircle(cx, cy, cx - 10);
+
+        for (var i = 0; i < 12; i++) {
+            var rad = i * 30.0 * Math.PI / 180.0;
+            var sinA = Math.sin(rad);
+            var cosA = Math.cos(rad);
+            var isCardinal = (i % 3 == 0);
+            var outerR = cx - 11;
+            var innerR = isCardinal ? (cx - 22) : (cx - 16);
+            var x1 = (cx + outerR * sinA).toNumber();
+            var y1 = (cy - outerR * cosA).toNumber();
+            var x2 = (cx + innerR * sinA).toNumber();
+            var y2 = (cy - innerR * cosA).toNumber();
+            if (isCardinal) {
+                dc.setColor(0x0088EE, Gfx.COLOR_TRANSPARENT);
+                dc.setPenWidth(2);
+            } else {
+                dc.setColor(0x334455, Gfx.COLOR_TRANSPARENT);
+                dc.setPenWidth(1);
+            }
+            dc.drawLine(x1, y1, x2, y2);
+        }
+    }
+
     // ----- Anello 24h delle fasi del giorno -----
 
-    // Disegna l'anello con archi colorati proporzionali a ciascuna fase:
-    //   blu   = notte (buio)
-    //   rosso = crepuscolo (mattutino e serale)
-    //   giallo= luce piena (alba -> tramonto)
-    // Mezzanotte in alto, il tempo scorre in senso orario. Sopra, l'indicatore
-    // dell'ora corrente (barretta bianca con bordo nero).
     hidden function drawPhaseRing(dc, cx, cy) {
         var r = FIELD_RADIUS + 18;
         dc.setPenWidth(3);
 
         if (cachedSunrise == null || cachedSunset == null) {
-            // Nessun dato solare: anello interamente blu.
             dc.setColor(Gfx.COLOR_BLUE, Gfx.COLOR_TRANSPARENT);
             dc.drawCircle(cx, cy, r);
             drawNowIndicator(dc, cx, cy, r);
             return;
         }
 
-        var sr = momentToLocalMin(cachedSunrise);
-        var ss = momentToLocalMin(cachedSunset);
-        // Bordi del crepuscolo astronomico; se assenti (es. estate alle alte
-        // latitudini) coincidono con alba/tramonto -> nessuna fascia rossa.
+        var sr   = momentToLocalMin(cachedSunrise);
+        var ss   = momentToLocalMin(cachedSunset);
         var dawn = (cachedAstroDawn != null) ? momentToLocalMin(cachedAstroDawn) : sr;
         var dusk = (cachedAstroDusk != null) ? momentToLocalMin(cachedAstroDusk) : ss;
 
-        // notte | crepuscolo mattutino | luce piena | crepuscolo serale | notte
         drawPhaseArc(dc, cx, cy, r, 0,    dawn, Gfx.COLOR_BLUE);
         drawPhaseArc(dc, cx, cy, r, dawn, sr,   Gfx.COLOR_RED);
         drawPhaseArc(dc, cx, cy, r, sr,   ss,   Gfx.COLOR_YELLOW);
@@ -113,9 +160,6 @@ class FenixWatchfaceView extends Ui.WatchFace {
         drawNowIndicator(dc, cx, cy, r);
     }
 
-    // Arco fra due minuti del giorno [0..1440]. Con mezzanotte in alto e tempo
-    // orario l'angolo bussola (da nord, orario) vale min/4; drawArc usa invece
-    // 0°=ore 3, crescente in senso antiorario, da cui la conversione 90 - C.
     hidden function drawPhaseArc(dc, cx, cy, radius, startMin, endMin, color) {
         if (endMin - startMin < 1) { return; }
         var ga = normDeg(90.0 - (startMin / 4.0));
@@ -124,7 +168,6 @@ class FenixWatchfaceView extends Ui.WatchFace {
         dc.drawArc(cx, cy, radius, Gfx.ARC_CLOCKWISE, ga, gb);
     }
 
-    // Barretta bianca con bordo nero, radiale, posizionata sull'ora corrente.
     hidden function drawNowIndicator(dc, cx, cy, radius) {
         var clock = Sys.getClockTime();
         var nowMin = clock.hour * 60 + clock.min;
@@ -132,18 +175,15 @@ class FenixWatchfaceView extends Ui.WatchFace {
         var sinA = Math.sin(rad);
         var cosA = Math.cos(rad);
 
-        // Bordo nero (penna più larga).
         dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
         dc.setPenWidth(7);
         dc.drawLine(cx + (radius - 8) * sinA, cy - (radius - 8) * cosA,
                     cx + (radius + 8) * sinA, cy - (radius + 8) * cosA);
 
-        // Barretta bianca al centro.
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
         dc.setPenWidth(3);
         dc.drawLine(cx + (radius - 6) * sinA, cy - (radius - 6) * cosA,
                     cx + (radius + 6) * sinA, cy - (radius + 6) * cosA);
-
         dc.setPenWidth(1);
     }
 
@@ -156,6 +196,14 @@ class FenixWatchfaceView extends Ui.WatchFace {
         while (d < 0.0)    { d += 360.0; }
         while (d >= 360.0) { d -= 360.0; }
         return d;
+    }
+
+    // ----- Helper valore campo -----
+
+    hidden function drawValue(dc, x, y, text, color) {
+        dc.setColor(color, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(x, y, Gfx.FONT_XTINY, text,
+            Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
     }
 
     // ----- Centro: orario + data -----
@@ -174,60 +222,59 @@ class FenixWatchfaceView extends Ui.WatchFace {
         ]);
 
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx, cy - 8, Gfx.FONT_NUMBER_THAI_HOT, timeStr,
+        dc.drawText(cx, cy - 8, Gfx.FONT_NUMBER_MEDIUM, timeStr,
             Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
     }
 
     hidden function drawCenterDate(dc, cx, cy) {
         var info = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
-        var dateStr = Lang.format("$1$/$2$/$3$", [
+        var days = ["DOM", "LUN", "MAR", "MER", "GIO", "VEN", "SAB"];
+        var dayName = days[info.day_of_week - 1];
+        var dateStr = Lang.format("$1$ $2$/$3$/$4$", [
+            dayName,
             info.day.format("%02d"),
             info.month.format("%02d"),
             (info.year % 100).format("%02d")
         ]);
-        dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx, cy + 32, Gfx.FONT_TINY, dateStr,
+        dc.setColor(0x55BBFF, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(cx, cy + 35, Gfx.FONT_XTINY, dateStr,
             Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
     }
 
     // ----- Campi dati -----
 
-    hidden function drawFieldHR(dc, cx, cy) {
+    hidden function drawFieldHR(dc, x, y) {
         var hr = readHeartRate();
         var hrStr = (hr != null) ? hr.toString() : "--";
 
-        drawHeartIcon(dc, cx - 16, cy + 1, 10);
-        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx - 4, cy, Gfx.FONT_XTINY, hrStr,
-            Gfx.TEXT_JUSTIFY_LEFT | Gfx.TEXT_JUSTIFY_VCENTER);
+        drawHeartIcon(dc, x, y - 8, 6);
+        drawValue(dc, x, y + 9, hrStr, Gfx.COLOR_WHITE);
     }
 
-    hidden function drawFieldWeather(dc, cx, cy) {
-        var cond = null;
-        var tempStr = "--";
-        if (Toybox has :Weather) {
-            var current = Weather.getCurrentConditions();
-            if (current != null) {
-                cond = current.condition;
-                if (current.temperature != null) {
-                    var t = current.temperature;
-                    if (Sys.getDeviceSettings().temperatureUnits
-                            == Sys.UNIT_STATUTE) {
-                        t = (t * 9.0 / 5.0) + 32.0;
-                    }
-                    tempStr = t.toNumber().toString() + "°";
-                }
+    hidden function drawFieldWeather(dc, x, y) {
+        if (!(Toybox has :Weather)) { return; }
+        var current = Weather.getCurrentConditions();
+        if (current == null) { return; }
+
+        var cond = current.condition;
+        var tempStr = null;
+        if (current.temperature != null) {
+            var t = current.temperature;
+            if (Sys.getDeviceSettings().temperatureUnits == Sys.UNIT_STATUTE) {
+                t = (t * 9.0 / 5.0) + 32.0;
             }
+            tempStr = t.toNumber().toString() + "°";
         }
-        WeatherIcons.draw(dc, cx, cy - 8, 18, cond);
-        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx, cy + 12, Gfx.FONT_XTINY, tempStr,
-            Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
+
+        WeatherIcons.draw(dc, x, y - 8, 16, cond);
+        if (tempStr != null) {
+            drawValue(dc, x, y + 11, tempStr, Gfx.COLOR_WHITE);
+        }
     }
 
     // Massima e minima previste per la giornata corrente (Toybox.Weather),
     // su un'unica riga "max°/min°". Stesso stile icona+valore degli altri campi.
-    hidden function drawFieldTempRange(dc, cx, cy) {
+    hidden function drawFieldTempRange(dc, x, y) {
         var hiStr = "--";
         var loStr = "--";
         if (Toybox has :Weather) {
@@ -247,14 +294,11 @@ class FenixWatchfaceView extends Ui.WatchFace {
                 }
             }
         }
-        drawThermometerIcon(dc, cx, cy - 8, 12);
-        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx, cy + 10, Gfx.FONT_XTINY,
-            hiStr + "°/" + loStr + "°",
-            Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
+        drawThermometerIcon(dc, x, y - 8, 12);
+        drawValue(dc, x, y + 10, hiStr + "°/" + loStr + "°", Gfx.COLOR_WHITE);
     }
 
-    hidden function drawFieldFloors(dc, cx, cy) {
+    hidden function drawFieldFloors(dc, x, y) {
         var info = ActivityMonitor.getInfo();
         var floors = 0;
         var floorGoal = 0;
@@ -266,37 +310,45 @@ class FenixWatchfaceView extends Ui.WatchFace {
                 floorGoal = info.floorsClimbedGoal;
             }
         }
-        drawStairsIcon(dc, cx, cy - 8, 12);
-        dc.setColor(Gfx.COLOR_BLUE, Gfx.COLOR_TRANSPARENT);
+        drawStairsIcon(dc, x, y - 9, 11);
         var s = (floorGoal > 0)
             ? Lang.format("$1$/$2$", [floors, floorGoal])
             : floors.toString();
-        dc.drawText(cx, cy + 10, Gfx.FONT_XTINY, s,
-            Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
+        drawValue(dc, x, y + 9, s, 0x55BBFF);
     }
 
-    hidden function drawFieldSun(dc, cx, cy) {
-        var label = "--";
-        var timeStr = "--:--";
-        var isSunrise = true;
+    hidden function drawFieldSun(dc, x, y) {
+        var loc = getLocation();
+        if (loc != null) { updateSunCache(loc[0], loc[1]); }
 
-        var next = nextSunEvent();
-        if (next != null) {
-            isSunrise = next[:isSunrise];
-            label = isSunrise ? "ALBA" : "TRAM";
-            timeStr = formatLocalHM(next[:moment]);
+        var timeStr = "--:--";
+        var nowVal = Time.now().value();
+        if (cachedSunrise != null && cachedSunrise.value() > nowVal) {
+            timeStr = formatLocalHM(cachedSunrise);
+        } else if (cachedTomorrowSunrise != null) {
+            timeStr = formatLocalHM(cachedTomorrowSunrise);
+        } else if (cachedSunrise != null) {
+            timeStr = formatLocalHM(cachedSunrise);
         }
 
-        var color = isSunrise ? Gfx.COLOR_YELLOW : Gfx.COLOR_ORANGE;
-        dc.setColor(color, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx, cy - 9, Gfx.FONT_XTINY, label,
-            Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
-        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx, cy + 8, Gfx.FONT_XTINY, timeStr,
-            Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
+        drawSunHorizonIcon(dc, x, y - 9, 15, Gfx.COLOR_YELLOW, true);
+        drawValue(dc, x, y + 9, timeStr, Gfx.COLOR_WHITE);
     }
 
-    hidden function drawFieldAltitude(dc, cx, cy) {
+    hidden function drawFieldSunset(dc, x, y) {
+        var loc = getLocation();
+        if (loc != null) { updateSunCache(loc[0], loc[1]); }
+
+        var timeStr = "--:--";
+        if (cachedSunset != null) {
+            timeStr = formatLocalHM(cachedSunset);
+        }
+
+        drawSunHorizonIcon(dc, x, y - 9, 15, Gfx.COLOR_ORANGE, false);
+        drawValue(dc, x, y + 9, timeStr, Gfx.COLOR_WHITE);
+    }
+
+    hidden function drawFieldAltitude(dc, x, y) {
         var alt = null;
         var info = Activity.getActivityInfo();
         if (info != null && info has :altitude && info.altitude != null) {
@@ -311,23 +363,19 @@ class FenixWatchfaceView extends Ui.WatchFace {
             }
             altStr = alt.toNumber().toString() + unit;
         }
-        drawMountainIcon(dc, cx, cy - 8, 12);
-        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx, cy + 10, Gfx.FONT_XTINY, altStr,
-            Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
+        drawMountainIcon(dc, x, y - 8, 12);
+        drawValue(dc, x, y + 9, altStr, Gfx.COLOR_WHITE);
     }
 
-    hidden function drawFieldSteps(dc, cx, cy) {
+    hidden function drawFieldSteps(dc, x, y) {
         var info = ActivityMonitor.getInfo();
         var steps = (info != null && info.steps != null) ? info.steps : 0;
 
-        drawFootIcon(dc, cx, cy - 8, 12);
-        dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx, cy + 10, Gfx.FONT_XTINY, steps.toString(),
-            Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
+        drawShoeIcon(dc, x, y - 7, 5);
+        drawValue(dc, x, y + 9, steps.toString(), Gfx.COLOR_GREEN);
     }
 
-    hidden function drawFieldBattery(dc, cx, cy) {
+    hidden function drawFieldBattery(dc, x, y) {
         var stats = Sys.getSystemStats();
         var batt = (stats != null && stats.battery != null) ? stats.battery : 0.0;
         var battInt = batt.toNumber();
@@ -336,12 +384,12 @@ class FenixWatchfaceView extends Ui.WatchFace {
         if (battInt <= 20) { color = Gfx.COLOR_RED; }
         else if (battInt <= 40) { color = Gfx.COLOR_YELLOW; }
 
-        var bw = 22;
-        var bh = 11;
+        var bw = 18;
+        var bh = 9;
         var tipW = 2;
-        var tipH = 5;
-        var bx = cx - (bw + tipW) / 2;
-        var by = cy - bh - 4;
+        var tipH = 4;
+        var bx = x - (bw + tipW) / 2;
+        var by = y - 9 - bh / 2;
 
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
         dc.setPenWidth(1);
@@ -354,23 +402,42 @@ class FenixWatchfaceView extends Ui.WatchFace {
             dc.fillRectangle(bx + 1, by + 1, fillW, bh - 2);
         }
 
-        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx, cy + 8, Gfx.FONT_XTINY,
-            battInt.toString() + "%",
-            Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
+        drawValue(dc, x, y + 9, battInt.toString() + "%", Gfx.COLOR_WHITE);
+    }
+
+    hidden function drawFieldBatteryDays(dc, x, y) {
+        var stats = Sys.getSystemStats();
+        var daysStr = "--";
+        if ((stats has :batteryInDays) && stats.batteryInDays != null) {
+            var d = stats.batteryInDays;
+            daysStr = d.format("%.0f");
+        }
+        drawValue(dc, x, y - 8, "Giorni", 0x55BBFF);
+        drawValue(dc, x, y + 8, daysStr, Gfx.COLOR_WHITE);
     }
 
     // ----- Icone vettoriali -----
 
     hidden function drawHeartIcon(dc, cx, cy, size) {
         dc.setColor(Gfx.COLOR_RED, Gfx.COLOR_TRANSPARENT);
-        var r = size / 2;
-        dc.fillCircle(cx - r / 2, cy - r / 3, r);
-        dc.fillCircle(cx + r / 2, cy - r / 3, r);
+        // Poligono derivato dal path SVG (viewBox 16x16, centrato in 8,8).
+        // s mappa così che la mezza-altezza del cuore = size pixel.
+        var s = size.toFloat() / 7.0;
+        var cxi = cx.toNumber();
+        var cyi = cy.toNumber();
         var pts = [
-            [cx - r - 1, cy - 1],
-            [cx + r + 1, cy - 1],
-            [cx,         cy + r + 2]
+            [cxi,                         cyi + (7.0 * s).toNumber()],  // punta bassa
+            [cxi + (7.0 * s).toNumber(),  cyi + (0.5 * s).toNumber()],  // spalla destra
+            [cxi + (8.0 * s).toNumber(),  cyi - (2.8 * s).toNumber()],  // estremo destra
+            [cxi + (7.5 * s).toNumber(),  cyi - (5.0 * s).toNumber()],  // lobo dx alto
+            [cxi + (4.0 * s).toNumber(),  cyi - (7.0 * s).toNumber()],  // cima lobo dx
+            [cxi + (1.5 * s).toNumber(),  cyi - (6.5 * s).toNumber()],  // tacca dx
+            [cxi,                         cyi - (4.5 * s).toNumber()],  // centro tacca
+            [cxi - (1.5 * s).toNumber(),  cyi - (6.5 * s).toNumber()],  // tacca sx
+            [cxi - (4.0 * s).toNumber(),  cyi - (7.0 * s).toNumber()],  // cima lobo sx
+            [cxi - (7.5 * s).toNumber(),  cyi - (5.0 * s).toNumber()],  // lobo sx alto
+            [cxi - (8.0 * s).toNumber(),  cyi - (2.8 * s).toNumber()],  // estremo sinistra
+            [cxi - (7.0 * s).toNumber(),  cyi + (0.5 * s).toNumber()]   // spalla sinistra
         ];
         dc.fillPolygon(pts);
     }
@@ -414,7 +481,7 @@ class FenixWatchfaceView extends Ui.WatchFace {
     }
 
     hidden function drawStairsIcon(dc, cx, cy, size) {
-        dc.setColor(Gfx.COLOR_BLUE, Gfx.COLOR_TRANSPARENT);
+        dc.setColor(0x0077DD, Gfx.COLOR_TRANSPARENT);
         var step = size / 3;
         var w = size;
         // 3 gradini ascendenti
@@ -423,16 +490,69 @@ class FenixWatchfaceView extends Ui.WatchFace {
         dc.fillRectangle(cx - w / 2 + 2*step,cy - step,       w - 2*step,step - 1);
     }
 
-    hidden function drawFootIcon(dc, cx, cy, size) {
+    hidden function drawShoeIcon(dc, cx, cy, size) {
         dc.setColor(Gfx.COLOR_GREEN, Gfx.COLOR_TRANSPARENT);
-        // pianta del piede ovale + 4 dita
-        var w = size / 2;
-        var h = size * 3 / 4;
-        dc.fillCircle(cx, cy + 2, w);
-        // dita: 4 cerchietti sopra
-        for (var i = -1; i <= 2; i++) {
-            var dx = (i - 0.5) * 3;
-            dc.fillCircle(cx + dx, cy - h / 2 + 1, 1);
+        // Poligono derivato dalla SVG (viewBox 512x512).
+        // ys = mezza-altezza, xs = mezza-larghezza (rapporto ~2.15:1).
+        var ys = size.toFloat();
+        var xs = ys * 2.15;
+        var cxi = cx.toNumber();
+        var cyi = cy.toNumber();
+        var pts = [
+            [cxi + (xs *  0.96).toNumber(), cyi - (ys * 0.05).toNumber()],  // punta destra
+            [cxi + (xs *  0.12).toNumber(), cyi - (ys * 1.00).toNumber()],  // lacci (top)
+            [cxi - (xs *  0.13).toNumber(), cyi - (ys * 0.85).toNumber()],  // lingua
+            [cxi - (xs *  0.18).toNumber(), cyi - (ys * 0.63).toNumber()],  // sotto lingua
+            [cxi - (xs *  0.55).toNumber(), cyi - (ys * 0.40).toNumber()],  // caviglia
+            [cxi - (xs *  0.84).toNumber(), cyi - (ys * 0.75).toNumber()],  // tallone alto
+            [cxi - (xs *  0.98).toNumber(), cyi - (ys * 0.73).toNumber()],  // tallone sx
+            [cxi - (xs *  0.99).toNumber(), cyi + (ys * 1.00).toNumber()],  // suola sx
+            [cxi + (xs *  0.97).toNumber(), cyi + (ys * 1.00).toNumber()],  // suola dx
+            [cxi + (xs *  0.96).toNumber(), cyi + (ys * 0.54).toNumber()]   // punta dx basso
+        ];
+        dc.fillPolygon(pts);
+    }
+
+    // Icona alba/tramonto: semisole sull'orizzonte con raggi e freccia.
+    // up = true → alba (freccia verso l'alto), false → tramonto (freccia in basso).
+    hidden function drawSunHorizonIcon(dc, cx, cy, size, color, up) {
+        var hw = size / 2;            // mezza larghezza dell'orizzonte
+        var hy = cy + 2;              // linea dell'orizzonte
+        var r  = (size / 4.0) + 1.0;  // raggio del semisole
+
+        dc.setColor(color, Gfx.COLOR_TRANSPARENT);
+
+        // Cupola del sole: base piatta appoggiata sull'orizzonte
+        var degs = [180, 210, 240, 270, 300, 330, 360];
+        var dome = new [degs.size()];
+        for (var i = 0; i < degs.size(); i++) {
+            var a = degs[i] * Math.PI / 180.0;
+            dome[i] = [
+                (cx + r * Math.cos(a)).toNumber(),
+                (hy + r * Math.sin(a)).toNumber()
+            ];
+        }
+        dc.fillPolygon(dome);
+
+        // Raggi rivolti verso l'alto
+        dc.setPenWidth(1);
+        var rays = [-55, 0, 55];
+        for (var i = 0; i < rays.size(); i++) {
+            var a = (rays[i] - 90) * Math.PI / 180.0;
+            dc.drawLine(
+                cx + (r + 1) * Math.cos(a), hy + (r + 1) * Math.sin(a),
+                cx + (r + 3) * Math.cos(a), hy + (r + 3) * Math.sin(a));
+        }
+
+        // Linea dell'orizzonte
+        dc.drawLine(cx - hw, hy, cx + hw, hy);
+
+        // Freccia di direzione sotto l'orizzonte
+        var ay = hy + 2;
+        if (up) {
+            dc.fillPolygon([[cx, ay], [cx - 3, ay + 4], [cx + 3, ay + 4]]);
+        } else {
+            dc.fillPolygon([[cx, ay + 4], [cx - 3, ay], [cx + 3, ay]]);
         }
     }
 
@@ -468,9 +588,8 @@ class FenixWatchfaceView extends Ui.WatchFace {
                 }
             }
         }
-        var app = App.getApp();
-        var sLat = app.getProperty("lastLat");
-        var sLon = app.getProperty("lastLon");
+        var sLat = App.Storage.getValue("lastLat");
+        var sLon = App.Storage.getValue("lastLon");
         if (sLat != null && sLon != null) {
             return [sLat, sLon];
         }
@@ -478,9 +597,8 @@ class FenixWatchfaceView extends Ui.WatchFace {
     }
 
     hidden function saveLocation(lat, lon) {
-        var app = App.getApp();
-        app.setProperty("lastLat", lat);
-        app.setProperty("lastLon", lon);
+        App.Storage.setValue("lastLat", lat);
+        App.Storage.setValue("lastLon", lon);
     }
 
     hidden function ensureSunData() {

@@ -4,6 +4,7 @@ bin/
 *.debug.xml
 developer_key
 developer_key.der
+developer_key.pem
 .idea/
 .vscode/
 *.log

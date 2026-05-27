@@ -1,0 +1,2066 @@
+[ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 1; @symbol_usingdef<0> = [Toybox,1,6,12]; @symbol_usingdef<1> = [Graphics,1,13,21]; @symbol_usingAlias = [Gfx,1,25,28]; ]
+using Toybox.Graphics as :Gfx;
+[ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 2; @symbol_usingdef<0> = [Toybox,2,6,12]; @symbol_usingdef<1> = [Math,2,13,17]; ]
+using Toybox.Math;
+[ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 3; @symbol_usingdef<0> = [Toybox,3,6,12]; @symbol_usingdef<1> = [Weather,3,13,20]; ]
+using Toybox.Weather;
+[ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 8; @symbol_moduledef = [WeatherIcons,8,7,19]; ]
+module WeatherIcons {
+    [ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 8; ]
+    <init> {
+    }
+    [ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 10; ]
+    enum {
+        [ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 11; @position = 8; @symbol_enumdec = [ICON_SUNNY,11,8,18]; ]
+        ICON_SUNNY,
+        [ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 12; @position = 8; @symbol_enumdec = [ICON_PARTLY_CLOUDY,12,8,26]; ]
+        ICON_PARTLY_CLOUDY,
+        [ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 13; @position = 8; @symbol_enumdec = [ICON_CLOUDY,13,8,19]; ]
+        ICON_CLOUDY,
+        [ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 14; @position = 8; @symbol_enumdec = [ICON_RAIN,14,8,17]; ]
+        ICON_RAIN,
+        [ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 15; @position = 8; @symbol_enumdec = [ICON_SNOW,15,8,17]; ]
+        ICON_SNOW,
+        [ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 16; @position = 8; @symbol_enumdec = [ICON_THUNDER,16,8,20]; ]
+        ICON_THUNDER,
+        [ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 17; @position = 8; @symbol_enumdec = [ICON_FOG,17,8,16]; ]
+        ICON_FOG,
+        [ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 18; @position = 8; @symbol_enumdec = [ICON_WINDY,18,8,18]; ]
+        ICON_WINDY,
+        [ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 19; @position = 8; @symbol_enumdec = [ICON_UNKNOWN,19,8,20]; ]
+        ICON_UNKNOWN
+    }
+    [ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 23; @symbol_functiondef = [fromCondition,23,13,26]; @symbol_param<0> = [c,23,27,28]; ]
+    function fromCondition(c) {
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_23_30_94_4_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 24 8 ]
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_24_8_24_46_if_stmt:
+        %tmp.1 = lgetv %c;
+        symbol [ c %tmp.1 24 12 13 ];
+        %tmp.2 = null;
+        %tmp.3 = eq %tmp.1 %tmp.2;
+        bf %tmp.3 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_24_8_24_46_if_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_24_8_24_46_if_true:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_24_23_24_46_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 24 25 ]
+        symbol [ ICON_UNKNOWN %tmp.5 24 32 44 ];
+        %tmp.5 = getv ? :ICON_UNKNOWN;
+        ret %tmp.5;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_24_23_24_46_stop:
+        goto @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_24_8_24_46_if_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_24_8_24_46_if_end:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 26 8 ]
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_26_8_30_8_if_stmt:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_26_12_28_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_26_12_27_32_begin:
+        %tmp.6 = lgetv %c;
+        symbol [ c %tmp.6 26 12 13 ];
+        symbol [ Weather %tmp.7 26 17 24 ];
+        %tmp.7 = getm $.Toybox.Weather;
+        symbol [ CONDITION_CLEAR %tmp.8 26 25 40 ];
+        %tmp.8 = getv %tmp.7 :CONDITION_CLEAR;
+        %tmp.9 = eq %tmp.6 %tmp.8;
+        bt %tmp.9 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_26_8_30_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_27_19_27_32_false:
+        %tmp.10 = lgetv %c;
+        symbol [ c %tmp.10 27 19 20 ];
+        symbol [ Weather %tmp.11 27 24 31 ];
+        %tmp.11 = getm $.Toybox.Weather;
+        symbol [ CONDITION_FAIR %tmp.12 27 32 46 ];
+        %tmp.12 = getv %tmp.11 :CONDITION_FAIR;
+        %tmp.13 = eq %tmp.10 %tmp.12;
+        push %tmp.13;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_27_19_27_32_end:
+        %tmp.14 = phi [%tmp.9 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_26_12_27_32_begin] [%tmp.13 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_27_19_27_32_false] [%tmp.14 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_27_19_27_32_end];
+        bt %tmp.14 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_26_8_30_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_28_19_28_32_false:
+        %tmp.15 = lgetv %c;
+        symbol [ c %tmp.15 28 19 20 ];
+        symbol [ Weather %tmp.16 28 24 31 ];
+        %tmp.16 = getm $.Toybox.Weather;
+        symbol [ CONDITION_MOSTLY_CLEAR %tmp.17 28 32 54 ];
+        %tmp.17 = getv %tmp.16 :CONDITION_MOSTLY_CLEAR;
+        %tmp.18 = eq %tmp.15 %tmp.17;
+        push %tmp.18;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_28_19_28_32_end:
+        %tmp.19 = phi [%tmp.14 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_26_12_28_32_begin] [%tmp.18 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_28_19_28_32_false] [%tmp.19 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_28_19_28_32_end];
+        bf %tmp.19 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_26_8_30_8_if_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_26_8_30_8_if_true:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_28_56_30_8_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 29 12 ]
+        symbol [ ICON_SUNNY %tmp.21 29 19 29 ];
+        %tmp.21 = getv ? :ICON_SUNNY;
+        ret %tmp.21;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_28_56_30_8_stop:
+        goto @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_26_8_30_8_if_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_26_8_30_8_if_end:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 32 8 ]
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_32_8_36_8_if_stmt:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_32_12_34_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_32_12_33_32_begin:
+        %tmp.22 = lgetv %c;
+        symbol [ c %tmp.22 32 12 13 ];
+        symbol [ Weather %tmp.23 32 17 24 ];
+        %tmp.23 = getm $.Toybox.Weather;
+        symbol [ CONDITION_PARTLY_CLOUDY %tmp.24 32 25 48 ];
+        %tmp.24 = getv %tmp.23 :CONDITION_PARTLY_CLOUDY;
+        %tmp.25 = eq %tmp.22 %tmp.24;
+        bt %tmp.25 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_32_8_36_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_33_19_33_32_false:
+        %tmp.26 = lgetv %c;
+        symbol [ c %tmp.26 33 19 20 ];
+        symbol [ Weather %tmp.27 33 24 31 ];
+        %tmp.27 = getm $.Toybox.Weather;
+        symbol [ CONDITION_PARTLY_CLEAR %tmp.28 33 32 54 ];
+        %tmp.28 = getv %tmp.27 :CONDITION_PARTLY_CLEAR;
+        %tmp.29 = eq %tmp.26 %tmp.28;
+        push %tmp.29;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_33_19_33_32_end:
+        %tmp.30 = phi [%tmp.25 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_32_12_33_32_begin] [%tmp.29 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_33_19_33_32_false] [%tmp.30 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_33_19_33_32_end];
+        bt %tmp.30 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_32_8_36_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_34_19_34_32_false:
+        %tmp.31 = lgetv %c;
+        symbol [ c %tmp.31 34 19 20 ];
+        symbol [ Weather %tmp.32 34 24 31 ];
+        %tmp.32 = getm $.Toybox.Weather;
+        symbol [ CONDITION_THIN_CLOUDS %tmp.33 34 32 53 ];
+        %tmp.33 = getv %tmp.32 :CONDITION_THIN_CLOUDS;
+        %tmp.34 = eq %tmp.31 %tmp.33;
+        push %tmp.34;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_34_19_34_32_end:
+        %tmp.35 = phi [%tmp.30 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_32_12_34_32_begin] [%tmp.34 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_34_19_34_32_false] [%tmp.35 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_34_19_34_32_end];
+        bf %tmp.35 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_32_8_36_8_if_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_32_8_36_8_if_true:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_34_55_36_8_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 35 12 ]
+        symbol [ ICON_PARTLY_CLOUDY %tmp.37 35 19 37 ];
+        %tmp.37 = getv ? :ICON_PARTLY_CLOUDY;
+        ret %tmp.37;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_34_55_36_8_stop:
+        goto @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_32_8_36_8_if_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_32_8_36_8_if_end:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 38 8 ]
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_38_8_41_8_if_stmt:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_38_12_39_32_begin:
+        %tmp.38 = lgetv %c;
+        symbol [ c %tmp.38 38 12 13 ];
+        symbol [ Weather %tmp.39 38 17 24 ];
+        %tmp.39 = getm $.Toybox.Weather;
+        symbol [ CONDITION_MOSTLY_CLOUDY %tmp.40 38 25 48 ];
+        %tmp.40 = getv %tmp.39 :CONDITION_MOSTLY_CLOUDY;
+        %tmp.41 = eq %tmp.38 %tmp.40;
+        bt %tmp.41 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_38_8_41_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_39_19_39_32_false:
+        %tmp.42 = lgetv %c;
+        symbol [ c %tmp.42 39 19 20 ];
+        symbol [ Weather %tmp.43 39 24 31 ];
+        %tmp.43 = getm $.Toybox.Weather;
+        symbol [ CONDITION_CLOUDY %tmp.44 39 32 48 ];
+        %tmp.44 = getv %tmp.43 :CONDITION_CLOUDY;
+        %tmp.45 = eq %tmp.42 %tmp.44;
+        push %tmp.45;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_39_19_39_32_end:
+        %tmp.46 = phi [%tmp.41 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_38_12_39_32_begin] [%tmp.45 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_39_19_39_32_false] [%tmp.46 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_39_19_39_32_end];
+        bf %tmp.46 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_38_8_41_8_if_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_38_8_41_8_if_true:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_39_50_41_8_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 40 12 ]
+        symbol [ ICON_CLOUDY %tmp.48 40 19 30 ];
+        %tmp.48 = getv ? :ICON_CLOUDY;
+        ret %tmp.48;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_39_50_41_8_stop:
+        goto @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_38_8_41_8_if_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_38_8_41_8_if_end:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 43 8 ]
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_8_53_8_if_stmt:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_12_51_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_12_50_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_12_49_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_12_48_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_12_47_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_12_46_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_12_45_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_12_44_32_begin:
+        %tmp.49 = lgetv %c;
+        symbol [ c %tmp.49 43 12 13 ];
+        symbol [ Weather %tmp.50 43 17 24 ];
+        %tmp.50 = getm $.Toybox.Weather;
+        symbol [ CONDITION_RAIN %tmp.51 43 25 39 ];
+        %tmp.51 = getv %tmp.50 :CONDITION_RAIN;
+        %tmp.52 = eq %tmp.49 %tmp.51;
+        bt %tmp.52 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_8_53_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_44_19_44_32_false:
+        %tmp.53 = lgetv %c;
+        symbol [ c %tmp.53 44 19 20 ];
+        symbol [ Weather %tmp.54 44 24 31 ];
+        %tmp.54 = getm $.Toybox.Weather;
+        symbol [ CONDITION_LIGHT_RAIN %tmp.55 44 32 52 ];
+        %tmp.55 = getv %tmp.54 :CONDITION_LIGHT_RAIN;
+        %tmp.56 = eq %tmp.53 %tmp.55;
+        push %tmp.56;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_44_19_44_32_end:
+        %tmp.57 = phi [%tmp.52 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_12_44_32_begin] [%tmp.56 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_44_19_44_32_false] [%tmp.57 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_44_19_44_32_end];
+        bt %tmp.57 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_8_53_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_45_19_45_32_false:
+        %tmp.58 = lgetv %c;
+        symbol [ c %tmp.58 45 19 20 ];
+        symbol [ Weather %tmp.59 45 24 31 ];
+        %tmp.59 = getm $.Toybox.Weather;
+        symbol [ CONDITION_HEAVY_RAIN %tmp.60 45 32 52 ];
+        %tmp.60 = getv %tmp.59 :CONDITION_HEAVY_RAIN;
+        %tmp.61 = eq %tmp.58 %tmp.60;
+        push %tmp.61;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_45_19_45_32_end:
+        %tmp.62 = phi [%tmp.57 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_12_45_32_begin] [%tmp.61 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_45_19_45_32_false] [%tmp.62 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_45_19_45_32_end];
+        bt %tmp.62 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_8_53_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_46_19_46_32_false:
+        %tmp.63 = lgetv %c;
+        symbol [ c %tmp.63 46 19 20 ];
+        symbol [ Weather %tmp.64 46 24 31 ];
+        %tmp.64 = getm $.Toybox.Weather;
+        symbol [ CONDITION_SCATTERED_SHOWERS %tmp.65 46 32 59 ];
+        %tmp.65 = getv %tmp.64 :CONDITION_SCATTERED_SHOWERS;
+        %tmp.66 = eq %tmp.63 %tmp.65;
+        push %tmp.66;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_46_19_46_32_end:
+        %tmp.67 = phi [%tmp.62 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_12_46_32_begin] [%tmp.66 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_46_19_46_32_false] [%tmp.67 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_46_19_46_32_end];
+        bt %tmp.67 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_8_53_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_47_19_47_32_false:
+        %tmp.68 = lgetv %c;
+        symbol [ c %tmp.68 47 19 20 ];
+        symbol [ Weather %tmp.69 47 24 31 ];
+        %tmp.69 = getm $.Toybox.Weather;
+        symbol [ CONDITION_SHOWERS %tmp.70 47 32 49 ];
+        %tmp.70 = getv %tmp.69 :CONDITION_SHOWERS;
+        %tmp.71 = eq %tmp.68 %tmp.70;
+        push %tmp.71;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_47_19_47_32_end:
+        %tmp.72 = phi [%tmp.67 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_12_47_32_begin] [%tmp.71 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_47_19_47_32_false] [%tmp.72 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_47_19_47_32_end];
+        bt %tmp.72 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_8_53_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_48_19_48_32_false:
+        %tmp.73 = lgetv %c;
+        symbol [ c %tmp.73 48 19 20 ];
+        symbol [ Weather %tmp.74 48 24 31 ];
+        %tmp.74 = getm $.Toybox.Weather;
+        symbol [ CONDITION_LIGHT_SHOWERS %tmp.75 48 32 55 ];
+        %tmp.75 = getv %tmp.74 :CONDITION_LIGHT_SHOWERS;
+        %tmp.76 = eq %tmp.73 %tmp.75;
+        push %tmp.76;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_48_19_48_32_end:
+        %tmp.77 = phi [%tmp.72 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_12_48_32_begin] [%tmp.76 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_48_19_48_32_false] [%tmp.77 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_48_19_48_32_end];
+        bt %tmp.77 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_8_53_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_49_19_49_32_false:
+        %tmp.78 = lgetv %c;
+        symbol [ c %tmp.78 49 19 20 ];
+        symbol [ Weather %tmp.79 49 24 31 ];
+        %tmp.79 = getm $.Toybox.Weather;
+        symbol [ CONDITION_HEAVY_SHOWERS %tmp.80 49 32 55 ];
+        %tmp.80 = getv %tmp.79 :CONDITION_HEAVY_SHOWERS;
+        %tmp.81 = eq %tmp.78 %tmp.80;
+        push %tmp.81;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_49_19_49_32_end:
+        %tmp.82 = phi [%tmp.77 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_12_49_32_begin] [%tmp.81 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_49_19_49_32_false] [%tmp.82 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_49_19_49_32_end];
+        bt %tmp.82 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_8_53_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_50_19_50_32_false:
+        %tmp.83 = lgetv %c;
+        symbol [ c %tmp.83 50 19 20 ];
+        symbol [ Weather %tmp.84 50 24 31 ];
+        %tmp.84 = getm $.Toybox.Weather;
+        symbol [ CONDITION_DRIZZLE %tmp.85 50 32 49 ];
+        %tmp.85 = getv %tmp.84 :CONDITION_DRIZZLE;
+        %tmp.86 = eq %tmp.83 %tmp.85;
+        push %tmp.86;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_50_19_50_32_end:
+        %tmp.87 = phi [%tmp.82 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_12_50_32_begin] [%tmp.86 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_50_19_50_32_false] [%tmp.87 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_50_19_50_32_end];
+        bt %tmp.87 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_8_53_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_51_19_51_32_false:
+        %tmp.88 = lgetv %c;
+        symbol [ c %tmp.88 51 19 20 ];
+        symbol [ Weather %tmp.89 51 24 31 ];
+        %tmp.89 = getm $.Toybox.Weather;
+        symbol [ CONDITION_UNKNOWN_PRECIPITATION %tmp.90 51 32 63 ];
+        %tmp.90 = getv %tmp.89 :CONDITION_UNKNOWN_PRECIPITATION;
+        %tmp.91 = eq %tmp.88 %tmp.90;
+        push %tmp.91;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_51_19_51_32_end:
+        %tmp.92 = phi [%tmp.87 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_12_51_32_begin] [%tmp.91 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_51_19_51_32_false] [%tmp.92 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_51_19_51_32_end];
+        bf %tmp.92 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_8_53_8_if_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_8_53_8_if_true:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_51_65_53_8_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 52 12 ]
+        symbol [ ICON_RAIN %tmp.94 52 19 28 ];
+        %tmp.94 = getv ? :ICON_RAIN;
+        ret %tmp.94;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_51_65_53_8_stop:
+        goto @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_8_53_8_if_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_43_8_53_8_if_end:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 55 8 ]
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_8_66_8_if_stmt:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_12_64_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_12_63_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_12_62_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_12_61_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_12_60_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_12_59_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_12_58_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_12_57_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_12_56_32_begin:
+        %tmp.95 = lgetv %c;
+        symbol [ c %tmp.95 55 12 13 ];
+        symbol [ Weather %tmp.96 55 17 24 ];
+        %tmp.96 = getm $.Toybox.Weather;
+        symbol [ CONDITION_SNOW %tmp.97 55 25 39 ];
+        %tmp.97 = getv %tmp.96 :CONDITION_SNOW;
+        %tmp.98 = eq %tmp.95 %tmp.97;
+        bt %tmp.98 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_8_66_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_56_19_56_32_false:
+        %tmp.99 = lgetv %c;
+        symbol [ c %tmp.99 56 19 20 ];
+        symbol [ Weather %tmp.100 56 24 31 ];
+        %tmp.100 = getm $.Toybox.Weather;
+        symbol [ CONDITION_LIGHT_SNOW %tmp.101 56 32 52 ];
+        %tmp.101 = getv %tmp.100 :CONDITION_LIGHT_SNOW;
+        %tmp.102 = eq %tmp.99 %tmp.101;
+        push %tmp.102;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_56_19_56_32_end:
+        %tmp.103 = phi [%tmp.98 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_12_56_32_begin] [%tmp.102 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_56_19_56_32_false] [%tmp.103 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_56_19_56_32_end];
+        bt %tmp.103 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_8_66_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_57_19_57_32_false:
+        %tmp.104 = lgetv %c;
+        symbol [ c %tmp.104 57 19 20 ];
+        symbol [ Weather %tmp.105 57 24 31 ];
+        %tmp.105 = getm $.Toybox.Weather;
+        symbol [ CONDITION_HEAVY_SNOW %tmp.106 57 32 52 ];
+        %tmp.106 = getv %tmp.105 :CONDITION_HEAVY_SNOW;
+        %tmp.107 = eq %tmp.104 %tmp.106;
+        push %tmp.107;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_57_19_57_32_end:
+        %tmp.108 = phi [%tmp.103 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_12_57_32_begin] [%tmp.107 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_57_19_57_32_false] [%tmp.108 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_57_19_57_32_end];
+        bt %tmp.108 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_8_66_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_58_19_58_32_false:
+        %tmp.109 = lgetv %c;
+        symbol [ c %tmp.109 58 19 20 ];
+        symbol [ Weather %tmp.110 58 24 31 ];
+        %tmp.110 = getm $.Toybox.Weather;
+        symbol [ CONDITION_LIGHT_RAIN_SNOW %tmp.111 58 32 57 ];
+        %tmp.111 = getv %tmp.110 :CONDITION_LIGHT_RAIN_SNOW;
+        %tmp.112 = eq %tmp.109 %tmp.111;
+        push %tmp.112;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_58_19_58_32_end:
+        %tmp.113 = phi [%tmp.108 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_12_58_32_begin] [%tmp.112 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_58_19_58_32_false] [%tmp.113 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_58_19_58_32_end];
+        bt %tmp.113 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_8_66_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_59_19_59_32_false:
+        %tmp.114 = lgetv %c;
+        symbol [ c %tmp.114 59 19 20 ];
+        symbol [ Weather %tmp.115 59 24 31 ];
+        %tmp.115 = getm $.Toybox.Weather;
+        symbol [ CONDITION_HEAVY_RAIN_SNOW %tmp.116 59 32 57 ];
+        %tmp.116 = getv %tmp.115 :CONDITION_HEAVY_RAIN_SNOW;
+        %tmp.117 = eq %tmp.114 %tmp.116;
+        push %tmp.117;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_59_19_59_32_end:
+        %tmp.118 = phi [%tmp.113 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_12_59_32_begin] [%tmp.117 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_59_19_59_32_false] [%tmp.118 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_59_19_59_32_end];
+        bt %tmp.118 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_8_66_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_60_19_60_32_false:
+        %tmp.119 = lgetv %c;
+        symbol [ c %tmp.119 60 19 20 ];
+        symbol [ Weather %tmp.120 60 24 31 ];
+        %tmp.120 = getm $.Toybox.Weather;
+        symbol [ CONDITION_RAIN_SNOW %tmp.121 60 32 51 ];
+        %tmp.121 = getv %tmp.120 :CONDITION_RAIN_SNOW;
+        %tmp.122 = eq %tmp.119 %tmp.121;
+        push %tmp.122;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_60_19_60_32_end:
+        %tmp.123 = phi [%tmp.118 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_12_60_32_begin] [%tmp.122 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_60_19_60_32_false] [%tmp.123 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_60_19_60_32_end];
+        bt %tmp.123 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_8_66_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_61_19_61_32_false:
+        %tmp.124 = lgetv %c;
+        symbol [ c %tmp.124 61 19 20 ];
+        symbol [ Weather %tmp.125 61 24 31 ];
+        %tmp.125 = getm $.Toybox.Weather;
+        symbol [ CONDITION_WINTRY_MIX %tmp.126 61 32 52 ];
+        %tmp.126 = getv %tmp.125 :CONDITION_WINTRY_MIX;
+        %tmp.127 = eq %tmp.124 %tmp.126;
+        push %tmp.127;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_61_19_61_32_end:
+        %tmp.128 = phi [%tmp.123 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_12_61_32_begin] [%tmp.127 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_61_19_61_32_false] [%tmp.128 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_61_19_61_32_end];
+        bt %tmp.128 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_8_66_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_62_19_62_32_false:
+        %tmp.129 = lgetv %c;
+        symbol [ c %tmp.129 62 19 20 ];
+        symbol [ Weather %tmp.130 62 24 31 ];
+        %tmp.130 = getm $.Toybox.Weather;
+        symbol [ CONDITION_HAIL %tmp.131 62 32 46 ];
+        %tmp.131 = getv %tmp.130 :CONDITION_HAIL;
+        %tmp.132 = eq %tmp.129 %tmp.131;
+        push %tmp.132;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_62_19_62_32_end:
+        %tmp.133 = phi [%tmp.128 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_12_62_32_begin] [%tmp.132 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_62_19_62_32_false] [%tmp.133 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_62_19_62_32_end];
+        bt %tmp.133 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_8_66_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_63_19_63_32_false:
+        %tmp.134 = lgetv %c;
+        symbol [ c %tmp.134 63 19 20 ];
+        symbol [ Weather %tmp.135 63 24 31 ];
+        %tmp.135 = getm $.Toybox.Weather;
+        symbol [ CONDITION_FLURRIES %tmp.136 63 32 50 ];
+        %tmp.136 = getv %tmp.135 :CONDITION_FLURRIES;
+        %tmp.137 = eq %tmp.134 %tmp.136;
+        push %tmp.137;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_63_19_63_32_end:
+        %tmp.138 = phi [%tmp.133 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_12_63_32_begin] [%tmp.137 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_63_19_63_32_false] [%tmp.138 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_63_19_63_32_end];
+        bt %tmp.138 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_8_66_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_64_19_64_32_false:
+        %tmp.139 = lgetv %c;
+        symbol [ c %tmp.139 64 19 20 ];
+        symbol [ Weather %tmp.140 64 24 31 ];
+        %tmp.140 = getm $.Toybox.Weather;
+        symbol [ CONDITION_ICE_SNOW %tmp.141 64 32 50 ];
+        %tmp.141 = getv %tmp.140 :CONDITION_ICE_SNOW;
+        %tmp.142 = eq %tmp.139 %tmp.141;
+        push %tmp.142;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_64_19_64_32_end:
+        %tmp.143 = phi [%tmp.138 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_12_64_32_begin] [%tmp.142 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_64_19_64_32_false] [%tmp.143 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_64_19_64_32_end];
+        bf %tmp.143 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_8_66_8_if_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_8_66_8_if_true:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_64_52_66_8_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 65 12 ]
+        symbol [ ICON_SNOW %tmp.145 65 19 28 ];
+        %tmp.145 = getv ? :ICON_SNOW;
+        ret %tmp.145;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_64_52_66_8_stop:
+        goto @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_8_66_8_if_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_55_8_66_8_if_end:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 68 8 ]
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_68_8_71_8_if_stmt:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_68_12_69_32_begin:
+        %tmp.146 = lgetv %c;
+        symbol [ c %tmp.146 68 12 13 ];
+        symbol [ Weather %tmp.147 68 17 24 ];
+        %tmp.147 = getm $.Toybox.Weather;
+        symbol [ CONDITION_THUNDERSTORMS %tmp.148 68 25 48 ];
+        %tmp.148 = getv %tmp.147 :CONDITION_THUNDERSTORMS;
+        %tmp.149 = eq %tmp.146 %tmp.148;
+        bt %tmp.149 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_68_8_71_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_69_19_69_32_false:
+        %tmp.150 = lgetv %c;
+        symbol [ c %tmp.150 69 19 20 ];
+        symbol [ Weather %tmp.151 69 24 31 ];
+        %tmp.151 = getm $.Toybox.Weather;
+        symbol [ CONDITION_SCATTERED_THUNDERSTORMS %tmp.152 69 32 65 ];
+        %tmp.152 = getv %tmp.151 :CONDITION_SCATTERED_THUNDERSTORMS;
+        %tmp.153 = eq %tmp.150 %tmp.152;
+        push %tmp.153;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_69_19_69_32_end:
+        %tmp.154 = phi [%tmp.149 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_68_12_69_32_begin] [%tmp.153 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_69_19_69_32_false] [%tmp.154 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_69_19_69_32_end];
+        bf %tmp.154 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_68_8_71_8_if_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_68_8_71_8_if_true:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_69_67_71_8_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 70 12 ]
+        symbol [ ICON_THUNDER %tmp.156 70 19 31 ];
+        %tmp.156 = getv ? :ICON_THUNDER;
+        ret %tmp.156;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_69_67_71_8_stop:
+        goto @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_68_8_71_8_if_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_68_8_71_8_if_end:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 73 8 ]
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_73_8_82_8_if_stmt:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_73_12_80_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_73_12_79_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_73_12_78_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_73_12_77_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_73_12_76_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_73_12_75_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_73_12_74_32_begin:
+        %tmp.157 = lgetv %c;
+        symbol [ c %tmp.157 73 12 13 ];
+        symbol [ Weather %tmp.158 73 17 24 ];
+        %tmp.158 = getm $.Toybox.Weather;
+        symbol [ CONDITION_FOG %tmp.159 73 25 38 ];
+        %tmp.159 = getv %tmp.158 :CONDITION_FOG;
+        %tmp.160 = eq %tmp.157 %tmp.159;
+        bt %tmp.160 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_73_8_82_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_74_19_74_32_false:
+        %tmp.161 = lgetv %c;
+        symbol [ c %tmp.161 74 19 20 ];
+        symbol [ Weather %tmp.162 74 24 31 ];
+        %tmp.162 = getm $.Toybox.Weather;
+        symbol [ CONDITION_HAZY %tmp.163 74 32 46 ];
+        %tmp.163 = getv %tmp.162 :CONDITION_HAZY;
+        %tmp.164 = eq %tmp.161 %tmp.163;
+        push %tmp.164;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_74_19_74_32_end:
+        %tmp.165 = phi [%tmp.160 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_73_12_74_32_begin] [%tmp.164 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_74_19_74_32_false] [%tmp.165 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_74_19_74_32_end];
+        bt %tmp.165 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_73_8_82_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_75_19_75_32_false:
+        %tmp.166 = lgetv %c;
+        symbol [ c %tmp.166 75 19 20 ];
+        symbol [ Weather %tmp.167 75 24 31 ];
+        %tmp.167 = getm $.Toybox.Weather;
+        symbol [ CONDITION_MIST %tmp.168 75 32 46 ];
+        %tmp.168 = getv %tmp.167 :CONDITION_MIST;
+        %tmp.169 = eq %tmp.166 %tmp.168;
+        push %tmp.169;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_75_19_75_32_end:
+        %tmp.170 = phi [%tmp.165 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_73_12_75_32_begin] [%tmp.169 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_75_19_75_32_false] [%tmp.170 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_75_19_75_32_end];
+        bt %tmp.170 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_73_8_82_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_76_19_76_32_false:
+        %tmp.171 = lgetv %c;
+        symbol [ c %tmp.171 76 19 20 ];
+        symbol [ Weather %tmp.172 76 24 31 ];
+        %tmp.172 = getm $.Toybox.Weather;
+        symbol [ CONDITION_HAZE %tmp.173 76 32 46 ];
+        %tmp.173 = getv %tmp.172 :CONDITION_HAZE;
+        %tmp.174 = eq %tmp.171 %tmp.173;
+        push %tmp.174;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_76_19_76_32_end:
+        %tmp.175 = phi [%tmp.170 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_73_12_76_32_begin] [%tmp.174 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_76_19_76_32_false] [%tmp.175 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_76_19_76_32_end];
+        bt %tmp.175 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_73_8_82_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_77_19_77_32_false:
+        %tmp.176 = lgetv %c;
+        symbol [ c %tmp.176 77 19 20 ];
+        symbol [ Weather %tmp.177 77 24 31 ];
+        %tmp.177 = getm $.Toybox.Weather;
+        symbol [ CONDITION_SMOKE %tmp.178 77 32 47 ];
+        %tmp.178 = getv %tmp.177 :CONDITION_SMOKE;
+        %tmp.179 = eq %tmp.176 %tmp.178;
+        push %tmp.179;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_77_19_77_32_end:
+        %tmp.180 = phi [%tmp.175 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_73_12_77_32_begin] [%tmp.179 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_77_19_77_32_false] [%tmp.180 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_77_19_77_32_end];
+        bt %tmp.180 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_73_8_82_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_78_19_78_32_false:
+        %tmp.181 = lgetv %c;
+        symbol [ c %tmp.181 78 19 20 ];
+        symbol [ Weather %tmp.182 78 24 31 ];
+        %tmp.182 = getm $.Toybox.Weather;
+        symbol [ CONDITION_SAND %tmp.183 78 32 46 ];
+        %tmp.183 = getv %tmp.182 :CONDITION_SAND;
+        %tmp.184 = eq %tmp.181 %tmp.183;
+        push %tmp.184;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_78_19_78_32_end:
+        %tmp.185 = phi [%tmp.180 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_73_12_78_32_begin] [%tmp.184 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_78_19_78_32_false] [%tmp.185 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_78_19_78_32_end];
+        bt %tmp.185 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_73_8_82_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_79_19_79_32_false:
+        %tmp.186 = lgetv %c;
+        symbol [ c %tmp.186 79 19 20 ];
+        symbol [ Weather %tmp.187 79 24 31 ];
+        %tmp.187 = getm $.Toybox.Weather;
+        symbol [ CONDITION_DUST %tmp.188 79 32 46 ];
+        %tmp.188 = getv %tmp.187 :CONDITION_DUST;
+        %tmp.189 = eq %tmp.186 %tmp.188;
+        push %tmp.189;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_79_19_79_32_end:
+        %tmp.190 = phi [%tmp.185 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_73_12_79_32_begin] [%tmp.189 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_79_19_79_32_false] [%tmp.190 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_79_19_79_32_end];
+        bt %tmp.190 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_73_8_82_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_80_19_80_32_false:
+        %tmp.191 = lgetv %c;
+        symbol [ c %tmp.191 80 19 20 ];
+        symbol [ Weather %tmp.192 80 24 31 ];
+        %tmp.192 = getm $.Toybox.Weather;
+        symbol [ CONDITION_VOLCANIC_ASH %tmp.193 80 32 54 ];
+        %tmp.193 = getv %tmp.192 :CONDITION_VOLCANIC_ASH;
+        %tmp.194 = eq %tmp.191 %tmp.193;
+        push %tmp.194;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_80_19_80_32_end:
+        %tmp.195 = phi [%tmp.190 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_73_12_80_32_begin] [%tmp.194 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_80_19_80_32_false] [%tmp.195 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_80_19_80_32_end];
+        bf %tmp.195 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_73_8_82_8_if_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_73_8_82_8_if_true:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_80_56_82_8_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 81 12 ]
+        symbol [ ICON_FOG %tmp.197 81 19 27 ];
+        %tmp.197 = getv ? :ICON_FOG;
+        ret %tmp.197;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_80_56_82_8_stop:
+        goto @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_73_8_82_8_if_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_73_8_82_8_if_end:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 84 8 ]
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_84_8_91_8_if_stmt:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_84_12_89_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_84_12_88_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_84_12_87_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_84_12_86_32_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_84_12_85_32_begin:
+        %tmp.198 = lgetv %c;
+        symbol [ c %tmp.198 84 12 13 ];
+        symbol [ Weather %tmp.199 84 17 24 ];
+        %tmp.199 = getm $.Toybox.Weather;
+        symbol [ CONDITION_WINDY %tmp.200 84 25 40 ];
+        %tmp.200 = getv %tmp.199 :CONDITION_WINDY;
+        %tmp.201 = eq %tmp.198 %tmp.200;
+        bt %tmp.201 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_84_8_91_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_85_19_85_32_false:
+        %tmp.202 = lgetv %c;
+        symbol [ c %tmp.202 85 19 20 ];
+        symbol [ Weather %tmp.203 85 24 31 ];
+        %tmp.203 = getm $.Toybox.Weather;
+        symbol [ CONDITION_SQUALL %tmp.204 85 32 48 ];
+        %tmp.204 = getv %tmp.203 :CONDITION_SQUALL;
+        %tmp.205 = eq %tmp.202 %tmp.204;
+        push %tmp.205;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_85_19_85_32_end:
+        %tmp.206 = phi [%tmp.201 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_84_12_85_32_begin] [%tmp.205 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_85_19_85_32_false] [%tmp.206 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_85_19_85_32_end];
+        bt %tmp.206 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_84_8_91_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_86_19_86_32_false:
+        %tmp.207 = lgetv %c;
+        symbol [ c %tmp.207 86 19 20 ];
+        symbol [ Weather %tmp.208 86 24 31 ];
+        %tmp.208 = getm $.Toybox.Weather;
+        symbol [ CONDITION_SANDSTORM %tmp.209 86 32 51 ];
+        %tmp.209 = getv %tmp.208 :CONDITION_SANDSTORM;
+        %tmp.210 = eq %tmp.207 %tmp.209;
+        push %tmp.210;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_86_19_86_32_end:
+        %tmp.211 = phi [%tmp.206 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_84_12_86_32_begin] [%tmp.210 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_86_19_86_32_false] [%tmp.211 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_86_19_86_32_end];
+        bt %tmp.211 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_84_8_91_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_87_19_87_32_false:
+        %tmp.212 = lgetv %c;
+        symbol [ c %tmp.212 87 19 20 ];
+        symbol [ Weather %tmp.213 87 24 31 ];
+        %tmp.213 = getm $.Toybox.Weather;
+        symbol [ CONDITION_TORNADO %tmp.214 87 32 49 ];
+        %tmp.214 = getv %tmp.213 :CONDITION_TORNADO;
+        %tmp.215 = eq %tmp.212 %tmp.214;
+        push %tmp.215;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_87_19_87_32_end:
+        %tmp.216 = phi [%tmp.211 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_84_12_87_32_begin] [%tmp.215 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_87_19_87_32_false] [%tmp.216 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_87_19_87_32_end];
+        bt %tmp.216 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_84_8_91_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_88_19_88_32_false:
+        %tmp.217 = lgetv %c;
+        symbol [ c %tmp.217 88 19 20 ];
+        symbol [ Weather %tmp.218 88 24 31 ];
+        %tmp.218 = getm $.Toybox.Weather;
+        symbol [ CONDITION_HURRICANE %tmp.219 88 32 51 ];
+        %tmp.219 = getv %tmp.218 :CONDITION_HURRICANE;
+        %tmp.220 = eq %tmp.217 %tmp.219;
+        push %tmp.220;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_88_19_88_32_end:
+        %tmp.221 = phi [%tmp.216 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_84_12_88_32_begin] [%tmp.220 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_88_19_88_32_false] [%tmp.221 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_88_19_88_32_end];
+        bt %tmp.221 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_84_8_91_8_if_true;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_89_19_89_32_false:
+        %tmp.222 = lgetv %c;
+        symbol [ c %tmp.222 89 19 20 ];
+        symbol [ Weather %tmp.223 89 24 31 ];
+        %tmp.223 = getm $.Toybox.Weather;
+        symbol [ CONDITION_TROPICAL_STORM %tmp.224 89 32 56 ];
+        %tmp.224 = getv %tmp.223 :CONDITION_TROPICAL_STORM;
+        %tmp.225 = eq %tmp.222 %tmp.224;
+        push %tmp.225;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_89_19_89_32_end:
+        %tmp.226 = phi [%tmp.221 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_84_12_89_32_begin] [%tmp.225 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_89_19_89_32_false] [%tmp.226 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_89_19_89_32_end];
+        bf %tmp.226 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_84_8_91_8_if_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_84_8_91_8_if_true:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_89_58_91_8_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 90 12 ]
+        symbol [ ICON_WINDY %tmp.228 90 19 29 ];
+        %tmp.228 = getv ? :ICON_WINDY;
+        ret %tmp.228;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_89_58_91_8_stop:
+        goto @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_84_8_91_8_if_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_84_8_91_8_if_end:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 93 8 ]
+        symbol [ ICON_UNKNOWN %tmp.230 93 15 27 ];
+        %tmp.230 = getv ? :ICON_UNKNOWN;
+        ret %tmp.230;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_23_30_94_4_stop:
+    }
+    [ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 96; @symbol_functiondef = [draw,96,13,17]; @symbol_param<0> = [dc,96,18,20]; @symbol_param<1> = [cx,96,22,24]; @symbol_param<2> = [cy,96,26,28]; @symbol_param<3> = [size,96,30,34]; @symbol_param<4> = [condition,96,36,45]; ]
+    function draw(dc, cx, cy, size, condition) {
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_96_47_107_4_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 97 8 ]
+        [ "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_96_47_107_4_start" "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_96_47_107_4_stop" ]
+        %icon.1 = local;
+        symbol [ icon %icon.1 97 12 16 ];
+        %tmp.1 = self;
+        symbol [ fromCondition %tmp.2 97 19 32 ];
+        %tmp.2 = getv function %tmp.1 :fromCondition;
+        %tmp.3 = lgetv %condition;
+        symbol [ condition %tmp.3 97 33 42 ];
+        %tmp.4 = invoke %tmp.1 %tmp.2(%tmp.3);
+        lputv %icon.1 %tmp.4;
+        symbol [ icon %icon.1 97 12 16 ];
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 98 8 ]
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_98_8_106_79_if_stmt:
+        %tmp.5 = lgetv %icon.1;
+        symbol [ icon %tmp.5 98 12 16 ];
+        symbol [ ICON_SUNNY %tmp.7 98 20 30 ];
+        %tmp.7 = getv ? :ICON_SUNNY;
+        %tmp.8 = eq %tmp.5 %tmp.7;
+        bf %tmp.8 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_98_8_106_79_if_false;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_98_8_106_79_if_true:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_98_44_98_73_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 98 46 ]
+        %tmp.9 = self;
+        symbol [ drawSun %tmp.10 98 46 53 ];
+        %tmp.10 = getv function %tmp.9 :drawSun;
+        %tmp.11 = lgetv %dc;
+        symbol [ dc %tmp.11 98 54 56 ];
+        %tmp.12 = lgetv %cx;
+        symbol [ cx %tmp.12 98 58 60 ];
+        %tmp.13 = lgetv %cy;
+        symbol [ cy %tmp.13 98 62 64 ];
+        %tmp.14 = lgetv %size;
+        symbol [ size %tmp.14 98 66 70 ];
+        invoke %tmp.9 %tmp.10(%tmp.11, %tmp.12, %tmp.13, %tmp.14);
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_98_44_98_73_stop:
+        goto @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_98_8_106_79_if_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_98_8_106_79_if_false:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 99 13 ]
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_99_13_106_79_if_stmt:
+        %tmp.15 = lgetv %icon.1;
+        symbol [ icon %tmp.15 99 17 21 ];
+        symbol [ ICON_PARTLY_CLOUDY %tmp.17 99 25 43 ];
+        %tmp.17 = getv ? :ICON_PARTLY_CLOUDY;
+        %tmp.18 = eq %tmp.15 %tmp.17;
+        bf %tmp.18 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_99_13_106_79_if_false;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_99_13_106_79_if_true:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_99_45_99_79_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 99 47 ]
+        %tmp.19 = self;
+        symbol [ drawSunCloud %tmp.20 99 47 59 ];
+        %tmp.20 = getv function %tmp.19 :drawSunCloud;
+        %tmp.21 = lgetv %dc;
+        symbol [ dc %tmp.21 99 60 62 ];
+        %tmp.22 = lgetv %cx;
+        symbol [ cx %tmp.22 99 64 66 ];
+        %tmp.23 = lgetv %cy;
+        symbol [ cy %tmp.23 99 68 70 ];
+        %tmp.24 = lgetv %size;
+        symbol [ size %tmp.24 99 72 76 ];
+        invoke %tmp.19 %tmp.20(%tmp.21, %tmp.22, %tmp.23, %tmp.24);
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_99_45_99_79_stop:
+        goto @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_99_13_106_79_if_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_99_13_106_79_if_false:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 100 13 ]
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_100_13_106_79_if_stmt:
+        %tmp.25 = lgetv %icon.1;
+        symbol [ icon %tmp.25 100 17 21 ];
+        symbol [ ICON_CLOUDY %tmp.27 100 25 36 ];
+        %tmp.27 = getv ? :ICON_CLOUDY;
+        %tmp.28 = eq %tmp.25 %tmp.27;
+        bf %tmp.28 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_100_13_106_79_if_false;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_100_13_106_79_if_true:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_100_45_100_95_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 100 47 ]
+        %tmp.29 = self;
+        symbol [ drawCloud %tmp.30 100 47 56 ];
+        %tmp.30 = getv function %tmp.29 :drawCloud;
+        %tmp.31 = lgetv %dc;
+        symbol [ dc %tmp.31 100 57 59 ];
+        %tmp.32 = lgetv %cx;
+        symbol [ cx %tmp.32 100 61 63 ];
+        %tmp.33 = lgetv %cy;
+        symbol [ cy %tmp.33 100 65 67 ];
+        %tmp.34 = lgetv %size;
+        symbol [ size %tmp.34 100 69 73 ];
+        symbol [ Gfx %tmp.35 100 75 78 ];
+        %tmp.35 = getm $.Toybox.Graphics;
+        symbol [ COLOR_LT_GRAY %tmp.36 100 79 92 ];
+        %tmp.36 = getv %tmp.35 :COLOR_LT_GRAY;
+        invoke %tmp.29 %tmp.30(%tmp.31, %tmp.32, %tmp.33, %tmp.34, %tmp.36);
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_100_45_100_95_stop:
+        goto @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_100_13_106_79_if_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_100_13_106_79_if_false:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 101 13 ]
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_101_13_106_79_if_stmt:
+        %tmp.37 = lgetv %icon.1;
+        symbol [ icon %tmp.37 101 17 21 ];
+        symbol [ ICON_RAIN %tmp.39 101 25 34 ];
+        %tmp.39 = getv ? :ICON_RAIN;
+        %tmp.40 = eq %tmp.37 %tmp.39;
+        bf %tmp.40 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_101_13_106_79_if_false;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_101_13_106_79_if_true:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_101_45_101_75_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 101 47 ]
+        %tmp.41 = self;
+        symbol [ drawRain %tmp.42 101 47 55 ];
+        %tmp.42 = getv function %tmp.41 :drawRain;
+        %tmp.43 = lgetv %dc;
+        symbol [ dc %tmp.43 101 56 58 ];
+        %tmp.44 = lgetv %cx;
+        symbol [ cx %tmp.44 101 60 62 ];
+        %tmp.45 = lgetv %cy;
+        symbol [ cy %tmp.45 101 64 66 ];
+        %tmp.46 = lgetv %size;
+        symbol [ size %tmp.46 101 68 72 ];
+        invoke %tmp.41 %tmp.42(%tmp.43, %tmp.44, %tmp.45, %tmp.46);
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_101_45_101_75_stop:
+        goto @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_101_13_106_79_if_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_101_13_106_79_if_false:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 102 13 ]
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_102_13_106_79_if_stmt:
+        %tmp.47 = lgetv %icon.1;
+        symbol [ icon %tmp.47 102 17 21 ];
+        symbol [ ICON_SNOW %tmp.49 102 25 34 ];
+        %tmp.49 = getv ? :ICON_SNOW;
+        %tmp.50 = eq %tmp.47 %tmp.49;
+        bf %tmp.50 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_102_13_106_79_if_false;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_102_13_106_79_if_true:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_102_45_102_75_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 102 47 ]
+        %tmp.51 = self;
+        symbol [ drawSnow %tmp.52 102 47 55 ];
+        %tmp.52 = getv function %tmp.51 :drawSnow;
+        %tmp.53 = lgetv %dc;
+        symbol [ dc %tmp.53 102 56 58 ];
+        %tmp.54 = lgetv %cx;
+        symbol [ cx %tmp.54 102 60 62 ];
+        %tmp.55 = lgetv %cy;
+        symbol [ cy %tmp.55 102 64 66 ];
+        %tmp.56 = lgetv %size;
+        symbol [ size %tmp.56 102 68 72 ];
+        invoke %tmp.51 %tmp.52(%tmp.53, %tmp.54, %tmp.55, %tmp.56);
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_102_45_102_75_stop:
+        goto @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_102_13_106_79_if_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_102_13_106_79_if_false:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 103 13 ]
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_103_13_106_79_if_stmt:
+        %tmp.57 = lgetv %icon.1;
+        symbol [ icon %tmp.57 103 17 21 ];
+        symbol [ ICON_THUNDER %tmp.59 103 25 37 ];
+        %tmp.59 = getv ? :ICON_THUNDER;
+        %tmp.60 = eq %tmp.57 %tmp.59;
+        bf %tmp.60 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_103_13_106_79_if_false;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_103_13_106_79_if_true:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_103_45_103_78_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 103 47 ]
+        %tmp.61 = self;
+        symbol [ drawThunder %tmp.62 103 47 58 ];
+        %tmp.62 = getv function %tmp.61 :drawThunder;
+        %tmp.63 = lgetv %dc;
+        symbol [ dc %tmp.63 103 59 61 ];
+        %tmp.64 = lgetv %cx;
+        symbol [ cx %tmp.64 103 63 65 ];
+        %tmp.65 = lgetv %cy;
+        symbol [ cy %tmp.65 103 67 69 ];
+        %tmp.66 = lgetv %size;
+        symbol [ size %tmp.66 103 71 75 ];
+        invoke %tmp.61 %tmp.62(%tmp.63, %tmp.64, %tmp.65, %tmp.66);
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_103_45_103_78_stop:
+        goto @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_103_13_106_79_if_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_103_13_106_79_if_false:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 104 13 ]
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_104_13_106_79_if_stmt:
+        %tmp.67 = lgetv %icon.1;
+        symbol [ icon %tmp.67 104 17 21 ];
+        symbol [ ICON_FOG %tmp.69 104 25 33 ];
+        %tmp.69 = getv ? :ICON_FOG;
+        %tmp.70 = eq %tmp.67 %tmp.69;
+        bf %tmp.70 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_104_13_106_79_if_false;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_104_13_106_79_if_true:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_104_45_104_74_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 104 47 ]
+        %tmp.71 = self;
+        symbol [ drawFog %tmp.72 104 47 54 ];
+        %tmp.72 = getv function %tmp.71 :drawFog;
+        %tmp.73 = lgetv %dc;
+        symbol [ dc %tmp.73 104 55 57 ];
+        %tmp.74 = lgetv %cx;
+        symbol [ cx %tmp.74 104 59 61 ];
+        %tmp.75 = lgetv %cy;
+        symbol [ cy %tmp.75 104 63 65 ];
+        %tmp.76 = lgetv %size;
+        symbol [ size %tmp.76 104 67 71 ];
+        invoke %tmp.71 %tmp.72(%tmp.73, %tmp.74, %tmp.75, %tmp.76);
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_104_45_104_74_stop:
+        goto @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_104_13_106_79_if_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_104_13_106_79_if_false:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 105 13 ]
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_105_13_106_79_if_stmt:
+        %tmp.77 = lgetv %icon.1;
+        symbol [ icon %tmp.77 105 17 21 ];
+        symbol [ ICON_WINDY %tmp.79 105 25 35 ];
+        %tmp.79 = getv ? :ICON_WINDY;
+        %tmp.80 = eq %tmp.77 %tmp.79;
+        bf %tmp.80 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_105_13_106_79_if_else_false;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_105_13_106_79_if_true:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_105_45_105_75_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 105 47 ]
+        %tmp.81 = self;
+        symbol [ drawWind %tmp.82 105 47 55 ];
+        %tmp.82 = getv function %tmp.81 :drawWind;
+        %tmp.83 = lgetv %dc;
+        symbol [ dc %tmp.83 105 56 58 ];
+        %tmp.84 = lgetv %cx;
+        symbol [ cx %tmp.84 105 60 62 ];
+        %tmp.85 = lgetv %cy;
+        symbol [ cy %tmp.85 105 64 66 ];
+        %tmp.86 = lgetv %size;
+        symbol [ size %tmp.86 105 68 72 ];
+        invoke %tmp.81 %tmp.82(%tmp.83, %tmp.84, %tmp.85, %tmp.86);
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_105_45_105_75_stop:
+        goto @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_105_13_106_79_if_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_105_13_106_79_if_else_false:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_106_46_106_79_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 106 48 ]
+        %tmp.87 = self;
+        symbol [ drawUnknown %tmp.88 106 48 59 ];
+        %tmp.88 = getv function %tmp.87 :drawUnknown;
+        %tmp.89 = lgetv %dc;
+        symbol [ dc %tmp.89 106 60 62 ];
+        %tmp.90 = lgetv %cx;
+        symbol [ cx %tmp.90 106 64 66 ];
+        %tmp.91 = lgetv %cy;
+        symbol [ cy %tmp.91 106 68 70 ];
+        %tmp.92 = lgetv %size;
+        symbol [ size %tmp.92 106 72 76 ];
+        invoke %tmp.87 %tmp.88(%tmp.89, %tmp.90, %tmp.91, %tmp.92);
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_106_46_106_79_stop:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_105_13_106_79_if_end:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_104_13_106_79_if_end:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_103_13_106_79_if_end:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_102_13_106_79_if_end:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_101_13_106_79_if_end:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_100_13_106_79_if_end:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_99_13_106_79_if_end:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_98_8_106_79_if_end:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_96_47_107_4_stop:
+    }
+    [ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 109; @symbol_functiondef = [drawSun,109,13,20]; @symbol_param<0> = [dc,109,21,23]; @symbol_param<1> = [cx,109,25,27]; @symbol_param<2> = [cy,109,29,31]; @symbol_param<3> = [size,109,33,37]; ]
+    function drawSun(dc, cx, cy, size) {
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_109_39_124_4_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 110 8 ]
+        [ "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_109_39_124_4_start" "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_109_39_124_4_stop" ]
+        %r.1 = local;
+        symbol [ r %r.1 110 12 13 ];
+        %tmp.1 = lgetv %size;
+        symbol [ size %tmp.1 110 16 20 ];
+        %tmp.2 = 4;
+        %tmp.3 = div %tmp.1 %tmp.2;
+        lputv %r.1 %tmp.3;
+        symbol [ r %r.1 110 12 13 ];
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 111 8 ]
+        %tmp.4 = lgetv %dc;
+        symbol [ dc %tmp.4 111 8 10 ];
+        symbol [ setColor %tmp.5 111 11 19 ];
+        %tmp.5 = getv function %tmp.4 :setColor;
+        symbol [ Gfx %tmp.6 111 20 23 ];
+        %tmp.6 = getm $.Toybox.Graphics;
+        symbol [ COLOR_YELLOW %tmp.7 111 24 36 ];
+        %tmp.7 = getv %tmp.6 :COLOR_YELLOW;
+        symbol [ Gfx %tmp.8 111 38 41 ];
+        %tmp.8 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.9 111 42 59 ];
+        %tmp.9 = getv %tmp.8 :COLOR_TRANSPARENT;
+        invoke %tmp.4 %tmp.5(%tmp.7, %tmp.9);
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 112 8 ]
+        %tmp.10 = lgetv %dc;
+        symbol [ dc %tmp.10 112 8 10 ];
+        symbol [ fillCircle %tmp.11 112 11 21 ];
+        %tmp.11 = getv function %tmp.10 :fillCircle;
+        %tmp.12 = lgetv %cx;
+        symbol [ cx %tmp.12 112 22 24 ];
+        %tmp.13 = lgetv %cy;
+        symbol [ cy %tmp.13 112 26 28 ];
+        %tmp.14 = lgetv %r.1;
+        symbol [ r %tmp.14 112 30 31 ];
+        invoke %tmp.10 %tmp.11(%tmp.12, %tmp.13, %tmp.14);
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 113 8 ]
+        %tmp.15 = lgetv %dc;
+        symbol [ dc %tmp.15 113 8 10 ];
+        symbol [ setPenWidth %tmp.16 113 11 22 ];
+        %tmp.16 = getv function %tmp.15 :setPenWidth;
+        %tmp.17 = 2;
+        invoke %tmp.15 %tmp.16(%tmp.17);
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 114 8 ]
+        [ "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_109_39_124_4_start" "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_109_39_124_4_stop" ]
+        %outer.2 = local;
+        symbol [ outer %outer.2 114 12 17 ];
+        %tmp.18 = lgetv %size;
+        symbol [ size %tmp.18 114 21 25 ];
+        %tmp.19 = 2;
+        %tmp.20 = div %tmp.18 %tmp.19;
+        %tmp.21 = 1;
+        %tmp.22 = sub %tmp.20 %tmp.21;
+        lputv %outer.2 %tmp.22;
+        symbol [ outer %outer.2 114 12 17 ];
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 115 8 ]
+        for @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_115_8_122_8_for_test @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_115_8_122_8_for_incr @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_115_8_122_8_for_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_115_8_122_8_for_init:
+        [ "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_115_8_122_8_for_begin" "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_115_8_122_8_for_end" ]
+        %i.3 = local;
+        symbol [ i %i.3 115 17 18 ];
+        %tmp.23 = 0;
+        lputv %i.3 %tmp.23;
+        symbol [ i %i.3 115 17 18 ];
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_115_8_122_8_for_test:
+        %tmp.24 = lgetv %i.3;
+        symbol [ i %tmp.24 115 24 25 ];
+        %tmp.25 = 8;
+        %tmp.26 = lt %tmp.24 %tmp.25;
+        bf %tmp.26 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_115_8_122_8_for_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_115_8_122_8_for_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_115_36_122_8_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 116 12 ]
+        [ "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_115_36_122_8_start" "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_115_36_122_8_stop" ]
+        %a.4 = local;
+        symbol [ a %a.4 116 16 17 ];
+        %tmp.27 = lgetv %i.3;
+        symbol [ i %tmp.27 116 20 21 ];
+        symbol [ Math %tmp.28 116 24 28 ];
+        %tmp.28 = getm $.Toybox.Math;
+        symbol [ PI %tmp.29 116 29 31 ];
+        %tmp.29 = getv %tmp.28 :PI;
+        %tmp.30 = mul %tmp.27 %tmp.29;
+        %tmp.31 = 4.0;
+        %tmp.32 = div %tmp.30 %tmp.31;
+        lputv %a.4 %tmp.32;
+        symbol [ a %a.4 116 16 17 ];
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 117 12 ]
+        [ "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_115_36_122_8_start" "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_115_36_122_8_stop" ]
+        %x1.5 = local;
+        symbol [ x1 %x1.5 117 16 18 ];
+        %tmp.33 = lgetv %cx;
+        symbol [ cx %tmp.33 117 21 23 ];
+        %tmp.34 = lgetv %r.1;
+        symbol [ r %tmp.34 117 27 28 ];
+        %tmp.35 = 2;
+        %tmp.36 = add %tmp.34 %tmp.35;
+        symbol [ Math %tmp.37 117 36 40 ];
+        %tmp.37 = getm $.Toybox.Math;
+        symbol [ cos %tmp.38 117 41 44 ];
+        %tmp.38 = getv function %tmp.37 :cos;
+        %tmp.39 = lgetv %a.4;
+        symbol [ a %tmp.39 117 45 46 ];
+        %tmp.40 = invoke %tmp.37 %tmp.38(%tmp.39);
+        %tmp.41 = mul %tmp.36 %tmp.40;
+        %tmp.42 = add %tmp.33 %tmp.41;
+        lputv %x1.5 %tmp.42;
+        symbol [ x1 %x1.5 117 16 18 ];
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 118 12 ]
+        [ "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_115_36_122_8_start" "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_115_36_122_8_stop" ]
+        %y1.6 = local;
+        symbol [ y1 %y1.6 118 16 18 ];
+        %tmp.43 = lgetv %cy;
+        symbol [ cy %tmp.43 118 21 23 ];
+        %tmp.44 = lgetv %r.1;
+        symbol [ r %tmp.44 118 27 28 ];
+        %tmp.45 = 2;
+        %tmp.46 = add %tmp.44 %tmp.45;
+        symbol [ Math %tmp.47 118 36 40 ];
+        %tmp.47 = getm $.Toybox.Math;
+        symbol [ sin %tmp.48 118 41 44 ];
+        %tmp.48 = getv function %tmp.47 :sin;
+        %tmp.49 = lgetv %a.4;
+        symbol [ a %tmp.49 118 45 46 ];
+        %tmp.50 = invoke %tmp.47 %tmp.48(%tmp.49);
+        %tmp.51 = mul %tmp.46 %tmp.50;
+        %tmp.52 = add %tmp.43 %tmp.51;
+        lputv %y1.6 %tmp.52;
+        symbol [ y1 %y1.6 118 16 18 ];
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 119 12 ]
+        [ "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_115_36_122_8_start" "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_115_36_122_8_stop" ]
+        %x2.7 = local;
+        symbol [ x2 %x2.7 119 16 18 ];
+        %tmp.53 = lgetv %cx;
+        symbol [ cx %tmp.53 119 21 23 ];
+        %tmp.54 = lgetv %outer.2;
+        symbol [ outer %tmp.54 119 26 31 ];
+        symbol [ Math %tmp.55 119 34 38 ];
+        %tmp.55 = getm $.Toybox.Math;
+        symbol [ cos %tmp.56 119 39 42 ];
+        %tmp.56 = getv function %tmp.55 :cos;
+        %tmp.57 = lgetv %a.4;
+        symbol [ a %tmp.57 119 43 44 ];
+        %tmp.58 = invoke %tmp.55 %tmp.56(%tmp.57);
+        %tmp.59 = mul %tmp.54 %tmp.58;
+        %tmp.60 = add %tmp.53 %tmp.59;
+        lputv %x2.7 %tmp.60;
+        symbol [ x2 %x2.7 119 16 18 ];
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 120 12 ]
+        [ "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_115_36_122_8_start" "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_115_36_122_8_stop" ]
+        %y2.8 = local;
+        symbol [ y2 %y2.8 120 16 18 ];
+        %tmp.61 = lgetv %cy;
+        symbol [ cy %tmp.61 120 21 23 ];
+        %tmp.62 = lgetv %outer.2;
+        symbol [ outer %tmp.62 120 26 31 ];
+        symbol [ Math %tmp.63 120 34 38 ];
+        %tmp.63 = getm $.Toybox.Math;
+        symbol [ sin %tmp.64 120 39 42 ];
+        %tmp.64 = getv function %tmp.63 :sin;
+        %tmp.65 = lgetv %a.4;
+        symbol [ a %tmp.65 120 43 44 ];
+        %tmp.66 = invoke %tmp.63 %tmp.64(%tmp.65);
+        %tmp.67 = mul %tmp.62 %tmp.66;
+        %tmp.68 = add %tmp.61 %tmp.67;
+        lputv %y2.8 %tmp.68;
+        symbol [ y2 %y2.8 120 16 18 ];
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 121 12 ]
+        %tmp.69 = lgetv %dc;
+        symbol [ dc %tmp.69 121 12 14 ];
+        symbol [ drawLine %tmp.70 121 15 23 ];
+        %tmp.70 = getv function %tmp.69 :drawLine;
+        %tmp.71 = lgetv %x1.5;
+        symbol [ x1 %tmp.71 121 24 26 ];
+        %tmp.72 = lgetv %y1.6;
+        symbol [ y1 %tmp.72 121 28 30 ];
+        %tmp.73 = lgetv %x2.7;
+        symbol [ x2 %tmp.73 121 32 34 ];
+        %tmp.74 = lgetv %y2.8;
+        symbol [ y2 %tmp.74 121 36 38 ];
+        invoke %tmp.69 %tmp.70(%tmp.71, %tmp.72, %tmp.73, %tmp.74);
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_115_36_122_8_stop:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_115_8_122_8_for_incr:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 115 ]
+        %tmp.77 = lgetv %i.3;
+        symbol [ i %tmp.77 115 31 32 ];
+        %tmp.78 = add %tmp.77 1;
+        lputv %i.3 %tmp.78;
+        symbol [ i %i.3 115 31 32 ];
+        goto @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_115_8_122_8_for_test;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_115_8_122_8_for_end:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 123 8 ]
+        %tmp.79 = lgetv %dc;
+        symbol [ dc %tmp.79 123 8 10 ];
+        symbol [ setPenWidth %tmp.80 123 11 22 ];
+        %tmp.80 = getv function %tmp.79 :setPenWidth;
+        %tmp.81 = 1;
+        invoke %tmp.79 %tmp.80(%tmp.81);
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_109_39_124_4_stop:
+    }
+    [ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 126; @symbol_functiondef = [drawCloud,126,13,22]; @symbol_param<0> = [dc,126,23,25]; @symbol_param<1> = [cx,126,27,29]; @symbol_param<2> = [cy,126,31,33]; @symbol_param<3> = [size,126,35,39]; @symbol_param<4> = [color,126,41,46]; ]
+    function drawCloud(dc, cx, cy, size, color) {
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_126_48_135_4_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 127 8 ]
+        %tmp.1 = lgetv %dc;
+        symbol [ dc %tmp.1 127 8 10 ];
+        symbol [ setColor %tmp.2 127 11 19 ];
+        %tmp.2 = getv function %tmp.1 :setColor;
+        %tmp.3 = lgetv %color;
+        symbol [ color %tmp.3 127 20 25 ];
+        symbol [ Gfx %tmp.4 127 27 30 ];
+        %tmp.4 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.5 127 31 48 ];
+        %tmp.5 = getv %tmp.4 :COLOR_TRANSPARENT;
+        invoke %tmp.1 %tmp.2(%tmp.3, %tmp.5);
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 128 8 ]
+        [ "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_126_48_135_4_start" "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_126_48_135_4_stop" ]
+        %r1.1 = local;
+        symbol [ r1 %r1.1 128 12 14 ];
+        %tmp.6 = lgetv %size;
+        symbol [ size %tmp.6 128 17 21 ];
+        %tmp.7 = 4;
+        %tmp.8 = div %tmp.6 %tmp.7;
+        lputv %r1.1 %tmp.8;
+        symbol [ r1 %r1.1 128 12 14 ];
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 129 8 ]
+        [ "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_126_48_135_4_start" "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_126_48_135_4_stop" ]
+        %r2.2 = local;
+        symbol [ r2 %r2.2 129 12 14 ];
+        %tmp.9 = lgetv %size;
+        symbol [ size %tmp.9 129 17 21 ];
+        %tmp.10 = 3;
+        %tmp.11 = div %tmp.9 %tmp.10;
+        lputv %r2.2 %tmp.11;
+        symbol [ r2 %r2.2 129 12 14 ];
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 130 8 ]
+        [ "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_126_48_135_4_start" "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_126_48_135_4_stop" ]
+        %r3.3 = local;
+        symbol [ r3 %r3.3 130 12 14 ];
+        %tmp.12 = lgetv %size;
+        symbol [ size %tmp.12 130 17 21 ];
+        %tmp.13 = 4;
+        %tmp.14 = div %tmp.12 %tmp.13;
+        lputv %r3.3 %tmp.14;
+        symbol [ r3 %r3.3 130 12 14 ];
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 131 8 ]
+        %tmp.15 = lgetv %dc;
+        symbol [ dc %tmp.15 131 8 10 ];
+        symbol [ fillCircle %tmp.16 131 11 21 ];
+        %tmp.16 = getv function %tmp.15 :fillCircle;
+        %tmp.17 = lgetv %cx;
+        symbol [ cx %tmp.17 131 22 24 ];
+        %tmp.18 = lgetv %r2.2;
+        symbol [ r2 %tmp.18 131 27 29 ];
+        %tmp.19 = sub %tmp.17 %tmp.18;
+        %tmp.20 = lgetv %cy;
+        symbol [ cy %tmp.20 131 31 33 ];
+        %tmp.21 = 1;
+        %tmp.22 = add %tmp.20 %tmp.21;
+        %tmp.23 = lgetv %r1.1;
+        symbol [ r1 %tmp.23 131 39 41 ];
+        invoke %tmp.15 %tmp.16(%tmp.19, %tmp.22, %tmp.23);
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 132 8 ]
+        %tmp.24 = lgetv %dc;
+        symbol [ dc %tmp.24 132 8 10 ];
+        symbol [ fillCircle %tmp.25 132 11 21 ];
+        %tmp.25 = getv function %tmp.24 :fillCircle;
+        %tmp.26 = lgetv %cx;
+        symbol [ cx %tmp.26 132 22 24 ];
+        %tmp.27 = lgetv %cy;
+        symbol [ cy %tmp.27 132 31 33 ];
+        %tmp.28 = 2;
+        %tmp.29 = sub %tmp.27 %tmp.28;
+        %tmp.30 = lgetv %r2.2;
+        symbol [ r2 %tmp.30 132 39 41 ];
+        invoke %tmp.24 %tmp.25(%tmp.26, %tmp.29, %tmp.30);
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 133 8 ]
+        %tmp.31 = lgetv %dc;
+        symbol [ dc %tmp.31 133 8 10 ];
+        symbol [ fillCircle %tmp.32 133 11 21 ];
+        %tmp.32 = getv function %tmp.31 :fillCircle;
+        %tmp.33 = lgetv %cx;
+        symbol [ cx %tmp.33 133 22 24 ];
+        %tmp.34 = lgetv %r2.2;
+        symbol [ r2 %tmp.34 133 27 29 ];
+        %tmp.35 = add %tmp.33 %tmp.34;
+        %tmp.36 = lgetv %cy;
+        symbol [ cy %tmp.36 133 31 33 ];
+        %tmp.37 = 1;
+        %tmp.38 = add %tmp.36 %tmp.37;
+        %tmp.39 = lgetv %r3.3;
+        symbol [ r3 %tmp.39 133 39 41 ];
+        invoke %tmp.31 %tmp.32(%tmp.35, %tmp.38, %tmp.39);
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 134 8 ]
+        %tmp.40 = lgetv %dc;
+        symbol [ dc %tmp.40 134 8 10 ];
+        symbol [ fillRectangle %tmp.41 134 11 24 ];
+        %tmp.41 = getv function %tmp.40 :fillRectangle;
+        %tmp.42 = lgetv %cx;
+        symbol [ cx %tmp.42 134 25 27 ];
+        %tmp.43 = lgetv %r2.2;
+        symbol [ r2 %tmp.43 134 30 32 ];
+        %tmp.44 = sub %tmp.42 %tmp.43;
+        %tmp.45 = lgetv %cy;
+        symbol [ cy %tmp.45 134 34 36 ];
+        %tmp.46 = 2;
+        %tmp.47 = lgetv %r2.2;
+        symbol [ r2 %tmp.47 134 42 44 ];
+        %tmp.48 = mul %tmp.46 %tmp.47;
+        %tmp.49 = lgetv %r1.1;
+        symbol [ r1 %tmp.49 134 46 48 ];
+        %tmp.50 = 1;
+        %tmp.51 = add %tmp.49 %tmp.50;
+        invoke %tmp.40 %tmp.41(%tmp.44, %tmp.45, %tmp.48, %tmp.51);
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_126_48_135_4_stop:
+    }
+    [ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 137; @symbol_functiondef = [drawSunCloud,137,13,25]; @symbol_param<0> = [dc,137,26,28]; @symbol_param<1> = [cx,137,30,32]; @symbol_param<2> = [cy,137,34,36]; @symbol_param<3> = [size,137,38,42]; ]
+    function drawSunCloud(dc, cx, cy, size) {
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_137_44_140_4_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 138 8 ]
+        %tmp.1 = self;
+        symbol [ drawSun %tmp.2 138 8 15 ];
+        %tmp.2 = getv function %tmp.1 :drawSun;
+        %tmp.3 = lgetv %dc;
+        symbol [ dc %tmp.3 138 16 18 ];
+        %tmp.4 = lgetv %cx;
+        symbol [ cx %tmp.4 138 20 22 ];
+        %tmp.5 = lgetv %size;
+        symbol [ size %tmp.5 138 25 29 ];
+        %tmp.6 = 5;
+        %tmp.7 = div %tmp.5 %tmp.6;
+        %tmp.8 = sub %tmp.4 %tmp.7;
+        %tmp.9 = lgetv %cy;
+        symbol [ cy %tmp.9 138 35 37 ];
+        %tmp.10 = lgetv %size;
+        symbol [ size %tmp.10 138 40 44 ];
+        %tmp.11 = 5;
+        %tmp.12 = div %tmp.10 %tmp.11;
+        %tmp.13 = sub %tmp.9 %tmp.12;
+        %tmp.14 = lgetv %size;
+        symbol [ size %tmp.14 138 50 54 ];
+        %tmp.15 = 3;
+        %tmp.16 = mul %tmp.14 %tmp.15;
+        %tmp.17 = 4;
+        %tmp.18 = div %tmp.16 %tmp.17;
+        invoke %tmp.1 %tmp.2(%tmp.3, %tmp.8, %tmp.13, %tmp.18);
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 139 8 ]
+        %tmp.19 = self;
+        symbol [ drawCloud %tmp.20 139 8 17 ];
+        %tmp.20 = getv function %tmp.19 :drawCloud;
+        %tmp.21 = lgetv %dc;
+        symbol [ dc %tmp.21 139 18 20 ];
+        %tmp.22 = lgetv %cx;
+        symbol [ cx %tmp.22 139 22 24 ];
+        %tmp.23 = lgetv %size;
+        symbol [ size %tmp.23 139 27 31 ];
+        %tmp.24 = 8;
+        %tmp.25 = div %tmp.23 %tmp.24;
+        %tmp.26 = add %tmp.22 %tmp.25;
+        %tmp.27 = lgetv %cy;
+        symbol [ cy %tmp.27 139 37 39 ];
+        %tmp.28 = lgetv %size;
+        symbol [ size %tmp.28 139 42 46 ];
+        %tmp.29 = 8;
+        %tmp.30 = div %tmp.28 %tmp.29;
+        %tmp.31 = add %tmp.27 %tmp.30;
+        %tmp.32 = lgetv %size;
+        symbol [ size %tmp.32 139 52 56 ];
+        %tmp.33 = 3;
+        %tmp.34 = mul %tmp.32 %tmp.33;
+        %tmp.35 = 4;
+        %tmp.36 = div %tmp.34 %tmp.35;
+        symbol [ Gfx %tmp.37 139 66 69 ];
+        %tmp.37 = getm $.Toybox.Graphics;
+        symbol [ COLOR_LT_GRAY %tmp.38 139 70 83 ];
+        %tmp.38 = getv %tmp.37 :COLOR_LT_GRAY;
+        invoke %tmp.19 %tmp.20(%tmp.21, %tmp.26, %tmp.31, %tmp.36, %tmp.38);
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_137_44_140_4_stop:
+    }
+    [ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 142; @symbol_functiondef = [drawRain,142,13,21]; @symbol_param<0> = [dc,142,22,24]; @symbol_param<1> = [cx,142,26,28]; @symbol_param<2> = [cy,142,30,32]; @symbol_param<3> = [size,142,34,38]; ]
+    function drawRain(dc, cx, cy, size) {
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_142_40_154_4_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 143 8 ]
+        %tmp.1 = self;
+        symbol [ drawCloud %tmp.2 143 8 17 ];
+        %tmp.2 = getv function %tmp.1 :drawCloud;
+        %tmp.3 = lgetv %dc;
+        symbol [ dc %tmp.3 143 18 20 ];
+        %tmp.4 = lgetv %cx;
+        symbol [ cx %tmp.4 143 22 24 ];
+        %tmp.5 = lgetv %cy;
+        symbol [ cy %tmp.5 143 26 28 ];
+        %tmp.6 = lgetv %size;
+        symbol [ size %tmp.6 143 31 35 ];
+        %tmp.7 = 6;
+        %tmp.8 = div %tmp.6 %tmp.7;
+        %tmp.9 = sub %tmp.5 %tmp.8;
+        %tmp.10 = lgetv %size;
+        symbol [ size %tmp.10 143 41 45 ];
+        symbol [ Gfx %tmp.11 143 47 50 ];
+        %tmp.11 = getm $.Toybox.Graphics;
+        symbol [ COLOR_LT_GRAY %tmp.12 143 51 64 ];
+        %tmp.12 = getv %tmp.11 :COLOR_LT_GRAY;
+        invoke %tmp.1 %tmp.2(%tmp.3, %tmp.4, %tmp.9, %tmp.10, %tmp.12);
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 144 8 ]
+        %tmp.13 = lgetv %dc;
+        symbol [ dc %tmp.13 144 8 10 ];
+        symbol [ setColor %tmp.14 144 11 19 ];
+        %tmp.14 = getv function %tmp.13 :setColor;
+        symbol [ Gfx %tmp.15 144 20 23 ];
+        %tmp.15 = getm $.Toybox.Graphics;
+        symbol [ COLOR_BLUE %tmp.16 144 24 34 ];
+        %tmp.16 = getv %tmp.15 :COLOR_BLUE;
+        symbol [ Gfx %tmp.17 144 36 39 ];
+        %tmp.17 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.18 144 40 57 ];
+        %tmp.18 = getv %tmp.17 :COLOR_TRANSPARENT;
+        invoke %tmp.13 %tmp.14(%tmp.16, %tmp.18);
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 145 8 ]
+        [ "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_142_40_154_4_start" "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_142_40_154_4_stop" ]
+        %dy.1 = local;
+        symbol [ dy %dy.1 145 12 14 ];
+        %tmp.19 = lgetv %cy;
+        symbol [ cy %tmp.19 145 17 19 ];
+        %tmp.20 = lgetv %size;
+        symbol [ size %tmp.20 145 22 26 ];
+        %tmp.21 = 4;
+        %tmp.22 = div %tmp.20 %tmp.21;
+        %tmp.23 = add %tmp.19 %tmp.22;
+        lputv %dy.1 %tmp.23;
+        symbol [ dy %dy.1 145 12 14 ];
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 146 8 ]
+        [ "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_142_40_154_4_start" "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_142_40_154_4_stop" ]
+        %offsets.2 = local;
+        symbol [ offsets %offsets.2 146 12 19 ];
+        %tmp.24 = newa 3;
+        %tmp.25 = lgetv %size;
+        symbol [ size %tmp.25 146 24 28 ];
+        %tmp.26 = sub 0 %tmp.25;
+        %tmp.27 = 4;
+        %tmp.28 = div %tmp.26 %tmp.27;
+        %tmp.29 = dup %tmp.24;
+        %tmp.30 = aputv %tmp.29 0 %tmp.28;
+        %tmp.31 = 0;
+        %tmp.32 = dup %tmp.30;
+        %tmp.33 = aputv %tmp.32 1 %tmp.31;
+        %tmp.34 = lgetv %size;
+        symbol [ size %tmp.34 146 37 41 ];
+        %tmp.35 = 4;
+        %tmp.36 = div %tmp.34 %tmp.35;
+        %tmp.37 = dup %tmp.33;
+        %tmp.38 = aputv %tmp.37 2 %tmp.36;
+        lputv %offsets.2 %tmp.38;
+        symbol [ offsets %offsets.2 146 12 19 ];
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 147 8 ]
+        for @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_147_8_153_8_for_test @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_147_8_153_8_for_incr @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_147_8_153_8_for_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_147_8_153_8_for_init:
+        [ "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_147_8_153_8_for_begin" "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_147_8_153_8_for_end" ]
+        %i.3 = local;
+        symbol [ i %i.3 147 17 18 ];
+        %tmp.39 = 0;
+        lputv %i.3 %tmp.39;
+        symbol [ i %i.3 147 17 18 ];
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_147_8_153_8_for_test:
+        %tmp.40 = lgetv %i.3;
+        symbol [ i %tmp.40 147 24 25 ];
+        %tmp.41 = lgetv %offsets.2;
+        symbol [ offsets %tmp.41 147 28 35 ];
+        symbol [ size %tmp.42 147 36 40 ];
+        %tmp.42 = getv function %tmp.41 :size;
+        %tmp.43 = invoke %tmp.41 %tmp.42();
+        %tmp.44 = lt %tmp.40 %tmp.43;
+        bf %tmp.44 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_147_8_153_8_for_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_147_8_153_8_for_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_147_49_153_8_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 148 12 ]
+        [ "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_147_49_153_8_start" "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_147_49_153_8_stop" ]
+        %x.4 = local;
+        symbol [ x %x.4 148 16 17 ];
+        %tmp.45 = lgetv %cx;
+        symbol [ cx %tmp.45 148 20 22 ];
+        %tmp.46 = lgetv %offsets.2;
+        symbol [ offsets %tmp.46 148 25 32 ];
+        %tmp.47 = lgetv %i.3;
+        symbol [ i %tmp.47 148 33 34 ];
+        %tmp.48 = agetv %tmp.46 %tmp.47;
+        %tmp.49 = add %tmp.45 %tmp.48;
+        lputv %x.4 %tmp.49;
+        symbol [ x %x.4 148 16 17 ];
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 149 12 ]
+        %tmp.50 = lgetv %dc;
+        symbol [ dc %tmp.50 149 12 14 ];
+        symbol [ fillCircle %tmp.51 149 15 25 ];
+        %tmp.51 = getv function %tmp.50 :fillCircle;
+        %tmp.52 = lgetv %x.4;
+        symbol [ x %tmp.52 149 26 27 ];
+        %tmp.53 = lgetv %dy.1;
+        symbol [ dy %tmp.53 149 29 31 ];
+        %tmp.54 = 2;
+        %tmp.55 = add %tmp.53 %tmp.54;
+        %tmp.56 = 2;
+        invoke %tmp.50 %tmp.51(%tmp.52, %tmp.55, %tmp.56);
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 150 12 ]
+        %tmp.57 = lgetv %dc;
+        symbol [ dc %tmp.57 150 12 14 ];
+        symbol [ setPenWidth %tmp.58 150 15 26 ];
+        %tmp.58 = getv function %tmp.57 :setPenWidth;
+        %tmp.59 = 2;
+        invoke %tmp.57 %tmp.58(%tmp.59);
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 151 12 ]
+        %tmp.60 = lgetv %dc;
+        symbol [ dc %tmp.60 151 12 14 ];
+        symbol [ drawLine %tmp.61 151 15 23 ];
+        %tmp.61 = getv function %tmp.60 :drawLine;
+        %tmp.62 = lgetv %x.4;
+        symbol [ x %tmp.62 151 24 25 ];
+        %tmp.63 = lgetv %dy.1;
+        symbol [ dy %tmp.63 151 27 29 ];
+        %tmp.64 = 2;
+        %tmp.65 = sub %tmp.63 %tmp.64;
+        %tmp.66 = lgetv %x.4;
+        symbol [ x %tmp.66 151 35 36 ];
+        %tmp.67 = lgetv %dy.1;
+        symbol [ dy %tmp.67 151 38 40 ];
+        %tmp.68 = 2;
+        %tmp.69 = add %tmp.67 %tmp.68;
+        invoke %tmp.60 %tmp.61(%tmp.62, %tmp.65, %tmp.66, %tmp.69);
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 152 12 ]
+        %tmp.70 = lgetv %dc;
+        symbol [ dc %tmp.70 152 12 14 ];
+        symbol [ setPenWidth %tmp.71 152 15 26 ];
+        %tmp.71 = getv function %tmp.70 :setPenWidth;
+        %tmp.72 = 1;
+        invoke %tmp.70 %tmp.71(%tmp.72);
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_147_49_153_8_stop:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_147_8_153_8_for_incr:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 147 ]
+        %tmp.75 = lgetv %i.3;
+        symbol [ i %tmp.75 147 44 45 ];
+        %tmp.76 = add %tmp.75 1;
+        lputv %i.3 %tmp.76;
+        symbol [ i %i.3 147 44 45 ];
+        goto @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_147_8_153_8_for_test;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_147_8_153_8_for_end:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_142_40_154_4_stop:
+    }
+    [ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 156; @symbol_functiondef = [drawSnow,156,13,21]; @symbol_param<0> = [dc,156,22,24]; @symbol_param<1> = [cx,156,26,28]; @symbol_param<2> = [cy,156,30,32]; @symbol_param<3> = [size,156,34,38]; ]
+    function drawSnow(dc, cx, cy, size) {
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_156_40_165_4_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 157 8 ]
+        %tmp.1 = self;
+        symbol [ drawCloud %tmp.2 157 8 17 ];
+        %tmp.2 = getv function %tmp.1 :drawCloud;
+        %tmp.3 = lgetv %dc;
+        symbol [ dc %tmp.3 157 18 20 ];
+        %tmp.4 = lgetv %cx;
+        symbol [ cx %tmp.4 157 22 24 ];
+        %tmp.5 = lgetv %cy;
+        symbol [ cy %tmp.5 157 26 28 ];
+        %tmp.6 = lgetv %size;
+        symbol [ size %tmp.6 157 31 35 ];
+        %tmp.7 = 6;
+        %tmp.8 = div %tmp.6 %tmp.7;
+        %tmp.9 = sub %tmp.5 %tmp.8;
+        %tmp.10 = lgetv %size;
+        symbol [ size %tmp.10 157 41 45 ];
+        symbol [ Gfx %tmp.11 157 47 50 ];
+        %tmp.11 = getm $.Toybox.Graphics;
+        symbol [ COLOR_LT_GRAY %tmp.12 157 51 64 ];
+        %tmp.12 = getv %tmp.11 :COLOR_LT_GRAY;
+        invoke %tmp.1 %tmp.2(%tmp.3, %tmp.4, %tmp.9, %tmp.10, %tmp.12);
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 158 8 ]
+        %tmp.13 = lgetv %dc;
+        symbol [ dc %tmp.13 158 8 10 ];
+        symbol [ setColor %tmp.14 158 11 19 ];
+        %tmp.14 = getv function %tmp.13 :setColor;
+        symbol [ Gfx %tmp.15 158 20 23 ];
+        %tmp.15 = getm $.Toybox.Graphics;
+        symbol [ COLOR_WHITE %tmp.16 158 24 35 ];
+        %tmp.16 = getv %tmp.15 :COLOR_WHITE;
+        symbol [ Gfx %tmp.17 158 37 40 ];
+        %tmp.17 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.18 158 41 58 ];
+        %tmp.18 = getv %tmp.17 :COLOR_TRANSPARENT;
+        invoke %tmp.13 %tmp.14(%tmp.16, %tmp.18);
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 159 8 ]
+        [ "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_156_40_165_4_start" "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_156_40_165_4_stop" ]
+        %dy.1 = local;
+        symbol [ dy %dy.1 159 12 14 ];
+        %tmp.19 = lgetv %cy;
+        symbol [ cy %tmp.19 159 17 19 ];
+        %tmp.20 = lgetv %size;
+        symbol [ size %tmp.20 159 22 26 ];
+        %tmp.21 = 4;
+        %tmp.22 = div %tmp.20 %tmp.21;
+        %tmp.23 = add %tmp.19 %tmp.22;
+        %tmp.24 = 1;
+        %tmp.25 = add %tmp.23 %tmp.24;
+        lputv %dy.1 %tmp.25;
+        symbol [ dy %dy.1 159 12 14 ];
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 160 8 ]
+        [ "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_156_40_165_4_start" "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_156_40_165_4_stop" ]
+        %offsets.2 = local;
+        symbol [ offsets %offsets.2 160 12 19 ];
+        %tmp.26 = newa 3;
+        %tmp.27 = lgetv %size;
+        symbol [ size %tmp.27 160 24 28 ];
+        %tmp.28 = sub 0 %tmp.27;
+        %tmp.29 = 4;
+        %tmp.30 = div %tmp.28 %tmp.29;
+        %tmp.31 = dup %tmp.26;
+        %tmp.32 = aputv %tmp.31 0 %tmp.30;
+        %tmp.33 = 0;
+        %tmp.34 = dup %tmp.32;
+        %tmp.35 = aputv %tmp.34 1 %tmp.33;
+        %tmp.36 = lgetv %size;
+        symbol [ size %tmp.36 160 37 41 ];
+        %tmp.37 = 4;
+        %tmp.38 = div %tmp.36 %tmp.37;
+        %tmp.39 = dup %tmp.35;
+        %tmp.40 = aputv %tmp.39 2 %tmp.38;
+        lputv %offsets.2 %tmp.40;
+        symbol [ offsets %offsets.2 160 12 19 ];
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 161 8 ]
+        for @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_161_8_164_8_for_test @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_161_8_164_8_for_incr @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_161_8_164_8_for_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_161_8_164_8_for_init:
+        [ "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_161_8_164_8_for_begin" "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_161_8_164_8_for_end" ]
+        %i.3 = local;
+        symbol [ i %i.3 161 17 18 ];
+        %tmp.41 = 0;
+        lputv %i.3 %tmp.41;
+        symbol [ i %i.3 161 17 18 ];
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_161_8_164_8_for_test:
+        %tmp.42 = lgetv %i.3;
+        symbol [ i %tmp.42 161 24 25 ];
+        %tmp.43 = lgetv %offsets.2;
+        symbol [ offsets %tmp.43 161 28 35 ];
+        symbol [ size %tmp.44 161 36 40 ];
+        %tmp.44 = getv function %tmp.43 :size;
+        %tmp.45 = invoke %tmp.43 %tmp.44();
+        %tmp.46 = lt %tmp.42 %tmp.45;
+        bf %tmp.46 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_161_8_164_8_for_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_161_8_164_8_for_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_161_49_164_8_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 162 12 ]
+        [ "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_161_49_164_8_start" "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_161_49_164_8_stop" ]
+        %x.4 = local;
+        symbol [ x %x.4 162 16 17 ];
+        %tmp.47 = lgetv %cx;
+        symbol [ cx %tmp.47 162 20 22 ];
+        %tmp.48 = lgetv %offsets.2;
+        symbol [ offsets %tmp.48 162 25 32 ];
+        %tmp.49 = lgetv %i.3;
+        symbol [ i %tmp.49 162 33 34 ];
+        %tmp.50 = agetv %tmp.48 %tmp.49;
+        %tmp.51 = add %tmp.47 %tmp.50;
+        lputv %x.4 %tmp.51;
+        symbol [ x %x.4 162 16 17 ];
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 163 12 ]
+        %tmp.52 = lgetv %dc;
+        symbol [ dc %tmp.52 163 12 14 ];
+        symbol [ fillCircle %tmp.53 163 15 25 ];
+        %tmp.53 = getv function %tmp.52 :fillCircle;
+        %tmp.54 = lgetv %x.4;
+        symbol [ x %tmp.54 163 26 27 ];
+        %tmp.55 = lgetv %dy.1;
+        symbol [ dy %tmp.55 163 29 31 ];
+        %tmp.56 = 2;
+        invoke %tmp.52 %tmp.53(%tmp.54, %tmp.55, %tmp.56);
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_161_49_164_8_stop:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_161_8_164_8_for_incr:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 161 ]
+        %tmp.59 = lgetv %i.3;
+        symbol [ i %tmp.59 161 44 45 ];
+        %tmp.60 = add %tmp.59 1;
+        lputv %i.3 %tmp.60;
+        symbol [ i %i.3 161 44 45 ];
+        goto @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_161_8_164_8_for_test;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_161_8_164_8_for_end:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_156_40_165_4_stop:
+    }
+    [ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 167; @symbol_functiondef = [drawThunder,167,13,24]; @symbol_param<0> = [dc,167,25,27]; @symbol_param<1> = [cx,167,29,31]; @symbol_param<2> = [cy,167,33,35]; @symbol_param<3> = [size,167,37,41]; ]
+    function drawThunder(dc, cx, cy, size) {
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_167_43_180_4_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 168 8 ]
+        %tmp.1 = self;
+        symbol [ drawCloud %tmp.2 168 8 17 ];
+        %tmp.2 = getv function %tmp.1 :drawCloud;
+        %tmp.3 = lgetv %dc;
+        symbol [ dc %tmp.3 168 18 20 ];
+        %tmp.4 = lgetv %cx;
+        symbol [ cx %tmp.4 168 22 24 ];
+        %tmp.5 = lgetv %cy;
+        symbol [ cy %tmp.5 168 26 28 ];
+        %tmp.6 = lgetv %size;
+        symbol [ size %tmp.6 168 31 35 ];
+        %tmp.7 = 6;
+        %tmp.8 = div %tmp.6 %tmp.7;
+        %tmp.9 = sub %tmp.5 %tmp.8;
+        %tmp.10 = lgetv %size;
+        symbol [ size %tmp.10 168 41 45 ];
+        symbol [ Gfx %tmp.11 168 47 50 ];
+        %tmp.11 = getm $.Toybox.Graphics;
+        symbol [ COLOR_DK_GRAY %tmp.12 168 51 64 ];
+        %tmp.12 = getv %tmp.11 :COLOR_DK_GRAY;
+        invoke %tmp.1 %tmp.2(%tmp.3, %tmp.4, %tmp.9, %tmp.10, %tmp.12);
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 169 8 ]
+        %tmp.13 = lgetv %dc;
+        symbol [ dc %tmp.13 169 8 10 ];
+        symbol [ setColor %tmp.14 169 11 19 ];
+        %tmp.14 = getv function %tmp.13 :setColor;
+        symbol [ Gfx %tmp.15 169 20 23 ];
+        %tmp.15 = getm $.Toybox.Graphics;
+        symbol [ COLOR_YELLOW %tmp.16 169 24 36 ];
+        %tmp.16 = getv %tmp.15 :COLOR_YELLOW;
+        symbol [ Gfx %tmp.17 169 38 41 ];
+        %tmp.17 = getm $.Toybox.Graphics;
+        symbol [ COLOR_YELLOW %tmp.18 169 42 54 ];
+        %tmp.18 = getv %tmp.17 :COLOR_YELLOW;
+        invoke %tmp.13 %tmp.14(%tmp.16, %tmp.18);
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 170 8 ]
+        [ "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_167_43_180_4_start" "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_167_43_180_4_stop" ]
+        %pts.1 = local;
+        symbol [ pts %pts.1 170 12 15 ];
+        %tmp.19 = newa 7;
+        %tmp.20 = newa 2;
+        %tmp.21 = lgetv %cx;
+        symbol [ cx %tmp.21 171 13 15 ];
+        %tmp.22 = dup %tmp.20;
+        %tmp.23 = aputv %tmp.22 0 %tmp.21;
+        %tmp.24 = lgetv %cy;
+        symbol [ cy %tmp.24 171 21 23 ];
+        %tmp.25 = 1;
+        %tmp.26 = add %tmp.24 %tmp.25;
+        %tmp.27 = dup %tmp.23;
+        %tmp.28 = aputv %tmp.27 1 %tmp.26;
+        %tmp.29 = dup %tmp.19;
+        %tmp.30 = aputv %tmp.29 0 %tmp.28;
+        %tmp.31 = newa 2;
+        %tmp.32 = lgetv %cx;
+        symbol [ cx %tmp.32 172 13 15 ];
+        %tmp.33 = 4;
+        %tmp.34 = add %tmp.32 %tmp.33;
+        %tmp.35 = dup %tmp.31;
+        %tmp.36 = aputv %tmp.35 0 %tmp.34;
+        %tmp.37 = lgetv %cy;
+        symbol [ cy %tmp.37 172 21 23 ];
+        %tmp.38 = 1;
+        %tmp.39 = add %tmp.37 %tmp.38;
+        %tmp.40 = dup %tmp.36;
+        %tmp.41 = aputv %tmp.40 1 %tmp.39;
+        %tmp.42 = dup %tmp.30;
+        %tmp.43 = aputv %tmp.42 1 %tmp.41;
+        %tmp.44 = newa 2;
+        %tmp.45 = lgetv %cx;
+        symbol [ cx %tmp.45 173 13 15 ];
+        %tmp.46 = 1;
+        %tmp.47 = add %tmp.45 %tmp.46;
+        %tmp.48 = dup %tmp.44;
+        %tmp.49 = aputv %tmp.48 0 %tmp.47;
+        %tmp.50 = lgetv %cy;
+        symbol [ cy %tmp.50 173 21 23 ];
+        %tmp.51 = lgetv %size;
+        symbol [ size %tmp.51 173 26 30 ];
+        %tmp.52 = 3;
+        %tmp.53 = div %tmp.51 %tmp.52;
+        %tmp.54 = add %tmp.50 %tmp.53;
+        %tmp.55 = dup %tmp.49;
+        %tmp.56 = aputv %tmp.55 1 %tmp.54;
+        %tmp.57 = dup %tmp.43;
+        %tmp.58 = aputv %tmp.57 2 %tmp.56;
+        %tmp.59 = newa 2;
+        %tmp.60 = lgetv %cx;
+        symbol [ cx %tmp.60 174 13 15 ];
+        %tmp.61 = 6;
+        %tmp.62 = add %tmp.60 %tmp.61;
+        %tmp.63 = dup %tmp.59;
+        %tmp.64 = aputv %tmp.63 0 %tmp.62;
+        %tmp.65 = lgetv %cy;
+        symbol [ cy %tmp.65 174 21 23 ];
+        %tmp.66 = lgetv %size;
+        symbol [ size %tmp.66 174 26 30 ];
+        %tmp.67 = 3;
+        %tmp.68 = div %tmp.66 %tmp.67;
+        %tmp.69 = add %tmp.65 %tmp.68;
+        %tmp.70 = 2;
+        %tmp.71 = sub %tmp.69 %tmp.70;
+        %tmp.72 = dup %tmp.64;
+        %tmp.73 = aputv %tmp.72 1 %tmp.71;
+        %tmp.74 = dup %tmp.58;
+        %tmp.75 = aputv %tmp.74 3 %tmp.73;
+        %tmp.76 = newa 2;
+        %tmp.77 = lgetv %cx;
+        symbol [ cx %tmp.77 175 13 15 ];
+        %tmp.78 = 2;
+        %tmp.79 = sub %tmp.77 %tmp.78;
+        %tmp.80 = dup %tmp.76;
+        %tmp.81 = aputv %tmp.80 0 %tmp.79;
+        %tmp.82 = lgetv %cy;
+        symbol [ cy %tmp.82 175 21 23 ];
+        %tmp.83 = lgetv %size;
+        symbol [ size %tmp.83 175 26 30 ];
+        %tmp.84 = 2;
+        %tmp.85 = div %tmp.83 %tmp.84;
+        %tmp.86 = add %tmp.82 %tmp.85;
+        %tmp.87 = 1;
+        %tmp.88 = add %tmp.86 %tmp.87;
+        %tmp.89 = dup %tmp.81;
+        %tmp.90 = aputv %tmp.89 1 %tmp.88;
+        %tmp.91 = dup %tmp.75;
+        %tmp.92 = aputv %tmp.91 4 %tmp.90;
+        %tmp.93 = newa 2;
+        %tmp.94 = lgetv %cx;
+        symbol [ cx %tmp.94 176 13 15 ];
+        %tmp.95 = 1;
+        %tmp.96 = add %tmp.94 %tmp.95;
+        %tmp.97 = dup %tmp.93;
+        %tmp.98 = aputv %tmp.97 0 %tmp.96;
+        %tmp.99 = lgetv %cy;
+        symbol [ cy %tmp.99 176 21 23 ];
+        %tmp.100 = lgetv %size;
+        symbol [ size %tmp.100 176 26 30 ];
+        %tmp.101 = 4;
+        %tmp.102 = div %tmp.100 %tmp.101;
+        %tmp.103 = add %tmp.99 %tmp.102;
+        %tmp.104 = dup %tmp.98;
+        %tmp.105 = aputv %tmp.104 1 %tmp.103;
+        %tmp.106 = dup %tmp.92;
+        %tmp.107 = aputv %tmp.106 5 %tmp.105;
+        %tmp.108 = newa 2;
+        %tmp.109 = lgetv %cx;
+        symbol [ cx %tmp.109 177 13 15 ];
+        %tmp.110 = 3;
+        %tmp.111 = sub %tmp.109 %tmp.110;
+        %tmp.112 = dup %tmp.108;
+        %tmp.113 = aputv %tmp.112 0 %tmp.111;
+        %tmp.114 = lgetv %cy;
+        symbol [ cy %tmp.114 177 21 23 ];
+        %tmp.115 = lgetv %size;
+        symbol [ size %tmp.115 177 26 30 ];
+        %tmp.116 = 4;
+        %tmp.117 = div %tmp.115 %tmp.116;
+        %tmp.118 = add %tmp.114 %tmp.117;
+        %tmp.119 = dup %tmp.113;
+        %tmp.120 = aputv %tmp.119 1 %tmp.118;
+        %tmp.121 = dup %tmp.107;
+        %tmp.122 = aputv %tmp.121 6 %tmp.120;
+        lputv %pts.1 %tmp.122;
+        symbol [ pts %pts.1 170 12 15 ];
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 179 8 ]
+        %tmp.123 = lgetv %dc;
+        symbol [ dc %tmp.123 179 8 10 ];
+        symbol [ fillPolygon %tmp.124 179 11 22 ];
+        %tmp.124 = getv function %tmp.123 :fillPolygon;
+        %tmp.125 = lgetv %pts.1;
+        symbol [ pts %tmp.125 179 23 26 ];
+        invoke %tmp.123 %tmp.124(%tmp.125);
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_167_43_180_4_stop:
+    }
+    [ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 182; @symbol_functiondef = [drawFog,182,13,20]; @symbol_param<0> = [dc,182,21,23]; @symbol_param<1> = [cx,182,25,27]; @symbol_param<2> = [cy,182,29,31]; @symbol_param<3> = [size,182,33,37]; ]
+    function drawFog(dc, cx, cy, size) {
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_182_39_192_4_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 183 8 ]
+        %tmp.1 = lgetv %dc;
+        symbol [ dc %tmp.1 183 8 10 ];
+        symbol [ setColor %tmp.2 183 11 19 ];
+        %tmp.2 = getv function %tmp.1 :setColor;
+        symbol [ Gfx %tmp.3 183 20 23 ];
+        %tmp.3 = getm $.Toybox.Graphics;
+        symbol [ COLOR_LT_GRAY %tmp.4 183 24 37 ];
+        %tmp.4 = getv %tmp.3 :COLOR_LT_GRAY;
+        symbol [ Gfx %tmp.5 183 39 42 ];
+        %tmp.5 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.6 183 43 60 ];
+        %tmp.6 = getv %tmp.5 :COLOR_TRANSPARENT;
+        invoke %tmp.1 %tmp.2(%tmp.4, %tmp.6);
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 184 8 ]
+        %tmp.7 = lgetv %dc;
+        symbol [ dc %tmp.7 184 8 10 ];
+        symbol [ setPenWidth %tmp.8 184 11 22 ];
+        %tmp.8 = getv function %tmp.7 :setPenWidth;
+        %tmp.9 = 2;
+        invoke %tmp.7 %tmp.8(%tmp.9);
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 185 8 ]
+        [ "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_182_39_192_4_start" "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_182_39_192_4_stop" ]
+        %step.1 = local;
+        symbol [ step %step.1 185 12 16 ];
+        %tmp.10 = lgetv %size;
+        symbol [ size %tmp.10 185 19 23 ];
+        %tmp.11 = 5;
+        %tmp.12 = div %tmp.10 %tmp.11;
+        lputv %step.1 %tmp.12;
+        symbol [ step %step.1 185 12 16 ];
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 186 8 ]
+        [ "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_182_39_192_4_start" "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_182_39_192_4_stop" ]
+        %half.2 = local;
+        symbol [ half %half.2 186 12 16 ];
+        %tmp.13 = lgetv %size;
+        symbol [ size %tmp.13 186 19 23 ];
+        %tmp.14 = 2;
+        %tmp.15 = div %tmp.13 %tmp.14;
+        lputv %half.2 %tmp.15;
+        symbol [ half %half.2 186 12 16 ];
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 187 8 ]
+        for @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_187_8_190_8_for_test @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_187_8_190_8_for_incr @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_187_8_190_8_for_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_187_8_190_8_for_init:
+        [ "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_187_8_190_8_for_begin" "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_187_8_190_8_for_end" ]
+        %i.3 = local;
+        symbol [ i %i.3 187 17 18 ];
+        %tmp.16 = -2;
+        lputv %i.3 %tmp.16;
+        symbol [ i %i.3 187 17 18 ];
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_187_8_190_8_for_test:
+        %tmp.17 = lgetv %i.3;
+        symbol [ i %tmp.17 187 25 26 ];
+        %tmp.18 = 2;
+        %tmp.19 = lte %tmp.17 %tmp.18;
+        bf %tmp.19 @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_187_8_190_8_for_end;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_187_8_190_8_for_begin:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_187_38_190_8_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 188 12 ]
+        [ "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_187_38_190_8_start" "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_187_38_190_8_stop" ]
+        %y.4 = local;
+        symbol [ y %y.4 188 16 17 ];
+        %tmp.20 = lgetv %cy;
+        symbol [ cy %tmp.20 188 20 22 ];
+        %tmp.21 = lgetv %i.3;
+        symbol [ i %tmp.21 188 25 26 ];
+        %tmp.22 = lgetv %step.1;
+        symbol [ step %tmp.22 188 29 33 ];
+        %tmp.23 = mul %tmp.21 %tmp.22;
+        %tmp.24 = add %tmp.20 %tmp.23;
+        lputv %y.4 %tmp.24;
+        symbol [ y %y.4 188 16 17 ];
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 189 12 ]
+        %tmp.25 = lgetv %dc;
+        symbol [ dc %tmp.25 189 12 14 ];
+        symbol [ drawLine %tmp.26 189 15 23 ];
+        %tmp.26 = getv function %tmp.25 :drawLine;
+        %tmp.27 = lgetv %cx;
+        symbol [ cx %tmp.27 189 24 26 ];
+        %tmp.28 = lgetv %half.2;
+        symbol [ half %tmp.28 189 29 33 ];
+        %tmp.29 = sub %tmp.27 %tmp.28;
+        %tmp.30 = lgetv %y.4;
+        symbol [ y %tmp.30 189 35 36 ];
+        %tmp.31 = lgetv %cx;
+        symbol [ cx %tmp.31 189 38 40 ];
+        %tmp.32 = lgetv %half.2;
+        symbol [ half %tmp.32 189 43 47 ];
+        %tmp.33 = add %tmp.31 %tmp.32;
+        %tmp.34 = lgetv %y.4;
+        symbol [ y %tmp.34 189 49 50 ];
+        invoke %tmp.25 %tmp.26(%tmp.29, %tmp.30, %tmp.33, %tmp.34);
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_187_38_190_8_stop:
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_187_8_190_8_for_incr:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 187 ]
+        %tmp.37 = lgetv %i.3;
+        symbol [ i %tmp.37 187 33 34 ];
+        %tmp.38 = add %tmp.37 1;
+        lputv %i.3 %tmp.38;
+        symbol [ i %i.3 187 33 34 ];
+        goto @C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_187_8_190_8_for_test;
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_187_8_190_8_for_end:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 191 8 ]
+        %tmp.39 = lgetv %dc;
+        symbol [ dc %tmp.39 191 8 10 ];
+        symbol [ setPenWidth %tmp.40 191 11 22 ];
+        %tmp.40 = getv function %tmp.39 :setPenWidth;
+        %tmp.41 = 1;
+        invoke %tmp.39 %tmp.40(%tmp.41);
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_182_39_192_4_stop:
+    }
+    [ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 194; @symbol_functiondef = [drawWind,194,13,21]; @symbol_param<0> = [dc,194,22,24]; @symbol_param<1> = [cx,194,26,28]; @symbol_param<2> = [cy,194,30,32]; @symbol_param<3> = [size,194,34,38]; ]
+    function drawWind(dc, cx, cy, size) {
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_194_40_202_4_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 195 8 ]
+        %tmp.1 = lgetv %dc;
+        symbol [ dc %tmp.1 195 8 10 ];
+        symbol [ setColor %tmp.2 195 11 19 ];
+        %tmp.2 = getv function %tmp.1 :setColor;
+        symbol [ Gfx %tmp.3 195 20 23 ];
+        %tmp.3 = getm $.Toybox.Graphics;
+        symbol [ COLOR_LT_GRAY %tmp.4 195 24 37 ];
+        %tmp.4 = getv %tmp.3 :COLOR_LT_GRAY;
+        symbol [ Gfx %tmp.5 195 39 42 ];
+        %tmp.5 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.6 195 43 60 ];
+        %tmp.6 = getv %tmp.5 :COLOR_TRANSPARENT;
+        invoke %tmp.1 %tmp.2(%tmp.4, %tmp.6);
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 196 8 ]
+        %tmp.7 = lgetv %dc;
+        symbol [ dc %tmp.7 196 8 10 ];
+        symbol [ setPenWidth %tmp.8 196 11 22 ];
+        %tmp.8 = getv function %tmp.7 :setPenWidth;
+        %tmp.9 = 2;
+        invoke %tmp.7 %tmp.8(%tmp.9);
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 197 8 ]
+        [ "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_194_40_202_4_start" "C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_194_40_202_4_stop" ]
+        %half.1 = local;
+        symbol [ half %half.1 197 12 16 ];
+        %tmp.10 = lgetv %size;
+        symbol [ size %tmp.10 197 19 23 ];
+        %tmp.11 = 2;
+        %tmp.12 = div %tmp.10 %tmp.11;
+        lputv %half.1 %tmp.12;
+        symbol [ half %half.1 197 12 16 ];
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 198 8 ]
+        %tmp.13 = lgetv %dc;
+        symbol [ dc %tmp.13 198 8 10 ];
+        symbol [ drawLine %tmp.14 198 11 19 ];
+        %tmp.14 = getv function %tmp.13 :drawLine;
+        %tmp.15 = lgetv %cx;
+        symbol [ cx %tmp.15 198 20 22 ];
+        %tmp.16 = lgetv %half.1;
+        symbol [ half %tmp.16 198 25 29 ];
+        %tmp.17 = sub %tmp.15 %tmp.16;
+        %tmp.18 = lgetv %cy;
+        symbol [ cy %tmp.18 198 31 33 ];
+        %tmp.19 = lgetv %size;
+        symbol [ size %tmp.19 198 36 40 ];
+        %tmp.20 = 4;
+        %tmp.21 = div %tmp.19 %tmp.20;
+        %tmp.22 = sub %tmp.18 %tmp.21;
+        %tmp.23 = lgetv %cx;
+        symbol [ cx %tmp.23 198 46 48 ];
+        %tmp.24 = lgetv %half.1;
+        symbol [ half %tmp.24 198 51 55 ];
+        %tmp.25 = add %tmp.23 %tmp.24;
+        %tmp.26 = 3;
+        %tmp.27 = sub %tmp.25 %tmp.26;
+        %tmp.28 = lgetv %cy;
+        symbol [ cy %tmp.28 198 61 63 ];
+        %tmp.29 = lgetv %size;
+        symbol [ size %tmp.29 198 66 70 ];
+        %tmp.30 = 4;
+        %tmp.31 = div %tmp.29 %tmp.30;
+        %tmp.32 = sub %tmp.28 %tmp.31;
+        invoke %tmp.13 %tmp.14(%tmp.17, %tmp.22, %tmp.27, %tmp.32);
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 199 8 ]
+        %tmp.33 = lgetv %dc;
+        symbol [ dc %tmp.33 199 8 10 ];
+        symbol [ drawLine %tmp.34 199 11 19 ];
+        %tmp.34 = getv function %tmp.33 :drawLine;
+        %tmp.35 = lgetv %cx;
+        symbol [ cx %tmp.35 199 20 22 ];
+        %tmp.36 = lgetv %half.1;
+        symbol [ half %tmp.36 199 25 29 ];
+        %tmp.37 = sub %tmp.35 %tmp.36;
+        %tmp.38 = lgetv %cy;
+        symbol [ cy %tmp.38 199 31 33 ];
+        %tmp.39 = lgetv %cx;
+        symbol [ cx %tmp.39 199 47 49 ];
+        %tmp.40 = lgetv %half.1;
+        symbol [ half %tmp.40 199 52 56 ];
+        %tmp.41 = add %tmp.39 %tmp.40;
+        %tmp.42 = lgetv %cy;
+        symbol [ cy %tmp.42 199 62 64 ];
+        invoke %tmp.33 %tmp.34(%tmp.37, %tmp.38, %tmp.41, %tmp.42);
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 200 8 ]
+        %tmp.43 = lgetv %dc;
+        symbol [ dc %tmp.43 200 8 10 ];
+        symbol [ drawLine %tmp.44 200 11 19 ];
+        %tmp.44 = getv function %tmp.43 :drawLine;
+        %tmp.45 = lgetv %cx;
+        symbol [ cx %tmp.45 200 20 22 ];
+        %tmp.46 = lgetv %half.1;
+        symbol [ half %tmp.46 200 25 29 ];
+        %tmp.47 = sub %tmp.45 %tmp.46;
+        %tmp.48 = lgetv %cy;
+        symbol [ cy %tmp.48 200 31 33 ];
+        %tmp.49 = lgetv %size;
+        symbol [ size %tmp.49 200 36 40 ];
+        %tmp.50 = 4;
+        %tmp.51 = div %tmp.49 %tmp.50;
+        %tmp.52 = add %tmp.48 %tmp.51;
+        %tmp.53 = lgetv %cx;
+        symbol [ cx %tmp.53 200 46 48 ];
+        %tmp.54 = lgetv %half.1;
+        symbol [ half %tmp.54 200 51 55 ];
+        %tmp.55 = add %tmp.53 %tmp.54;
+        %tmp.56 = 6;
+        %tmp.57 = sub %tmp.55 %tmp.56;
+        %tmp.58 = lgetv %cy;
+        symbol [ cy %tmp.58 200 61 63 ];
+        %tmp.59 = lgetv %size;
+        symbol [ size %tmp.59 200 66 70 ];
+        %tmp.60 = 4;
+        %tmp.61 = div %tmp.59 %tmp.60;
+        %tmp.62 = add %tmp.58 %tmp.61;
+        invoke %tmp.43 %tmp.44(%tmp.47, %tmp.52, %tmp.57, %tmp.62);
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 201 8 ]
+        %tmp.63 = lgetv %dc;
+        symbol [ dc %tmp.63 201 8 10 ];
+        symbol [ setPenWidth %tmp.64 201 11 22 ];
+        %tmp.64 = getv function %tmp.63 :setPenWidth;
+        %tmp.65 = 1;
+        invoke %tmp.63 %tmp.64(%tmp.65);
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_194_40_202_4_stop:
+    }
+    [ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 204; @symbol_functiondef = [drawUnknown,204,13,24]; @symbol_param<0> = [dc,204,25,27]; @symbol_param<1> = [cx,204,29,31]; @symbol_param<2> = [cy,204,33,35]; @symbol_param<3> = [size,204,37,41]; ]
+    function drawUnknown(dc, cx, cy, size) {
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_204_43_208_4_start:
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 205 8 ]
+        %tmp.1 = lgetv %dc;
+        symbol [ dc %tmp.1 205 8 10 ];
+        symbol [ setColor %tmp.2 205 11 19 ];
+        %tmp.2 = getv function %tmp.1 :setColor;
+        symbol [ Gfx %tmp.3 205 20 23 ];
+        %tmp.3 = getm $.Toybox.Graphics;
+        symbol [ COLOR_DK_GRAY %tmp.4 205 24 37 ];
+        %tmp.4 = getv %tmp.3 :COLOR_DK_GRAY;
+        symbol [ Gfx %tmp.5 205 39 42 ];
+        %tmp.5 = getm $.Toybox.Graphics;
+        symbol [ COLOR_TRANSPARENT %tmp.6 205 43 60 ];
+        %tmp.6 = getv %tmp.5 :COLOR_TRANSPARENT;
+        invoke %tmp.1 %tmp.2(%tmp.4, %tmp.6);
+[ "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc" 206 8 ]
+        %tmp.7 = lgetv %dc;
+        symbol [ dc %tmp.7 206 8 10 ];
+        symbol [ drawText %tmp.8 206 11 19 ];
+        %tmp.8 = getv function %tmp.7 :drawText;
+        %tmp.9 = lgetv %cx;
+        symbol [ cx %tmp.9 206 20 22 ];
+        %tmp.10 = lgetv %cy;
+        symbol [ cy %tmp.10 206 24 26 ];
+        symbol [ Gfx %tmp.11 206 28 31 ];
+        %tmp.11 = getm $.Toybox.Graphics;
+        symbol [ FONT_TINY %tmp.12 206 32 41 ];
+        %tmp.12 = getv %tmp.11 :FONT_TINY;
+        %tmp.13 = "?";
+        symbol [ Gfx %tmp.14 207 12 15 ];
+        %tmp.14 = getm $.Toybox.Graphics;
+        symbol [ TEXT_JUSTIFY_CENTER %tmp.15 207 16 35 ];
+        %tmp.15 = getv %tmp.14 :TEXT_JUSTIFY_CENTER;
+        symbol [ Gfx %tmp.16 207 38 41 ];
+        %tmp.16 = getm $.Toybox.Graphics;
+        symbol [ TEXT_JUSTIFY_VCENTER %tmp.17 207 42 62 ];
+        %tmp.17 = getv %tmp.16 :TEXT_JUSTIFY_VCENTER;
+        %tmp.18 = bitor %tmp.15 %tmp.17;
+        invoke %tmp.7 %tmp.8(%tmp.9, %tmp.10, %tmp.12, %tmp.13, %tmp.18);
+C__Users_mauro_Project_Garmin_Watchface_source_WeatherIcons_mc_204_43_208_4_stop:
+    }
+}
+[ @file = "C:\Users\mauro\Project\Garmin-Watchface\source\WeatherIcons.mc"; @line = 1; ]
+<init> {
+}
