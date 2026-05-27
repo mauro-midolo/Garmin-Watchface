@@ -57,7 +57,7 @@ class FenixWatchfaceView extends Ui.WatchFace {
         var cx = width / 2;
         var cy = height / 2;
 
-        FIELD_RADIUS = (cx * 0.74).toNumber();
+        FIELD_RADIUS = (cx * 0.63).toNumber();
 
         dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
         dc.clear();
