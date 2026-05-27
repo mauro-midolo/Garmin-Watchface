@@ -57,7 +57,7 @@ class FenixWatchfaceView extends Ui.WatchFace {
         var cx = width / 2;
         var cy = height / 2;
 
-        FIELD_RADIUS = (cx * 0.63).toNumber();
+        FIELD_RADIUS = (cx * 0.68).toNumber();
 
         dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
         dc.clear();
@@ -76,12 +76,12 @@ class FenixWatchfaceView extends Ui.WatchFace {
 
         // Layer 4: campi dati radiali (slot da 30°, posizionati tra le tacche)
         drawFieldWeather     (dc, polarX(cx,  45), polarY(cy,  45));  // 1-2
-        drawFieldFloors      (dc, polarX(cx,  75), polarY(cy,  75));  // 2-3
+        drawFieldTempRange   (dc, polarX(cx,  75), polarY(cy,  75));  // 2-3
         drawFieldAltitude    (dc, polarX(cx, 105), polarY(cy, 105));  // 3-4
         drawFieldSteps       (dc, polarX(cx, 135), polarY(cy, 135));  // 4-5
         drawFieldSunset      (dc, polarX(cx, 165), polarY(cy, 165));  // 5-6
         drawFieldSun         (dc, polarX(cx, 195), polarY(cy, 195));  // 6-7
-        drawFieldTempRange   (dc, polarX(cx, 225), polarY(cy, 225));  // 7-8
+        drawFieldFloors      (dc, polarX(cx, 225), polarY(cy, 225));  // 7-8
         drawFieldBatteryDays (dc, polarX(cx, 255), polarY(cy, 255));  // 8-9
         drawFieldBattery     (dc, polarX(cx, 285), polarY(cy, 285));  // 9-10
         drawFieldHR          (dc, polarX(cx, 315), polarY(cy, 315));  // 10-11
