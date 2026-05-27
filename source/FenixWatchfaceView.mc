@@ -100,8 +100,8 @@ class FenixWatchfaceView extends Ui.WatchFace {
     // ----- Anello 24h delle fasi del giorno (cerchio esterno unico) -----
 
     hidden function drawPhaseRing(dc, cx, cy) {
-        var r = cx - 8;  // raggio esterno unico
-        dc.setPenWidth(5);
+        var r = cx - 4;  // bordo esterno del ring a cx (tocca il bezel)
+        dc.setPenWidth(8);
 
         if (cachedSunrise == null || cachedSunset == null) {
             dc.setColor(Gfx.COLOR_BLUE, Gfx.COLOR_TRANSPARENT);
@@ -133,8 +133,8 @@ class FenixWatchfaceView extends Ui.WatchFace {
             var sinA = Math.sin(rad);
             var cosA = Math.cos(rad);
             var isCardinal = (i % 3 == 0);
-            var outerR = cx - 4;
-            var innerR = isCardinal ? (cx - 16) : (cx - 11);
+            var outerR = cx - 9;
+            var innerR = isCardinal ? (cx - 21) : (cx - 14);
             var x1 = (cx + outerR * sinA).toNumber();
             var y1 = (cy - outerR * cosA).toNumber();
             var x2 = (cx + innerR * sinA).toNumber();
