@@ -1,4 +1,10 @@
 <?xml version="1.0"?>
 <drawables>
     <bitmap id="LauncherIcon" filename="launcher_icon.png"/>
+    <bitmap id="BluetoothOn" filename="bluetooth-on.png"/>
+    <bitmap id="BluetoothOff" filename="bluetooth-off.png"/>
+    <bitmap id="GpsOn" filename="gps-on.png"/>
+    <bitmap id="GpsOff" filename="gps-off.png"/>
+    <bitmap id="WifiOn" filename="wifi-on.png"/>
+    <bitmap id="WifiOff" filename="wifi-off.png"/>
 </drawables>

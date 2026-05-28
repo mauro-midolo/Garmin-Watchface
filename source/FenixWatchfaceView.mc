@@ -24,11 +24,26 @@ class FenixWatchfaceView extends Ui.WatchFace {
     // reali dello schermo. Tenuto leggermente dentro le tacche orarie.
     hidden var FIELD_RADIUS = 88;
 
+    // Bitmap icone connettività, caricati una sola volta in onLayout
+    hidden var btOnBmp = null;
+    hidden var btOffBmp = null;
+    hidden var gpsOnBmp = null;
+    hidden var gpsOffBmp = null;
+    hidden var wifiOnBmp = null;
+    hidden var wifiOffBmp = null;
+
     function initialize() {
         WatchFace.initialize();
     }
 
-    function onLayout(dc) {}
+    function onLayout(dc) {
+        btOnBmp    = Ui.loadResource(Rez.Drawables.BluetoothOn);
+        btOffBmp   = Ui.loadResource(Rez.Drawables.BluetoothOff);
+        gpsOnBmp   = Ui.loadResource(Rez.Drawables.GpsOn);
+        gpsOffBmp  = Ui.loadResource(Rez.Drawables.GpsOff);
+        wifiOnBmp  = Ui.loadResource(Rez.Drawables.WifiOn);
+        wifiOffBmp = Ui.loadResource(Rez.Drawables.WifiOff);
+    }
     function onShow() {}
     function onHide() {}
     function onExitSleep() {}
@@ -74,7 +89,7 @@ class FenixWatchfaceView extends Ui.WatchFace {
         dc.drawLine(cx - 38, cy + 19, cx + 38, cy + 19);
         drawCenterDate(dc, cx, cy);
 
-        // Icone di stato connettività (sotto la data)
+        // Icone di stato connettività (sopra l'orario)
         drawConnectivityIcons(dc, cx, cy);
 
         // Layer 4: campi dati radiali (slot da 30°, posizionati tra le tacche)
@@ -694,71 +709,30 @@ class FenixWatchfaceView extends Ui.WatchFace {
             gpsActive = (posInfo.accuracy >= Position.QUALITY_USABLE);
         }
 
-        var iconY   = cy + 50;
-        var spacing = 22;
-        var iconSz  = 9;
+        var iconY   = cy - 50;
+        var spacing = 30;
 
-        drawBluetoothIcon(dc, cx - spacing, iconY, iconSz, btActive);
-        drawWifiIcon     (dc, cx,           iconY, iconSz, wifiActive);
-        drawGpsIcon      (dc, cx + spacing,  iconY, iconSz, gpsActive);
+        var btBmp = btActive ? btOnBmp : btOffBmp;
+        if (btBmp != null) {
+            dc.drawBitmap(
+                cx - spacing - btBmp.getWidth() / 2,
+                iconY - btBmp.getHeight() / 2,
+                btBmp);
+        }
+        var wifiBmp = wifiActive ? wifiOnBmp : wifiOffBmp;
+        if (wifiBmp != null) {
+            dc.drawBitmap(
+                cx - wifiBmp.getWidth() / 2,
+                iconY - wifiBmp.getHeight() / 2,
+                wifiBmp);
+        }
+        var gpsBmp = gpsActive ? gpsOnBmp : gpsOffBmp;
+        if (gpsBmp != null) {
+            dc.drawBitmap(
+                cx + spacing - gpsBmp.getWidth() / 2,
+                iconY - gpsBmp.getHeight() / 2,
+                gpsBmp);
+        }
     }
 
-    // Simbolo Bluetooth (runa ᛒ): asse verticale + 2 chevron a destra + 2 gambe a sinistra
-    hidden function drawBluetoothIcon(dc, cx, cy, size, isActive) {
-        var color = isActive ? 0x4477FF : 0x444444;
-        dc.setColor(color, Gfx.COLOR_TRANSPARENT);
-        dc.setPenWidth(1);
-
-        var hs  = size / 2;
-        var qs  = size / 4;
-        var xR  = (cx + (hs * 0.65).toNumber());
-        var xL  = (cx - (hs * 0.55).toNumber());
-        var yT  = cy - hs;
-        var yB  = cy + hs;
-        var yMt = cy - qs;
-        var yMb = cy + qs;
-
-        dc.drawLine(cx,  yT,  cx,  yB);    // asse verticale
-        dc.drawLine(cx,  yT,  xR,  yMt);   // chevron sup: scende a destra
-        dc.drawLine(xR,  yMt, cx,  cy);    // chevron sup: rientra al centro
-        dc.drawLine(cx,  cy,  xR,  yMb);   // chevron inf: scende a destra
-        dc.drawLine(xR,  yMb, cx,  yB);    // chevron inf: rientra al basso
-        dc.drawLine(cx,  yMt, xL,  yT);    // gamba sinistra superiore
-        dc.drawLine(cx,  yMb, xL,  yB);    // gamba sinistra inferiore
-    }
-
-    // Icona WiFi: 3 archi semicircolari concentrici aperti verso l'alto + punto
-    // ARC_CLOCKWISE da 180° a 0° = semicerchio superiore (∩)
-    hidden function drawWifiIcon(dc, cx, cy, size, isActive) {
-        var color = isActive ? 0x00AAFF : 0x444444;
-        dc.setColor(color, Gfx.COLOR_TRANSPARENT);
-        dc.setPenWidth(1);
-
-        var arcCy = cy + size / 3;
-
-        dc.fillCircle(cx, arcCy, 1);
-
-        var r1 = size / 4;
-        var r2 = size / 2;
-        var r3 = size * 3 / 4;
-
-        if (r1 >= 2) { dc.drawArc(cx, arcCy, r1, Gfx.ARC_CLOCKWISE, 180, 0); }
-        if (r2 >= 3) { dc.drawArc(cx, arcCy, r2, Gfx.ARC_CLOCKWISE, 180, 0); }
-        if (r3 >= 4) { dc.drawArc(cx, arcCy, r3, Gfx.ARC_CLOCKWISE, 180, 0); }
-    }
-
-    // Icona GPS: cerchio con mirino interno
-    hidden function drawGpsIcon(dc, cx, cy, size, isActive) {
-        var color = isActive ? 0x00BB44 : 0x444444;
-        dc.setColor(color, Gfx.COLOR_TRANSPARENT);
-        dc.setPenWidth(1);
-
-        var r    = size / 2;
-        var tick = r / 2;
-        if (tick < 1) { tick = 1; }
-
-        dc.drawCircle(cx, cy, r);
-        dc.drawLine(cx - tick, cy, cx + tick, cy);
-        dc.drawLine(cx, cy - tick, cx, cy + tick);
-    }
 }
