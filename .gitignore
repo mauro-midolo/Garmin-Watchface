@@ -10,3 +10,6 @@ developer_key.pem
 .vscode/
 *.log
 .claude/
+gen/
+internal-mir/
+external-mir/
