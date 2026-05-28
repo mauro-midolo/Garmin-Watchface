@@ -74,6 +74,9 @@ class FenixWatchfaceView extends Ui.WatchFace {
         dc.drawLine(cx - 38, cy + 19, cx + 38, cy + 19);
         drawCenterDate(dc, cx, cy);
 
+        // Icone di stato connettività (sotto la data)
+        drawConnectivityIcons(dc, cx, cy);
+
         // Layer 4: campi dati radiali (slot da 30°, posizionati tra le tacche)
         drawFieldWeather     (dc, polarX(cx,  45), polarY(cy,  45));  // 1-2
         drawFieldTempRange   (dc, polarX(cx,  75), polarY(cy,  75));  // 2-3
@@ -665,5 +668,97 @@ class FenixWatchfaceView extends Ui.WatchFace {
             if (h == 0) { h = 12; }
         }
         return Lang.format("$1$:$2$", [h.format("%02d"), info.min.format("%02d")]);
+    }
+
+    // ----- Icone stato connettività (Bluetooth, WiFi, GPS) -----
+
+    hidden function drawConnectivityIcons(dc, cx, cy) {
+        var ds = Sys.getDeviceSettings();
+
+        // Bluetooth: telefono connesso
+        var btActive = (ds has :phoneConnected) ? (ds.phoneConnected == true) : false;
+
+        // WiFi via connectionInfo (CIQ 3.1+)
+        var wifiActive = false;
+        if ((ds has :connectionInfo) && (ds.connectionInfo != null)) {
+            var wifiInfo = ds.connectionInfo.get(:wifi);
+            if (wifiInfo != null && (wifiInfo has :state)) {
+                wifiActive = (wifiInfo.state != 0);
+            }
+        }
+
+        // GPS: qualità del fix di posizione
+        var gpsActive = false;
+        var posInfo = Position.getInfo();
+        if (posInfo != null && (posInfo has :accuracy)) {
+            gpsActive = (posInfo.accuracy >= Position.QUALITY_USABLE);
+        }
+
+        var iconY   = cy + 50;
+        var spacing = 22;
+        var iconSz  = 9;
+
+        drawBluetoothIcon(dc, cx - spacing, iconY, iconSz, btActive);
+        drawWifiIcon     (dc, cx,           iconY, iconSz, wifiActive);
+        drawGpsIcon      (dc, cx + spacing,  iconY, iconSz, gpsActive);
+    }
+
+    // Simbolo Bluetooth (runa ᛒ): asse verticale + 2 chevron a destra + 2 gambe a sinistra
+    hidden function drawBluetoothIcon(dc, cx, cy, size, isActive) {
+        var color = isActive ? 0x4477FF : 0x444444;
+        dc.setColor(color, Gfx.COLOR_TRANSPARENT);
+        dc.setPenWidth(1);
+
+        var hs  = size / 2;
+        var qs  = size / 4;
+        var xR  = (cx + (hs * 0.65).toNumber());
+        var xL  = (cx - (hs * 0.55).toNumber());
+        var yT  = cy - hs;
+        var yB  = cy + hs;
+        var yMt = cy - qs;
+        var yMb = cy + qs;
+
+        dc.drawLine(cx,  yT,  cx,  yB);    // asse verticale
+        dc.drawLine(cx,  yT,  xR,  yMt);   // chevron sup: scende a destra
+        dc.drawLine(xR,  yMt, cx,  cy);    // chevron sup: rientra al centro
+        dc.drawLine(cx,  cy,  xR,  yMb);   // chevron inf: scende a destra
+        dc.drawLine(xR,  yMb, cx,  yB);    // chevron inf: rientra al basso
+        dc.drawLine(cx,  yMt, xL,  yT);    // gamba sinistra superiore
+        dc.drawLine(cx,  yMb, xL,  yB);    // gamba sinistra inferiore
+    }
+
+    // Icona WiFi: 3 archi semicircolari concentrici aperti verso l'alto + punto
+    // ARC_CLOCKWISE da 180° a 0° = semicerchio superiore (∩)
+    hidden function drawWifiIcon(dc, cx, cy, size, isActive) {
+        var color = isActive ? 0x00AAFF : 0x444444;
+        dc.setColor(color, Gfx.COLOR_TRANSPARENT);
+        dc.setPenWidth(1);
+
+        var arcCy = cy + size / 3;
+
+        dc.fillCircle(cx, arcCy, 1);
+
+        var r1 = size / 4;
+        var r2 = size / 2;
+        var r3 = size * 3 / 4;
+
+        if (r1 >= 2) { dc.drawArc(cx, arcCy, r1, Gfx.ARC_CLOCKWISE, 180, 0); }
+        if (r2 >= 3) { dc.drawArc(cx, arcCy, r2, Gfx.ARC_CLOCKWISE, 180, 0); }
+        if (r3 >= 4) { dc.drawArc(cx, arcCy, r3, Gfx.ARC_CLOCKWISE, 180, 0); }
+    }
+
+    // Icona GPS: cerchio con mirino interno
+    hidden function drawGpsIcon(dc, cx, cy, size, isActive) {
+        var color = isActive ? 0x00BB44 : 0x444444;
+        dc.setColor(color, Gfx.COLOR_TRANSPARENT);
+        dc.setPenWidth(1);
+
+        var r    = size / 2;
+        var tick = r / 2;
+        if (tick < 1) { tick = 1; }
+
+        dc.drawCircle(cx, cy, r);
+        dc.drawLine(cx - tick, cy, cx + tick, cy);
+        dc.drawLine(cx, cy - tick, cx, cy + tick);
     }
 }
