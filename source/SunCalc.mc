@@ -43,7 +43,7 @@ module SunCalc {
         for (var i = 0; i < keys.size(); i++) {
             var which = keys[i][:which];
             var m = eventMoment(
-                lat, year, month, day, n, lngHour, which, keys[i][:t], zenith);
+                lat, year, month, day, n, lngHour, which, keys[i][:t], zenith, moment);
             results.put(which, m);
         }
         return results;
@@ -51,7 +51,7 @@ module SunCalc {
 
     // Istante (Moment, costruito in UTC) di un singolo evento del sole.
     // Ritorna null se l'evento non avviene (es. notte o giorno polare).
-    function eventMoment(lat, year, month, day, n, lngHour, which, tApprox, zenith) {
+    function eventMoment(lat, year, month, day, n, lngHour, which, tApprox, zenith, moment) {
         // Approssimazione frazione di giorno dell'evento in UTC.
         var t = n + ((tApprox - lngHour) / 24.0);
 
@@ -97,16 +97,11 @@ module SunCalc {
         var UT = T - lngHour;
         UT = normalize(UT, 24.0);
 
-        // Build Moment for that day in UTC
-        var hours = Math.floor(UT).toNumber();
-        var minutes = Math.floor((UT - hours) * 60.0).toNumber();
-        var seconds = Math.floor((((UT - hours) * 60.0) - minutes) * 60.0).toNumber();
-
-        var opts = {
-            :year => year, :month => month, :day => day,
-            :hour => hours, :minute => minutes, :second => seconds
-        };
-        return Gregorian.moment(opts);
+        // Build Moment in UTC using epoch arithmetic.
+        // Gregorian.moment() interprets fields as local time (not UTC), so we
+        // compute from the Unix epoch: UTC midnight of the input date + event UT hours.
+        var utcMidnight = (moment.value() / 86400) * 86400;
+        return new Time.Moment(utcMidnight + (UT * 3600.0).toNumber());
     }
 
     function dayOfYear(year, month, day) {
