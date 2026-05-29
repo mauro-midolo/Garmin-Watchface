@@ -14,7 +14,20 @@ da una pull request.
 
 Per ogni intervento che modifica file del repository, Claude deve:
 
-1. Creare un nuovo branch dedicato a partire da `main` aggiornato:
+1. **Auto-assegnazione e label dell'issue** — prima di iniziare qualsiasi lavoro
+   su un'issue, eseguire automaticamente:
+   ```
+   gh issue edit <numero> --add-assignee "@me"
+   gh issue edit <numero> --add-label "<etichetta-appropriata>"
+   ```
+   Scegliere l'etichetta in base al tipo di modifica:
+   - `enhancement` — nuova funzionalità o miglioramento
+   - `bug` — correzione di un errore
+   - `refactor` — riorganizzazione del codice senza cambio di comportamento
+   - `documentation` — modifiche solo alla documentazione
+   - `automation` — configurazione di workflow o automazione
+
+2. Creare un nuovo branch dedicato a partire da `main` aggiornato:
    ```
    git checkout main
    git pull origin main
@@ -23,15 +36,27 @@ Per ogni intervento che modifica file del repository, Claude deve:
    I branch creati da Claude usano sempre il prefisso `claude/` (la CI è già
    configurata per girare su `claude/**`).
 
-2. Fare commit atomici e con messaggi chiari in italiano sul branch.
+3. Fare commit atomici e con messaggi chiari in italiano sul branch.
 
-3. Fare push del branch e **aprire sempre una pull request verso `main`**:
+4. Fare push del branch e **aprire sempre una pull request verso `main`** usando
+   `gh pr create` (NON limitarsi a fornire un link):
    ```
    git push -u origin claude/<descrizione-breve>
-   gh pr create --base main --title "<titolo>" --body "<descrizione>"
+   gh pr create \
+     --base main \
+     --title "<titolo>" \
+     --body "$(cat <<'EOF'
+   ## Sommario
+   <descrizione delle modifiche>
+
+   Risolve #<numero-issue>
+
+   Generated with [Claude Code](https://claude.ai/code)
+   EOF
+   )"
    ```
 
-4. Nella descrizione della PR riassumere cosa è cambiato e perché. Lasciare che
+5. Nella descrizione della PR riassumere cosa è cambiato e perché. Lasciare che
    sia l'utente a fare il merge: **Claude non fa merge della PR**.
 
 Anche per modifiche minime (fix, refactor, una singola riga) va comunque aperta
