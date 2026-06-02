@@ -13,6 +13,9 @@ module SunCalc {
 
     // Zenit ufficiale per alba/tramonto (centro del sole a -0.833°).
     const ZENITH_OFFICIAL = 90.833;
+    // Zenit del crepuscolo civile (sole a -6°): è la fase con luce ancora
+    // percepibile attorno ad alba/tramonto, adatta all'anello visivo.
+    const ZENITH_CIVIL = 96.0;
     // Zenit del crepuscolo astronomico (sole a -18°): inizio/fine della notte.
     const ZENITH_ASTRONOMICAL = 108.0;
 
