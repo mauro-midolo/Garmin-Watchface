@@ -17,8 +17,8 @@ class FenixWatchfaceView extends Ui.WatchFace {
     hidden var cachedSunrise = null;
     hidden var cachedSunset = null;
     hidden var cachedTomorrowSunrise = null;
-    hidden var cachedAstroDawn = null;
-    hidden var cachedAstroDusk = null;
+    hidden var cachedCivilDawn = null;
+    hidden var cachedCivilDusk = null;
 
     // Raggio dinamico dei campi: calcolato in onUpdate in base alle dimensioni
     // reali dello schermo. Tenuto leggermente dentro le tacche orarie.
@@ -131,8 +131,8 @@ class FenixWatchfaceView extends Ui.WatchFace {
 
         var sr   = momentToLocalMin(cachedSunrise);
         var ss   = momentToLocalMin(cachedSunset);
-        var dawn = (cachedAstroDawn != null) ? momentToLocalMin(cachedAstroDawn) : sr;
-        var dusk = (cachedAstroDusk != null) ? momentToLocalMin(cachedAstroDusk) : ss;
+        var dawn = (cachedCivilDawn != null) ? momentToLocalMin(cachedCivilDawn) : sr;
+        var dusk = (cachedCivilDusk != null) ? momentToLocalMin(cachedCivilDusk) : ss;
 
         drawPhaseArc(dc, cx, cy, r, 0,    dawn, Gfx.COLOR_BLUE);
         drawPhaseArc(dc, cx, cy, r, dawn, sr,   Gfx.COLOR_RED);
@@ -648,9 +648,9 @@ class FenixWatchfaceView extends Ui.WatchFace {
             cachedSunset  = res.get("sunset");
 
             var resTw = SunCalc.computeWithZenith(
-                lat, lon, now, SunCalc.ZENITH_ASTRONOMICAL);
-            cachedAstroDawn = resTw.get("sunrise");
-            cachedAstroDusk = resTw.get("sunset");
+                lat, lon, now, SunCalc.ZENITH_CIVIL);
+            cachedCivilDawn = resTw.get("sunrise");
+            cachedCivilDusk = resTw.get("sunset");
 
             var tomorrow = now.add(new Time.Duration(86400));
             var resT = SunCalc.compute(lat, lon, tomorrow);
