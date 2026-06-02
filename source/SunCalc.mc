@@ -43,7 +43,7 @@ module SunCalc {
         for (var i = 0; i < keys.size(); i++) {
             var which = keys[i][:which];
             var m = eventMoment(
-                lat, year, month, day, n, lngHour, which, keys[i][:t], zenith, moment);
+                lat, n, lngHour, which, keys[i][:t], zenith, moment);
             results.put(which, m);
         }
         return results;
@@ -51,7 +51,9 @@ module SunCalc {
 
     // Istante (Moment, costruito in UTC) di un singolo evento del sole.
     // Ritorna null se l'evento non avviene (es. notte o giorno polare).
-    function eventMoment(lat, year, month, day, n, lngHour, which, tApprox, zenith, moment) {
+    // Monkey C consente al massimo 9 argomenti per chiamata: la firma è
+    // dimensionata di conseguenza.
+    function eventMoment(lat, n, lngHour, which, tApprox, zenith, moment) {
         // Approssimazione frazione di giorno dell'evento in UTC.
         var t = n + ((tApprox - lngHour) / 24.0);
 
