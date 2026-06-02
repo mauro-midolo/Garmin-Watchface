@@ -709,7 +709,7 @@ class FenixWatchfaceView extends Ui.WatchFace {
             gpsActive = (posInfo.accuracy >= Position.QUALITY_USABLE);
         }
 
-        var iconY   = cy - 50;
+        var iconY   = cy - 90;
         var spacing = 30;
 
         var btBmp = btActive ? btOnBmp : btOffBmp;
