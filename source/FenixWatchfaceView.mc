@@ -286,12 +286,12 @@ class FenixWatchfaceView extends Ui.WatchFace {
             if (current != null) {
                 var statute = (Sys.getDeviceSettings().temperatureUnits
                         == Sys.UNIT_STATUTE);
-                if (current.highTemperature != null) {
+                if ((current has :highTemperature) && current.highTemperature != null) {
                     var hi = current.highTemperature;
                     if (statute) { hi = (hi * 9.0 / 5.0) + 32.0; }
                     hiStr = hi.toNumber().toString();
                 }
-                if (current.lowTemperature != null) {
+                if ((current has :lowTemperature) && current.lowTemperature != null) {
                     var lo = current.lowTemperature;
                     if (statute) { lo = (lo * 9.0 / 5.0) + 32.0; }
                     loStr = lo.toNumber().toString();
