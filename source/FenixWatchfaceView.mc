@@ -146,11 +146,11 @@ class FenixWatchfaceView extends Ui.WatchFace {
     }
 
     hidden function drawHourTicks(dc, cx, cy) {
-        for (var i = 0; i < 12; i++) {
-            var rad = i * 30.0 * Math.PI / 180.0;
+        for (var i = 0; i < 24; i++) {
+            var rad = i * 15.0 * Math.PI / 180.0;
             var sinA = Math.sin(rad);
             var cosA = Math.cos(rad);
-            var isCardinal = (i % 3 == 0);
+            var isCardinal = (i % 6 == 0);
             var outerR = cx - 6;
             var innerR = isCardinal ? (cx - 17) : (cx - 11);
             var x1 = (cx + outerR * sinA).toNumber();
