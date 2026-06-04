@@ -90,10 +90,11 @@ class FenixWatchfaceView extends Ui.WatchFace {
         var cx = centerX;
         var cy = centerY;
 
-        // Cancella solo l'area centrale (orario + separatore + data)
+        // Cancella solo l'area centrale (secondi + orario + separatore + data)
         dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
-        dc.fillRectangle(cx - 55, cy - 35, 110, 80);
+        dc.fillRectangle(cx - 55, cy - 50, 110, 95);
 
+        drawCenterSeconds(dc, cx, cy);
         drawCenterTime(dc, cx, cy);
         dc.setColor(0x0066CC, Gfx.COLOR_TRANSPARENT);
         dc.setPenWidth(1);
@@ -130,19 +131,13 @@ class FenixWatchfaceView extends Ui.WatchFace {
         // Layer 1: indicatore dell'ora corrente (dinamico, cambia ogni minuto)
         drawNowIndicator(dc, cx, cy, cx - 3);
 
-        // Layer 2: orario, separatore blu, data
+        // Layer 2: secondi (sopra l'orario), orario, separatore blu, data
+        drawCenterSeconds(dc, cx, cy);
         drawCenterTime(dc, cx, cy);
         dc.setColor(0x0066CC, Gfx.COLOR_TRANSPARENT);
         dc.setPenWidth(1);
         dc.drawLine(cx - 38, cy + 19, cx + 38, cy + 19);
         drawCenterDate(dc, cx, cy);
-
-        // Secondi correnti (0–59): aggiornati ad ogni chiamata di onUpdate,
-        // mostrati come testo sotto la data centrale.
-        var seconds = Sys.getClockTime().sec;
-        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx, cy + 52, Gfx.FONT_XTINY, seconds.format("%02d"),
-            Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
 
         // Icone di stato connettività (sopra l'orario)
         drawConnectivityIcons(dc, cx, cy);
@@ -305,7 +300,16 @@ class FenixWatchfaceView extends Ui.WatchFace {
             Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
     }
 
-    // ----- Centro: orario + data -----
+    // ----- Centro: secondi + orario + data -----
+
+    // Secondi correnti (0–59) mostrati sopra l'orario, con font più piccolo
+    // (FONT_XTINY) rispetto al font dell'orario (FONT_NUMBER_MEDIUM).
+    hidden function drawCenterSeconds(dc, cx, cy) {
+        var seconds = Sys.getClockTime().sec;
+        dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(cx, cy - 40, Gfx.FONT_XTINY, seconds.format("%02d"),
+            Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
+    }
 
     hidden function drawCenterTime(dc, cx, cy) {
         var clock = Sys.getClockTime();
