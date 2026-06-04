@@ -137,6 +137,13 @@ class FenixWatchfaceView extends Ui.WatchFace {
         dc.drawLine(cx - 38, cy + 19, cx + 38, cy + 19);
         drawCenterDate(dc, cx, cy);
 
+        // Secondi correnti (0–59): aggiornati ad ogni chiamata di onUpdate,
+        // mostrati come testo sotto la data centrale.
+        var seconds = Sys.getClockTime().sec;
+        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(cx, cy + 52, Gfx.FONT_XTINY, seconds.format("%02d"),
+            Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
+
         // Icone di stato connettività (sopra l'orario)
         drawConnectivityIcons(dc, cx, cy);
 
