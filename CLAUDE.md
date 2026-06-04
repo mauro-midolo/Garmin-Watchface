@@ -1,16 +1,17 @@
 # CLAUDE.md
-
 Questo file fornisce indicazioni a Claude Code (claude.ai/code) quando lavora su questo repository.
 
 ## Panoramica del progetto
-
 Watchface **Connect IQ** per **Garmin Fenix 6 Pro**, scritta in **Monkey C**.
 Display radiale 260x260
 
 ## Workflow Git — REGOLA FONDAMENTALE
-
 **Non committare MAI direttamente su `main`.** Ogni modifica al codice deve passare
 da una pull request.
+
+**Branch:** quando vieni triggerato su un'issue, sei GIÀ sul branch corretto creato
+automaticamente dall'action (es. `claude/issue-<numero>-<data>`). **NON** creare un
+nuovo branch e **NON** fare `git checkout`/`git checkout -b`: lavora sul branch attivo.
 
 Per ogni intervento che modifica file del repository, Claude deve:
 
@@ -27,23 +28,17 @@ Per ogni intervento che modifica file del repository, Claude deve:
    - `documentation` — modifiche solo alla documentazione
    - `automation` — configurazione di workflow o automazione
 
-2. Creare un nuovo branch dedicato a partire da `main` aggiornato:
-   ```
-   git checkout main
-   git pull origin main
-   git checkout -b claude/<descrizione-breve>
-   ```
-   I branch creati da Claude usano sempre il prefisso `claude/` (la CI è già
-   configurata per girare su `claude/**`).
+2. Fare commit atomici e con messaggi chiari in italiano sul branch già attivo.
 
-3. Fare commit atomici e con messaggi chiari in italiano sul branch.
-
-4. Fare push del branch e **aprire sempre una pull request verso `main`** usando
-   `gh pr create` (NON limitarsi a fornire un link):
+3. Fare push del branch e **aprire SEMPRE una pull request verso `main`** eseguendo
+   il comando `gh pr create`. Questo passo è **OBBLIGATORIO**: non limitarti a
+   fornire un link "Create a PR" — devi eseguire effettivamente `gh pr create`.
+   Usa il nome del branch corrente (ricavabile con `git branch --show-current`):
    ```
-   git push -u origin claude/<descrizione-breve>
+   git push -u origin HEAD
    gh pr create \
      --base main \
+     --head "$(git branch --show-current)" \
      --title "<titolo>" \
      --body "$(cat <<'EOF'
    ## Sommario
@@ -56,14 +51,13 @@ Per ogni intervento che modifica file del repository, Claude deve:
    )"
    ```
 
-5. Nella descrizione della PR riassumere cosa è cambiato e perché. Lasciare che
+4. Nella descrizione della PR riassumere cosa è cambiato e perché. Lasciare che
    sia l'utente a fare il merge: **Claude non fa merge della PR**.
 
 Anche per modifiche minime (fix, refactor, una singola riga) va comunque aperta
-una PR — niente commit diretti su `main`.
+una PR con `gh pr create` — niente commit diretti su `main`, niente solo-link.
 
 ## Build
-
 Requisiti:
 - Garmin Connect IQ SDK >= 4.x
 - Device **fenix6pro** installato tramite SDK Manager
@@ -85,7 +79,6 @@ monkeydo FenixWatchface.prg fenix6pro
 ```
 
 ## Convenzioni di codice
-
 - Linguaggio: **Monkey C**. File sorgente in `source/`, un file per
   classe/responsabilità principale.
 - Le stringhe visibili all'utente vanno in `resources/strings/strings.xml`, non
@@ -96,7 +89,6 @@ monkeydo FenixWatchface.prg fenix6pro
   efficiente, niente operazioni costose ad ogni frame).
 
 ## Note di dominio importanti
-
 - **Alba/tramonto** (`SunCalc.mc`) richiedono una posizione GPS valida; alla prima
   installazione può mostrare `--:--` finché non c'è un fix. La posizione viene
   salvata in `properties.xml` e riutilizzata.
