@@ -137,12 +137,11 @@ class FenixWatchfaceView extends Ui.WatchFace {
         dc.drawLine(cx - 38, cy + 19, cx + 38, cy + 19);
         drawCenterDate(dc, cx, cy);
 
-        // Secondi correnti (0–59): aggiornati ad ogni chiamata di onUpdate,
-        // mostrati come testo sotto la data centrale.
-        var seconds = Sys.getClockTime().sec;
-        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx, cy + 52, Gfx.FONT_XTINY, seconds.format("%02d"),
-            Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
+        // Secondi correnti (0–59): mostrati come testo SOPRA l'orario, con font
+        // più piccolo (FONT_XTINY) rispetto al FONT_NUMBER_MEDIUM dell'orario.
+        // Aggiornati solo qui, in onUpdate; volutamente NON ridisegnati in
+        // onPartialUpdate.
+        drawCenterSeconds(dc, cx, cy);
 
         // Icone di stato connettività (sopra l'orario)
         drawConnectivityIcons(dc, cx, cy);
@@ -322,6 +321,15 @@ class FenixWatchfaceView extends Ui.WatchFace {
 
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
         dc.drawText(cx, cy - 8, Gfx.FONT_NUMBER_MEDIUM, timeStr,
+            Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
+    }
+
+    // Secondi sopra l'orario, font più piccolo dell'orario. Disegnati solo in
+    // onUpdate: NON vengono ridisegnati in onPartialUpdate.
+    hidden function drawCenterSeconds(dc, cx, cy) {
+        var seconds = Sys.getClockTime().sec;
+        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+        dc.drawText(cx, cy - 40, Gfx.FONT_XTINY, seconds.format("%02d"),
             Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
     }
 
