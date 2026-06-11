@@ -38,20 +38,12 @@ class FenixWatchfaceView extends Ui.WatchFace {
     hidden var wifiOnBmp = null;
     hidden var wifiOffBmp = null;
 
-    // Buffer di sfondo per le componenti statiche/semi-statiche
-    // (anello fasi del giorno + tacche orarie). Viene rigenerato solo quando
-    // cambia il giorno (alba/tramonto) o quando la watchface torna in primo
-    // piano, NON ad ogni frame.
-    hidden var backgroundBuffer = null;
-    hidden var backgroundDirty  = true;
-
     function initialize() {
         WatchFace.initialize();
     }
 
     // onLayout: inizializzazione del layout e delle risorse statiche.
-    // Eseguito una sola volta: carica i bitmap, calcola la geometria e prepara
-    // il buffer di sfondo.
+    // Eseguito una sola volta: carica i bitmap e calcola la geometria.
     function onLayout(dc) {
         btOnBmp    = Ui.loadResource(Rez.Drawables.BluetoothOn);
         btOffBmp   = Ui.loadResource(Rez.Drawables.BluetoothOff);
@@ -65,17 +57,12 @@ class FenixWatchfaceView extends Ui.WatchFace {
         centerX = screenW / 2;
         centerY = screenH / 2;
         FIELD_RADIUS = (centerX * 0.75).toNumber();
-
-        createBackgroundBuffer();
-        backgroundDirty = true;
     }
 
-    // onShow: la watchface torna visibile → forziamo la rigenerazione dello
-    // sfondo (i dati di alba/tramonto potrebbero essere cambiati) e aggiorniamo
-    // la cache del sole.
+    // onShow: la watchface torna visibile → aggiorniamo la cache del sole
+    // (i dati di alba/tramonto potrebbero essere cambiati).
     function onShow() {
         ensureSunData();
-        backgroundDirty = true;
     }
 
     function onHide() {}
@@ -89,24 +76,13 @@ class FenixWatchfaceView extends Ui.WatchFace {
         var cx = centerX;
         var cy = centerY;
 
-        // Dati semi-statici: alba/tramonto. Se cambia il giorno la cache viene
-        // ricalcolata e il buffer di sfondo marcato come da rigenerare.
+        // Dati semi-statici: alba/tramonto, ricalcolati solo al cambio giorno.
         ensureSunData();
 
-        // (Ri)genera lo sfondo statico solo se necessario (cambio giorno o show)
-        if (backgroundDirty) {
-            rebuildBackground();
-        }
-
-        // Layer 0: sfondo statico/semi-statico (anello fasi + tacche orarie)
+        // Layer 0: sfondo (anello fasi del giorno + tacche orarie)
         dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
         dc.clear();
-        if (backgroundBuffer != null) {
-            dc.drawBitmap(0, 0, backgroundBuffer);
-        } else {
-            // Fallback: disegno diretto se il buffer non è disponibile
-            drawPhaseRing(dc, cx, cy);
-        }
+        drawPhaseRing(dc, cx, cy);
 
         // Layer 1: indicatore dell'ora corrente (dinamico, cambia ogni minuto)
         drawNowIndicator(dc, cx, cy, cx - 3);
@@ -138,47 +114,6 @@ class FenixWatchfaceView extends Ui.WatchFace {
         drawFieldBatteryDays (dc, polarX(cx, 255), polarY(cy, 255));  // 8-9
         drawFieldBattery     (dc, polarX(cx, 285), polarY(cy, 285));  // 9-10
         drawFieldHR          (dc, polarX(cx, 315), polarY(cy, 315));  // 10-11
-    }
-
-    // ----- Buffer di sfondo (componenti statiche / semi-statiche) -----
-
-    // Crea il BufferedBitmap usato per l'anello fasi del giorno e le tacche
-    // orarie. Usa una palette ridotta per limitare l'uso di memoria. Se l'API
-    // non è disponibile, backgroundBuffer resta null e onUpdate usa il fallback.
-    hidden function createBackgroundBuffer() {
-        var opts = {
-            :width => screenW,
-            :height => screenH,
-            :palette => [
-                Gfx.COLOR_BLACK,
-                Gfx.COLOR_WHITE,
-                Gfx.COLOR_BLUE,
-                Gfx.COLOR_RED,
-                Gfx.COLOR_YELLOW
-            ]
-        };
-        if (Gfx has :createBufferedBitmap) {
-            var ref = Gfx.createBufferedBitmap(opts);
-            backgroundBuffer = (ref != null) ? ref.get() : null;
-        } else if (Gfx has :BufferedBitmap) {
-            backgroundBuffer = new Gfx.BufferedBitmap(opts);
-        } else {
-            backgroundBuffer = null;
-        }
-    }
-
-    // Rigenera il contenuto del buffer di sfondo: anello fasi del giorno +
-    // tacche orarie. L'indicatore dell'ora corrente NON è incluso perché è
-    // dinamico e viene disegnato in onUpdate.
-    hidden function rebuildBackground() {
-        backgroundDirty = false;
-        if (backgroundBuffer == null) {
-            return;
-        }
-        var bdc = backgroundBuffer.getDc();
-        bdc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
-        bdc.clear();
-        drawPhaseRing(bdc, centerX, centerY);
     }
 
     // ----- Geometria radiale -----
@@ -737,10 +672,6 @@ class FenixWatchfaceView extends Ui.WatchFace {
             cachedTomorrowSunrise = resT.get("sunrise");
 
             lastSunCalcDay = dayKey;
-
-            // I dati di alba/tramonto sono cambiati: l'anello fasi del giorno
-            // (semi-statico) va rigenerato nel buffer di sfondo.
-            backgroundDirty = true;
         }
     }
 
