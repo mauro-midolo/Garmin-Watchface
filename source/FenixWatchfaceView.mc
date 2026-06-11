@@ -13,6 +13,13 @@ using Toybox.Weather;
 
 class FenixWatchfaceView extends Ui.WatchFace {
 
+    // Stato di alimentazione: true quando l'orologio è "sveglio" e onUpdate
+    // viene chiamato ogni secondo (high-power mode); false in low-power mode,
+    // quando onUpdate è chiamato al più una volta al minuto. I secondi vengono
+    // mostrati solo quando isAwake è true, cioè quando sono effettivamente
+    // aggiornati in tempo reale.
+    hidden var isAwake = true;
+
     hidden var lastSunCalcDay = -1;
     hidden var cachedSunrise = null;
     hidden var cachedSunset = null;
@@ -66,8 +73,19 @@ class FenixWatchfaceView extends Ui.WatchFace {
     }
 
     function onHide() {}
-    function onExitSleep() {}
+
+    // onExitSleep: l'orologio torna in high-power mode → onUpdate sarà chiamato
+    // ogni secondo. Riattiviamo la visualizzazione dei secondi.
+    function onExitSleep() {
+        isAwake = true;
+        Ui.requestUpdate();
+    }
+
+    // onEnterSleep: l'orologio passa in low-power mode → onUpdate non sarà più
+    // chiamato ogni secondo. Nascondiamo i secondi (non sarebbero aggiornati in
+    // tempo reale) e forziamo un ultimo redraw per rimuoverli dallo schermo.
     function onEnterSleep() {
+        isAwake = false;
         Ui.requestUpdate();
     }
 
@@ -242,7 +260,11 @@ class FenixWatchfaceView extends Ui.WatchFace {
 
     // Secondi sopra l'orario, font più piccolo dell'orario. Disegnati solo in
     // onUpdate: NON vengono ridisegnati in onPartialUpdate.
+    // Mostrati esclusivamente quando l'orologio è sveglio (isAwake): in
+    // low-power mode onUpdate viene chiamato al più una volta al minuto, quindi
+    // i secondi sarebbero un valore fermo e fuorviante → li nascondiamo.
     hidden function drawCenterSeconds(dc, cx, cy) {
+        if (!isAwake) { return; }
         var seconds = Sys.getClockTime().sec;
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
         dc.drawText(cx, cy - 50, Gfx.FONT_MEDIUM, seconds.format("%02d"),
