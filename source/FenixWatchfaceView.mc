@@ -84,26 +84,7 @@ class FenixWatchfaceView extends Ui.WatchFace {
         Ui.requestUpdate();
     }
 
-    // onPartialUpdate: aggiornamento incrementale (solo l'area centrale con
-    // orario, separatore e data) senza ridisegnare l'intero quadrante.
-    function onPartialUpdate(dc) {
-        var cx = centerX;
-        var cy = centerY;
 
-        // Cancella solo l'area centrale (orario + separatore + data)
-        dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
-        dc.fillRectangle(cx - 55, cy - 35, 110, 80);
-
-        drawCenterTime(dc, cx, cy);
-        dc.setColor(0x0066CC, Gfx.COLOR_TRANSPARENT);
-        dc.setPenWidth(1);
-        dc.drawLine(cx - 38, cy + 19, cx + 38, cy + 19);
-        drawCenterDate(dc, cx, cy);
-    }
-
-    // onUpdate: aggiornamento completo dei dati dinamici (chiamato ~1 volta al
-    // minuto). Lo sfondo statico/semi-statico viene preso dal buffer e non
-    // ricalcolato; vengono ridisegnati solo gli elementi che cambiano.
     function onUpdate(dc) {
         var cx = centerX;
         var cy = centerY;
@@ -329,7 +310,7 @@ class FenixWatchfaceView extends Ui.WatchFace {
     hidden function drawCenterSeconds(dc, cx, cy) {
         var seconds = Sys.getClockTime().sec;
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx, cy - 40, Gfx.FONT_XTINY, seconds.format("%02d"),
+        dc.drawText(cx, cy - 50, Gfx.FONT_MEDIUM, seconds.format("%02d"),
             Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
     }
 
@@ -421,7 +402,7 @@ class FenixWatchfaceView extends Ui.WatchFace {
         var s = (floorGoal > 0)
             ? Lang.format("$1$/$2$", [floors, floorGoal])
             : floors.toString();
-        drawValue(dc, x, y + 9, s, 0x55BBFF);
+        drawValue(dc, x, y + 9, s, Gfx.COLOR_WHITE);
     }
 
     hidden function drawFieldSun(dc, x, y) {
@@ -475,7 +456,7 @@ class FenixWatchfaceView extends Ui.WatchFace {
         var steps = (info != null && info.steps != null) ? info.steps : 0;
 
         drawShoeIcon(dc, x, y - 7, 5);
-        drawValue(dc, x, y + 9, steps.toString(), Gfx.COLOR_GREEN);
+        drawValue(dc, x, y + 9, steps.toString(), Gfx.COLOR_WHITE);
     }
 
     hidden function drawFieldBattery(dc, x, y) {
