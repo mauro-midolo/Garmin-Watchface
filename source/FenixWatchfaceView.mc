@@ -27,6 +27,20 @@ class FenixWatchfaceView extends Ui.WatchFace {
     hidden var cachedCivilDawn = null;
     hidden var cachedCivilDusk = null;
 
+    // Cache della fase lunare: ricalcolata una sola volta al giorno (vedi
+    // ensureMoonData). cachedMoonFraction = frazione illuminata del disco
+    // (0 = novilunio, 1 = plenilunio); cachedMoonWaxing = true se la luna è
+    // crescente (limbo illuminato a destra, convenzione emisfero nord);
+    // cachedMoonPhaseIndex = indice 0..7 della fase canonica.
+    hidden var lastMoonCalcDay = -1;
+    hidden var cachedMoonFraction = 0.0;
+    hidden var cachedMoonWaxing = true;
+    hidden var cachedMoonPhaseIndex = 0;
+
+    // Mese sinodico medio (giorni tra due noviluni consecutivi): periodo del
+    // ciclo delle fasi lunari usato per il calcolo astronomico.
+    const SYNODIC_MONTH = 29.530588853;
+
     // Raggio dei campi: calcolato una sola volta in onLayout in base alle
     // dimensioni reali dello schermo. Tenuto leggermente dentro le tacche orarie.
     hidden var FIELD_RADIUS = 88;
@@ -97,6 +111,10 @@ class FenixWatchfaceView extends Ui.WatchFace {
         // Dati semi-statici: alba/tramonto, ricalcolati solo al cambio giorno.
         ensureSunData();
 
+        // Fase lunare: puro calcolo astronomico, ricalcolato solo al cambio
+        // giorno (mai in onPartialUpdate, per rispettare il power budget).
+        ensureMoonData();
+
         // Layer 0: sfondo (anello fasi del giorno + tacche orarie)
         dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
         dc.clear();
@@ -120,6 +138,9 @@ class FenixWatchfaceView extends Ui.WatchFace {
 
         // Icone di stato connettività (sopra l'orario)
         drawConnectivityIcons(dc, cx, cy);
+
+        // Fase lunare (glifo vettoriale sotto la data)
+        drawMoonPhase(dc, cx, cy);
 
         // Layer 3: campi dati radiali (slot da 30°, posizionati tra le tacche)
         drawFieldWeather     (dc, polarX(cx,  45), polarY(cy,  45));  // 1-2
@@ -720,6 +741,104 @@ class FenixWatchfaceView extends Ui.WatchFace {
             if (h == 0) { h = 12; }
         }
         return Lang.format("$1$:$2$", [h.format("%02d"), info.min.format("%02d")]);
+    }
+
+    // ----- Fase lunare -----
+
+    // Calcola la fase lunare a partire dalla sola data corrente: puro calcolo
+    // astronomico, NESSUN sensore, GPS o chiamata di rete. Eseguito UNA SOLA
+    // VOLTA AL GIORNO (guardia sul day-key, come ensureSunData): il risultato
+    // resta in cache e viene riusato a ogni onUpdate senza ricalcolare.
+    //
+    // FORMULA: si misura l'"età" della luna come tempo trascorso da un
+    // novilunio di riferimento noto, riportato nel mese sinodico medio
+    // (~29.53 giorni). La frazione del ciclo (0..1) dà fase e illuminazione.
+    hidden function ensureMoonData() {
+        var now = Time.now();
+        var info = Gregorian.info(now, Time.FORMAT_SHORT);
+        var dayKey = info.year * 10000 + info.month * 100 + info.day;
+        if (dayKey == lastMoonCalcDay) { return; }
+
+        // Novilunio di riferimento: 6 gennaio 2000, 18:14 UTC (JD ~2451550.1),
+        // istante di novilunio comunemente usato come epoca nei calcoli lunari.
+        var refNewMoon = Gregorian.moment({
+            :year => 2000, :month => 1, :day => 6,
+            :hour => 18, :minute => 14, :second => 0
+        });
+
+        // Giorni trascorsi dal novilunio di riferimento.
+        var elapsedDays = now.subtract(refNewMoon).value() / 86400.0;
+
+        // Frazione del ciclo sinodico corrente: phase in [0, 1).
+        //   0   = novilunio, 0.5 = plenilunio.
+        var phase = elapsedDays / SYNODIC_MONTH;
+        phase = phase - Math.floor(phase);
+        if (phase < 0.0) { phase += 1.0; }
+
+        // Frazione illuminata del disco: 0 (novilunio) → 1 (plenilunio) → 0.
+        cachedMoonFraction = (1.0 - Math.cos(2.0 * Math.PI * phase)) / 2.0;
+        // Crescente nella prima metà del ciclo (limbo illuminato a destra),
+        // calante nella seconda metà (limbo a sinistra).
+        cachedMoonWaxing = (phase < 0.5);
+        // Indice 0..7 delle 8 fasi canoniche (0 = novilunio, 1 = crescente,
+        // 2 = primo quarto, 3 = gibbosa crescente, 4 = plenilunio,
+        // 5 = gibbosa calante, 6 = ultimo quarto, 7 = calante).
+        cachedMoonPhaseIndex = (Math.floor(phase * 8.0 + 0.5)).toNumber() % 8;
+
+        lastMoonCalcDay = dayKey;
+    }
+
+    // Disegna il glifo della luna nella fase corrente, vettorialmente con dc:
+    // disco in ombra + regione illuminata costruita come un unico poligono
+    // delimitato dal limbo circolare e dal terminatore (semi-ellisse). In low
+    // power mode resta leggero (nessun calcolo: legge solo la cache).
+    //
+    // POSIZIONE E DIMENSIONE: per spostare/ridimensionare l'icona modifica
+    // "mx"/"my" (centro) e "R" (raggio) qui sotto.
+    hidden function drawMoonPhase(dc, cx, cy) {
+        var mx = cx;          // centro X: colonna centrale
+        var my = cy + 62;     // centro Y: spazio libero sotto la data
+        var R  = 13;          // raggio del disco lunare
+
+        // Disco in ombra + contorno (sempre visibile, anche al novilunio).
+        dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_BLACK);
+        dc.fillCircle(mx, my, R);
+        dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
+        dc.setPenWidth(1);
+        dc.drawCircle(mx, my, R);
+
+        var f = cachedMoonFraction;
+        // k: posizione orizzontale del terminatore relativa al limbo (-1..1).
+        //   f=0  → k=1  (terminatore sul limbo: nessuna porzione illuminata)
+        //   f=.5 → k=0  (terminatore verticale: mezzo disco illuminato)
+        //   f=1  → k=-1 (terminatore sul limbo opposto: disco pieno)
+        var k = 1.0 - 2.0 * f;
+        var sign = cachedMoonWaxing ? 1.0 : -1.0;   // crescente → lato destro
+
+        // Regione illuminata come poligono unico: si scende lungo il limbo
+        // circolare e si risale lungo il terminatore (semi-ellisse di
+        // semilarghezza k volte quella del limbo a ciascuna quota).
+        var N = 16;
+        var pts = new [2 * (N + 1)];
+        for (var i = 0; i <= N; i++) {
+            // limbo: dall'alto (y=-R) verso il basso (y=+R)
+            var y = -R + (2.0 * R) * i / N;
+            var d = (R * R) - (y * y);
+            if (d < 0.0) { d = 0.0; }
+            var xl = Math.sqrt(d);
+            pts[i] = [ (mx + sign * xl).toNumber(), (my + y).toNumber() ];
+            // terminatore: dal basso (y=+R) verso l'alto (y=-R)
+            var yt = R - (2.0 * R) * i / N;
+            var dt = (R * R) - (yt * yt);
+            if (dt < 0.0) { dt = 0.0; }
+            var xlt = Math.sqrt(dt);
+            pts[N + 1 + i] = [ (mx + sign * k * xlt).toNumber(),
+                               (my + yt).toNumber() ];
+        }
+
+        dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
+        dc.fillPolygon(pts);
+        dc.setPenWidth(1);
     }
 
     // ----- Icone stato connettività (Bluetooth, WiFi, GPS) -----
