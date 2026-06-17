@@ -849,12 +849,14 @@ class FenixWatchfaceView extends Ui.WatchFace {
         // Bluetooth: telefono connesso
         var btActive = (ds has :phoneConnected) ? (ds.phoneConnected == true) : false;
 
-        // WiFi via connectionInfo (CIQ 3.1+)
+        // WiFi via connectionInfo (CIQ 3.1+): attivo solo se effettivamente
+        // connesso a una rete. Gli stati NOT_INITIALIZED (0) e NOT_CONNECTED (1)
+        // indicano WiFi non attivo; solo CONNECTION_STATE_CONNECTED (2) è attivo.
         var wifiActive = false;
         if ((ds has :connectionInfo) && (ds.connectionInfo != null)) {
             var wifiInfo = ds.connectionInfo.get(:wifi);
             if (wifiInfo != null && (wifiInfo has :state)) {
-                wifiActive = (wifiInfo.state != 0);
+                wifiActive = (wifiInfo.state == Sys.CONNECTION_STATE_CONNECTED);
             }
         }
 
