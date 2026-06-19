@@ -7,7 +7,6 @@ using Toybox.Time;
 using Toybox.Time.Gregorian;
 using Toybox.ActivityMonitor;
 using Toybox.Activity;
-using Toybox.Position;
 using Toybox.Application as App;
 using Toybox.Weather;
 
@@ -51,28 +50,13 @@ class FenixWatchfaceView extends Ui.WatchFace {
     hidden var centerX = 0;
     hidden var centerY = 0;
 
-    // Bitmap icone connettività, caricati una sola volta in onLayout
-    hidden var btOnBmp = null;
-    hidden var btOffBmp = null;
-    hidden var gpsOnBmp = null;
-    hidden var gpsOffBmp = null;
-    hidden var wifiOnBmp = null;
-    hidden var wifiOffBmp = null;
-
     function initialize() {
         WatchFace.initialize();
     }
 
-    // onLayout: inizializzazione del layout e delle risorse statiche.
-    // Eseguito una sola volta: carica i bitmap e calcola la geometria.
+    // onLayout: inizializzazione del layout. Eseguito una sola volta: calcola
+    // la geometria dello schermo.
     function onLayout(dc) {
-        btOnBmp    = Ui.loadResource(Rez.Drawables.BluetoothOn);
-        btOffBmp   = Ui.loadResource(Rez.Drawables.BluetoothOff);
-        gpsOnBmp   = Ui.loadResource(Rez.Drawables.GpsOn);
-        gpsOffBmp  = Ui.loadResource(Rez.Drawables.GpsOff);
-        wifiOnBmp  = Ui.loadResource(Rez.Drawables.WifiOn);
-        wifiOffBmp = Ui.loadResource(Rez.Drawables.WifiOff);
-
         screenW = dc.getWidth();
         screenH = dc.getHeight();
         centerX = screenW / 2;
@@ -136,8 +120,8 @@ class FenixWatchfaceView extends Ui.WatchFace {
         // onPartialUpdate.
         drawCenterSeconds(dc, cx, cy);
 
-        // Icone di stato connettività (sopra l'orario)
-        drawConnectivityIcons(dc, cx, cy);
+        // Icona telefono connesso (sopra l'orario); nessun indicatore se non connesso
+        drawPhoneIcon(dc, cx, cy);
 
         // Fase lunare (glifo vettoriale sotto la data)
         drawMoonPhase(dc, cx, cy);
@@ -663,16 +647,25 @@ class FenixWatchfaceView extends Ui.WatchFace {
         return null;
     }
 
+    // Posizione usata solo per il calcolo astronomico di alba/tramonto.
+    // Ricavata dalla località di osservazione del meteo (Toybox.Weather), che
+    // segue la posizione del telefono/orologio senza richiedere il GPS. Il
+    // valore viene messo in cache in Storage e riutilizzato quando il meteo non
+    // è ancora disponibile.
     hidden function getLocation() {
-        var info = Position.getInfo();
-        if (info != null && info.position != null) {
-            var deg = info.position.toDegrees();
-            if (deg != null && deg.size() >= 2) {
-                var lat = deg[0];
-                var lon = deg[1];
-                if (lat != 0.0 || lon != 0.0) {
-                    saveLocation(lat, lon);
-                    return [lat, lon];
+        if (Toybox has :Weather) {
+            var current = Weather.getCurrentConditions();
+            if (current != null
+                    && (current has :observationLocationPosition)
+                    && current.observationLocationPosition != null) {
+                var deg = current.observationLocationPosition.toDegrees();
+                if (deg != null && deg.size() >= 2) {
+                    var lat = deg[0];
+                    var lon = deg[1];
+                    if (lat != 0.0 || lon != 0.0) {
+                        saveLocation(lat, lon);
+                        return [lat, lon];
+                    }
                 }
             }
         }
@@ -716,20 +709,6 @@ class FenixWatchfaceView extends Ui.WatchFace {
 
             lastSunCalcDay = dayKey;
         }
-    }
-
-    hidden function nextSunEvent() {
-        var nowVal = Time.now().value();
-        if (cachedSunrise != null && nowVal < cachedSunrise.value()) {
-            return { :isSunrise => true, :moment => cachedSunrise };
-        }
-        if (cachedSunset != null && nowVal < cachedSunset.value()) {
-            return { :isSunrise => false, :moment => cachedSunset };
-        }
-        if (cachedTomorrowSunrise != null) {
-            return { :isSunrise => true, :moment => cachedTomorrowSunrise };
-        }
-        return null;
     }
 
     hidden function formatLocalHM(moment) {
@@ -841,56 +820,33 @@ class FenixWatchfaceView extends Ui.WatchFace {
         dc.setPenWidth(1);
     }
 
-    // ----- Icone stato connettività (Bluetooth, WiFi, GPS) -----
+    // ----- Icona telefono connesso -----
 
-    hidden function drawConnectivityIcons(dc, cx, cy) {
+    // Disegna un'icona "smartphone" vettoriale (nessuna PNG) sopra l'orario,
+    // SOLO quando il telefono è connesso. Quando non è connesso non viene
+    // mostrato alcun indicatore.
+    hidden function drawPhoneIcon(dc, cx, cy) {
         var ds = Sys.getDeviceSettings();
+        var connected = (ds has :phoneConnected) ? (ds.phoneConnected == true) : false;
+        if (!connected) { return; }
 
-        // Bluetooth: telefono connesso
-        var btActive = (ds has :phoneConnected) ? (ds.phoneConnected == true) : false;
+        var w = 14;              // larghezza del corpo del telefono
+        var h = 24;              // altezza del corpo del telefono
+        var x = cx - w / 2;
+        var y = (cy - 90) - h / 2;
 
-        // WiFi via connectionInfo (CIQ 3.1+): attivo solo se effettivamente
-        // connesso a una rete. Gli stati NOT_INITIALIZED (0) e NOT_CONNECTED (1)
-        // indicano WiFi non attivo; solo CONNECTION_STATE_CONNECTED (2) è attivo.
-        var wifiActive = false;
-        if ((ds has :connectionInfo) && (ds.connectionInfo != null)) {
-            var wifiInfo = ds.connectionInfo.get(:wifi);
-            if (wifiInfo != null && (wifiInfo has :state)) {
-                wifiActive = (wifiInfo.state == Sys.CONNECTION_STATE_CONNECTED);
-            }
-        }
+        // Corpo del telefono (rettangolo arrotondato bianco)
+        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+        dc.fillRoundedRectangle(x, y, w, h, 3);
 
-        // GPS: qualità del fix di posizione
-        var gpsActive = false;
-        var posInfo = Position.getInfo();
-        if (posInfo != null && (posInfo has :accuracy)) {
-            gpsActive = (posInfo.accuracy >= Position.QUALITY_USABLE);
-        }
+        // Schermo (interno nero)
+        dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_TRANSPARENT);
+        dc.fillRoundedRectangle(x + 2, y + 4, w - 4, h - 8, 1);
 
-        var iconY   = cy - 90;
-        var spacing = 30;
-
-        var btBmp = btActive ? btOnBmp : btOffBmp;
-        if (btBmp != null) {
-            dc.drawBitmap(
-                cx - spacing - btBmp.getWidth() / 2,
-                iconY - btBmp.getHeight() / 2,
-                btBmp);
-        }
-        var wifiBmp = wifiActive ? wifiOnBmp : wifiOffBmp;
-        if (wifiBmp != null) {
-            dc.drawBitmap(
-                cx - wifiBmp.getWidth() / 2,
-                iconY - wifiBmp.getHeight() / 2,
-                wifiBmp);
-        }
-        var gpsBmp = gpsActive ? gpsOnBmp : gpsOffBmp;
-        if (gpsBmp != null) {
-            dc.drawBitmap(
-                cx + spacing - gpsBmp.getWidth() / 2,
-                iconY - gpsBmp.getHeight() / 2,
-                gpsBmp);
-        }
+        // Altoparlante (linea in alto) e tasto home (punto in basso)
+        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+        dc.fillRectangle(cx - 2, y + 2, 4, 1);
+        dc.fillCircle(cx, y + h - 2, 1);
     }
 
 }

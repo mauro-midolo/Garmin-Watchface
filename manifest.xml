@@ -4,9 +4,7 @@
         <iq:products>
             <iq:product id="fenix6pro"/>
         </iq:products>
-        <iq:permissions>
-            <iq:uses-permission id="Positioning"/>
-        </iq:permissions>
+        <iq:permissions/>
         <iq:languages>
             <iq:language>eng</iq:language>
             <iq:language>ita</iq:language>
