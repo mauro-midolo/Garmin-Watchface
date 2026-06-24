@@ -89,9 +89,11 @@ monkeydo FenixWatchface.prg fenix6pro
   efficiente, niente operazioni costose ad ogni frame).
 
 ## Note di dominio importanti
-- **Alba/tramonto** (`SunCalc.mc`) richiedono una posizione GPS valida; alla prima
-  installazione può mostrare `--:--` finché non c'è un fix. La posizione viene
-  salvata in `properties.xml` e riutilizzata.
+- **Alba/tramonto** (`SunCalc.mc`) richiedono una posizione: viene ricavata dalla
+  località di osservazione del meteo (`Toybox.Weather`,
+  `observationLocationPosition`), quindi serve la sync con Garmin Connect. Alla
+  prima installazione può mostrare `--:--` finché i dati meteo non sono
+  disponibili. La posizione viene salvata in `properties.xml` e riutilizzata.
 - **Frequenza cardiaca**: `Activity.getActivityInfo().currentHeartRate` con
   fallback a `ActivityMonitor.getHeartRateHistory` (ultimo campione).
 - **Meteo**: `Toybox.Weather.getCurrentConditions()` (richiede sync con Garmin

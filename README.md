@@ -41,7 +41,7 @@ Attorno al bordo è presente un **anello delle fasi del giorno**: archi colorati
 
 ## Note sull'utilizzo
 
-- **Alba/tramonto**: alla prima installazione potrebbe apparire `--:--` finché l'orologio non ottiene un fix GPS. Dopo il primo utilizzo all'aperto la posizione viene salvata e riutilizzata automaticamente.
+- **Alba/tramonto**: la posizione usata per il calcolo è ricavata dai dati meteo (località di osservazione), quindi richiede la sincronizzazione con Garmin Connect. Alla prima installazione potrebbe apparire `--:--` finché i dati meteo non sono disponibili; la posizione viene poi salvata e riutilizzata automaticamente.
 - **Meteo**: i dati meteo richiedono che l'orologio sia sincronizzato con Garmin Connect tramite Bluetooth. Temperatura e unità di misura seguono le impostazioni dell'orologio (°C / °F).
 - **Frequenza cardiaca**: visualizza la frequenza cardiaca in tempo reale durante un'attività; a riposo mostra l'ultimo campione disponibile.
 - **Piani saliti**: rilevati tramite l'altimetro barometrico del Fenix 6 Pro; il contatore si azzera ogni mezzanotte.
