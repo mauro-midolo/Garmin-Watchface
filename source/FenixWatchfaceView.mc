@@ -9,6 +9,7 @@ using Toybox.ActivityMonitor;
 using Toybox.Activity;
 using Toybox.Application as App;
 using Toybox.Weather;
+using Toybox.Position;
 
 class FenixWatchfaceView extends Ui.WatchFace {
 
@@ -648,33 +649,56 @@ class FenixWatchfaceView extends Ui.WatchFace {
     }
 
     // Posizione usata solo per il calcolo astronomico di alba/tramonto.
-    // Ricavata dalla località di osservazione del meteo (Toybox.Weather), che
-    // segue la posizione del telefono/orologio senza richiedere il GPS. Il
-    // valore viene messo in cache in Storage e riutilizzato quando il meteo non
-    // è ancora disponibile.
+    // Si tenta, nell'ordine:
+    //   1) la località di osservazione del meteo (Toybox.Weather), che segue la
+    //      posizione del telefono/orologio (richiede il permesso Positioning);
+    //   2) l'ultima posizione nota del GPS (Toybox.Position.getInfo()), che NON
+    //      accende il GPS ma restituisce l'ultimo fix disponibile;
+    //   3) il valore salvato in Storage da una sessione precedente.
+    // La prima posizione valida trovata viene messa in cache in Storage e
+    // riutilizzata quando le altre fonti non sono disponibili.
     hidden function getLocation() {
+        // 1) Località di osservazione del meteo.
         if (Toybox has :Weather) {
             var current = Weather.getCurrentConditions();
             if (current != null
                     && (current has :observationLocationPosition)
                     && current.observationLocationPosition != null) {
-                var deg = current.observationLocationPosition.toDegrees();
-                if (deg != null && deg.size() >= 2) {
-                    var lat = deg[0];
-                    var lon = deg[1];
-                    if (lat != 0.0 || lon != 0.0) {
-                        saveLocation(lat, lon);
-                        return [lat, lon];
-                    }
-                }
+                var loc = degreesIfValid(
+                    current.observationLocationPosition.toDegrees());
+                if (loc != null) { return loc; }
             }
         }
+
+        // 2) Ultima posizione nota del GPS (nessun consumo: solo l'ultimo fix).
+        if (Toybox has :Position) {
+            var info = Position.getInfo();
+            if (info != null && info.position != null) {
+                var loc = degreesIfValid(info.position.toDegrees());
+                if (loc != null) { return loc; }
+            }
+        }
+
+        // 3) Posizione salvata in precedenza.
         var sLat = App.Storage.getValue("lastLat");
         var sLon = App.Storage.getValue("lastLon");
         if (sLat != null && sLon != null) {
             return [sLat, sLon];
         }
         return null;
+    }
+
+    // Valida una coppia [lat, lon] in gradi: ritorna [lat, lon] (salvandola in
+    // cache) se è una posizione plausibile, altrimenti null. Scarta il valore
+    // (0,0) che le API restituiscono quando non hanno ancora un fix valido.
+    hidden function degreesIfValid(deg) {
+        if (deg == null || deg.size() < 2) { return null; }
+        var lat = deg[0];
+        var lon = deg[1];
+        if (lat == null || lon == null) { return null; }
+        if (lat == 0.0 && lon == 0.0) { return null; }
+        saveLocation(lat, lon);
+        return [lat, lon];
     }
 
     hidden function saveLocation(lat, lon) {
