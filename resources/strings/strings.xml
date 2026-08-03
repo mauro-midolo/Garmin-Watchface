@@ -6,5 +6,17 @@
     <string id="FloorsLabel">PIANI</string>
     <string id="SunriseLabel">ALBA</string>
     <string id="SunsetLabel">TRAM</string>
+    <string id="DaysLabel">Giorni</string>
     <string id="NoData">--:--</string>
+    <string id="NoValue">--</string>
+
+    <!-- Abbreviazioni dei giorni della settimana, nell'ordine restituito da
+         Gregorian.info().day_of_week (1 = domenica). -->
+    <string id="DaySun">DOM</string>
+    <string id="DayMon">LUN</string>
+    <string id="DayTue">MAR</string>
+    <string id="DayWed">MER</string>
+    <string id="DayThu">GIO</string>
+    <string id="DayFri">VEN</string>
+    <string id="DaySat">SAB</string>
 </strings>

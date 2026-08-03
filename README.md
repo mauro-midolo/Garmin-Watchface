@@ -25,10 +25,10 @@ I campi sono disposti in senso orario nelle posizioni a mezz'ora attorno al quad
 | 1:30 | Condizioni meteo attuali + temperatura ☀ |
 | 2:30 | Temperatura min/max prevista per la giornata 🌡 (`min°/max°`) |
 | 3:30 | Altitudine attuale ▲ (m o ft) |
-| 4:30 | Passi effettuati oggi 👟 |
+| 4:30 | Passi effettuati oggi 👟 (in verde al raggiungimento dell'obiettivo) |
 | 5:30 | Tramonto 🌇 |
 | 6:30 | Alba 🌅 (la prossima disponibile) |
-| 7:30 | Piani saliti oggi 🪜 (`saliti/obiettivo`) |
+| 7:30 | Piani saliti oggi 🪜 (`saliti/obiettivo`, in verde al raggiungimento dell'obiettivo) |
 | 8:30 | Autonomia residua della batteria in giorni |
 | 9:30 | Batteria residua 🔋 (percentuale, colore verde/giallo/rosso) |
 | 10:30 | Frequenza cardiaca ❤ |
@@ -66,3 +66,4 @@ Attorno al bordo è presente un **anello 24h delle fasi del giorno**: archi colo
 - **Altitudine**: ricavata dall'altimetro barometrico; mostrata in metri o piedi secondo le impostazioni dell'orologio.
 - **Batteria**: oltre alla percentuale residua, viene mostrata anche la stima dell'autonomia rimanente in giorni.
 - **Secondi**: mostrati solo quando l'orologio è attivo; in modalità risparmio energetico vengono nascosti per non visualizzare un valore non aggiornato.
+- **Consumo**: il disegno è ottimizzato per il budget energetico di una watchface. Le letture di sistema (impostazioni, meteo, attività, batteria, orario) vengono fatte **una sola volta per frame**; posizione GPS/meteo, alba/tramonto, fase lunare e stringa della data sono ricalcolati **una volta al giorno**; le coordinate di tacche orarie e campi radiali sono precalcolate all'avvio, così in `onUpdate` non resta alcuna trigonometria su angoli costanti.
