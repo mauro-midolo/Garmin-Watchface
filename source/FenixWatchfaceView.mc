@@ -20,55 +20,161 @@ class FenixWatchfaceView extends Ui.WatchFace {
     // aggiornati in tempo reale.
     hidden var isAwake = true;
 
+    // ----- Cache alba/tramonto -----
+    // I momenti astronomici cambiano una volta al giorno: si ricalcolano solo
+    // al cambio giorno. Vengono messe in cache anche le stringhe già formattate
+    // e gli archi dell'anello, per non rifare Gregorian.info/Lang.format e la
+    // conversione in gradi a ogni frame.
     hidden var lastSunCalcDay = -1;
+    hidden var lastSunAttemptMin = -1;
     hidden var cachedSunrise = null;
     hidden var cachedSunset = null;
     hidden var cachedTomorrowSunrise = null;
     hidden var cachedCivilDawn = null;
     hidden var cachedCivilDusk = null;
+    hidden var cachedSunriseStr = null;
+    hidden var cachedSunsetStr = null;
+    hidden var cachedTomorrowSunriseStr = null;
+    // Archi dell'anello 24h già convertiti in gradi: [ [gradiA, gradiB, colore], ... ]
+    hidden var cachedPhaseArcs = null;
 
     // Cache della fase lunare: ricalcolata una sola volta al giorno (vedi
     // ensureMoonData). cachedMoonFraction = frazione illuminata del disco
     // (0 = novilunio, 1 = plenilunio); cachedMoonWaxing = true se la luna è
     // crescente (limbo illuminato a destra, convenzione emisfero nord);
-    // cachedMoonPhaseIndex = indice 0..7 della fase canonica.
+    // cachedMoonPoly = poligono della regione illuminata, precalcolato.
     hidden var lastMoonCalcDay = -1;
     hidden var cachedMoonFraction = 0.0;
     hidden var cachedMoonWaxing = true;
-    hidden var cachedMoonPhaseIndex = 0;
+    hidden var cachedMoonPoly = null;
+
+    // Cache della stringa di data: cambia una volta al giorno.
+    hidden var lastDateDay = -1;
+    hidden var cachedDateStr = "";
+
+    // Formato orario corrente (12/24h): se l'utente lo cambia dalle impostazioni
+    // le stringhe già formattate in cache vanno rigenerate.
+    hidden var lastIs24 = null;
 
     // Mese sinodico medio (giorni tra due noviluni consecutivi): periodo del
     // ciclo delle fasi lunari usato per il calcolo astronomico.
     const SYNODIC_MONTH = 29.530588853;
 
-    // Raggio dei campi: calcolato una sola volta in onLayout in base alle
-    // dimensioni reali dello schermo. Tenuto leggermente dentro le tacche orarie.
-    hidden var FIELD_RADIUS = 88;
+    // Novilunio di riferimento: 6 gennaio 2000, 18:14 UTC, in secondi dall'epoca
+    // Unix. Valore costante e già in UTC: Gregorian.moment() NON è utilizzabile
+    // perché interpreta i campi come ora locale (errore fino a ±14 ore).
+    const REF_NEW_MOON_EPOCH = 947182440;
 
     // Geometria dello schermo, calcolata una sola volta in onLayout
     hidden var screenW = 0;
     hidden var screenH = 0;
     hidden var centerX = 0;
     hidden var centerY = 0;
+    hidden var ringRadius = 0;
+
+    // Geometria precalcolata in onLayout: gli angoli dei campi dati e delle
+    // tacche orarie sono costanti, quindi seno/coseno si calcolano una volta
+    // sola invece che ~68 volte per frame.
+    hidden var fieldX = null;   // ascisse dei 10 slot radiali
+    hidden var fieldY = null;   // ordinate dei 10 slot radiali
+    hidden var ticksThin = null;      // [x1,y1,x2,y2, ...] tacche normali
+    hidden var ticksCardinal = null;  // [x1,y1,x2,y2, ...] tacche cardinali
+
+    // Stringhe localizzate, caricate una volta sola da resources/strings.
+    hidden var dayNames = null;
+    hidden var strDays = "";
+    hidden var strNoTime = "--:--";
+    hidden var strNoValue = "--";
 
     function initialize() {
         WatchFace.initialize();
     }
 
     // onLayout: inizializzazione del layout. Eseguito una sola volta: calcola
-    // la geometria dello schermo.
+    // la geometria dello schermo, precalcola le coordinate costanti (campi
+    // radiali e tacche orarie) e carica le stringhe localizzate.
     function onLayout(dc) {
         screenW = dc.getWidth();
         screenH = dc.getHeight();
         centerX = screenW / 2;
         centerY = screenH / 2;
-        FIELD_RADIUS = (centerX * 0.75).toNumber();
+        ringRadius = centerX - 3;
+
+        var fieldRadius = centerX * 0.75;
+        buildFieldPositions(fieldRadius);
+        buildHourTicks();
+        loadStrings();
     }
 
-    // onShow: la watchface torna visibile → aggiorniamo la cache del sole
-    // (i dati di alba/tramonto potrebbero essere cambiati).
+    // Posizioni dei 10 campi dati: slot da 30° a partire da 45°, cioè i settori
+    // compresi tra le tacche orarie (1-2, 2-3, ... 10-11).
+    hidden function buildFieldPositions(radius) {
+        fieldX = new [10];
+        fieldY = new [10];
+        for (var i = 0; i < 10; i++) {
+            var deg = 45.0 + 30.0 * i;
+            var rad = deg * Math.PI / 180.0;
+            fieldX[i] = (centerX + radius * Math.sin(rad)).toNumber();
+            fieldY[i] = (centerY - radius * Math.cos(rad)).toNumber();
+        }
+    }
+
+    // Estremi delle 24 tacche orarie, separati per spessore così che in fase di
+    // disegno servano solo due setColor/setPenWidth invece di 24.
+    hidden function buildHourTicks() {
+        ticksThin = new [4 * 20];
+        ticksCardinal = new [4 * 4];
+        var ti = 0;
+        var ci = 0;
+        var outerR = centerX - 6;
+        for (var i = 0; i < 24; i++) {
+            var rad = i * 15.0 * Math.PI / 180.0;
+            var sinA = Math.sin(rad);
+            var cosA = Math.cos(rad);
+            var isCardinal = (i % 6 == 0);
+            var innerR = isCardinal ? (centerX - 17) : (centerX - 11);
+            var x1 = (centerX + outerR * sinA).toNumber();
+            var y1 = (centerY - outerR * cosA).toNumber();
+            var x2 = (centerX + innerR * sinA).toNumber();
+            var y2 = (centerY - innerR * cosA).toNumber();
+            if (isCardinal) {
+                ticksCardinal[ci]     = x1;
+                ticksCardinal[ci + 1] = y1;
+                ticksCardinal[ci + 2] = x2;
+                ticksCardinal[ci + 3] = y2;
+                ci += 4;
+            } else {
+                ticksThin[ti]     = x1;
+                ticksThin[ti + 1] = y1;
+                ticksThin[ti + 2] = x2;
+                ticksThin[ti + 3] = y2;
+                ti += 4;
+            }
+        }
+    }
+
+    // Le stringhe visibili all'utente stanno in resources/strings/strings.xml:
+    // si caricano una volta sola in onLayout, mai in onUpdate.
+    hidden function loadStrings() {
+        dayNames = [
+            Ui.loadResource(Rez.Strings.DaySun),
+            Ui.loadResource(Rez.Strings.DayMon),
+            Ui.loadResource(Rez.Strings.DayTue),
+            Ui.loadResource(Rez.Strings.DayWed),
+            Ui.loadResource(Rez.Strings.DayThu),
+            Ui.loadResource(Rez.Strings.DayFri),
+            Ui.loadResource(Rez.Strings.DaySat)
+        ];
+        strDays    = Ui.loadResource(Rez.Strings.DaysLabel);
+        strNoTime  = Ui.loadResource(Rez.Strings.NoData);
+        strNoValue = Ui.loadResource(Rez.Strings.NoValue);
+    }
+
+    // onShow: la watchface torna visibile → invalidiamo la cache del sole così
+    // che al primo update venga rigenerata (i dati potrebbero essere cambiati).
     function onShow() {
-        ensureSunData();
+        lastSunCalcDay = -1;
+        lastSunAttemptMin = -1;
     }
 
     function onHide() {}
@@ -93,12 +199,39 @@ class FenixWatchfaceView extends Ui.WatchFace {
         var cx = centerX;
         var cy = centerY;
 
-        // Dati semi-statici: alba/tramonto, ricalcolati solo al cambio giorno.
-        ensureSunData();
+        // Snapshot dei dati di sistema: ogni chiamata a queste API ha un costo
+        // non trascurabile, quindi si legge UNA sola volta per frame e si passa
+        // il risultato ai singoli campi (prima erano fino a 7 letture ciascuna).
+        var settings = Sys.getDeviceSettings();
+        var clock    = Sys.getClockTime();
+        var actMon   = ActivityMonitor.getInfo();
+        var activity = Activity.getActivityInfo();
+        var stats    = Sys.getSystemStats();
+        var weather  = readWeather();
 
-        // Fase lunare: puro calcolo astronomico, ricalcolato solo al cambio
-        // giorno (mai in onPartialUpdate, per rispettare il power budget).
-        ensureMoonData();
+        // Un solo Gregorian.info per frame: la chiave di giornata serve a sole,
+        // luna e stringa della data.
+        var now     = Time.now();
+        var dateInfo = Gregorian.info(now, Time.FORMAT_SHORT);
+        var dayKey   = dateInfo.year * 10000 + dateInfo.month * 100 + dateInfo.day;
+
+        // Cambio 12/24h dalle impostazioni: invalida le stringhe orarie in cache.
+        var is24 = settings.is24Hour;
+        if (lastIs24 != is24) {
+            lastIs24 = is24;
+            refreshSunStrings(is24);
+        }
+
+        // Dati semi-statici, ricalcolati solo al cambio giorno.
+        ensureSunData(dayKey, now, weather, is24, clock);
+        ensureMoonData(dayKey, now);
+        ensureDateString(dayKey, dateInfo);
+
+        // Antialiasing: migliora nettamente archi, poligoni e linee oblique
+        // (anello, lancetta dell'ora, icone vettoriali). Disponibile da CIQ 3.2.
+        if (dc has :setAntiAlias) {
+            dc.setAntiAlias(true);
+        }
 
         // Layer 0: sfondo (anello fasi del giorno + tacche orarie)
         dc.setColor(Gfx.COLOR_BLACK, Gfx.COLOR_BLACK);
@@ -106,60 +239,93 @@ class FenixWatchfaceView extends Ui.WatchFace {
         drawPhaseRing(dc, cx, cy);
 
         // Layer 1: indicatore dell'ora corrente (dinamico, cambia ogni minuto)
-        drawNowIndicator(dc, cx, cy, cx - 3);
+        drawNowIndicator(dc, cx, cy, ringRadius, clock);
 
         // Layer 2: orario, separatore blu, data
-        drawCenterTime(dc, cx, cy);
+        drawCenterTime(dc, cx, cy, clock, is24);
         dc.setColor(0x0066CC, Gfx.COLOR_TRANSPARENT);
         dc.setPenWidth(1);
         dc.drawLine(cx - 38, cy + 19, cx + 38, cy + 19);
         drawCenterDate(dc, cx, cy);
 
         // Secondi correnti (0–59): mostrati come testo SOPRA l'orario, con font
-        // più piccolo (FONT_XTINY) rispetto al FONT_NUMBER_MEDIUM dell'orario.
-        // Aggiornati solo qui, in onUpdate; volutamente NON ridisegnati in
-        // onPartialUpdate.
-        drawCenterSeconds(dc, cx, cy);
+        // più piccolo (FONT_MEDIUM) rispetto al FONT_NUMBER_MEDIUM dell'orario.
+        drawCenterSeconds(dc, cx, cy, clock);
 
         // Icona telefono connesso (sopra l'orario); nessun indicatore se non connesso
-        drawPhoneIcon(dc, cx, cy);
+        drawPhoneIcon(dc, cx, cy, settings);
 
         // Fase lunare (glifo vettoriale sotto la data)
-        drawMoonPhase(dc, cx, cy);
+        drawMoonPhase(dc);
 
-        // Layer 3: campi dati radiali (slot da 30°, posizionati tra le tacche)
-        drawFieldWeather     (dc, polarX(cx,  45), polarY(cy,  45));  // 1-2
-        drawFieldTempRange   (dc, polarX(cx,  75), polarY(cy,  75));  // 2-3
-        drawFieldAltitude    (dc, polarX(cx, 105), polarY(cy, 105));  // 3-4
-        drawFieldSteps       (dc, polarX(cx, 135), polarY(cy, 135));  // 4-5
-        drawFieldSunset      (dc, polarX(cx, 165), polarY(cy, 165));  // 5-6
-        drawFieldSun         (dc, polarX(cx, 195), polarY(cy, 195));  // 6-7
-        drawFieldFloors      (dc, polarX(cx, 225), polarY(cy, 225));  // 7-8
-        drawFieldBatteryDays (dc, polarX(cx, 255), polarY(cy, 255));  // 8-9
-        drawFieldBattery     (dc, polarX(cx, 285), polarY(cy, 285));  // 9-10
-        drawFieldHR          (dc, polarX(cx, 315), polarY(cy, 315));  // 10-11
+        // Layer 3: campi dati radiali (slot da 30°, posizionati tra le tacche,
+        // con coordinate precalcolate in onLayout)
+        var statute = (settings.temperatureUnits == Sys.UNIT_STATUTE);
+        drawFieldWeather     (dc, fieldX[0], fieldY[0], weather, statute);  // 1-2
+        drawFieldTempRange   (dc, fieldX[1], fieldY[1], weather, statute);  // 2-3
+        drawFieldAltitude    (dc, fieldX[2], fieldY[2], activity, settings);// 3-4
+        drawFieldSteps       (dc, fieldX[3], fieldY[3], actMon);            // 4-5
+        drawFieldSunset      (dc, fieldX[4], fieldY[4]);                    // 5-6
+        drawFieldSun         (dc, fieldX[5], fieldY[5], now);               // 6-7
+        drawFieldFloors      (dc, fieldX[6], fieldY[6], actMon);            // 7-8
+        drawFieldBatteryDays (dc, fieldX[7], fieldY[7], stats);             // 8-9
+        drawFieldBattery     (dc, fieldX[8], fieldY[8], stats);             // 9-10
+        drawFieldHR          (dc, fieldX[9], fieldY[9], activity);          // 10-11
     }
 
-    // ----- Geometria radiale -----
-
-    hidden function polarX(cx, deg) {
-        return cx + FIELD_RADIUS * Math.sin(deg * Math.PI / 180.0);
-    }
-
-    hidden function polarY(cy, deg) {
-        return cy - FIELD_RADIUS * Math.cos(deg * Math.PI / 180.0);
+    // Condizioni meteo lette una sola volta per frame (prima: 3 chiamate).
+    hidden function readWeather() {
+        if (!(Toybox has :Weather)) { return null; }
+        return Weather.getCurrentConditions();
     }
 
     // ----- Anello 24h delle fasi del giorno (cerchio esterno unico) -----
 
     hidden function drawPhaseRing(dc, cx, cy) {
-        var r = cx - 3;  // bordo esterno del ring a cx (tocca il bezel)
+        var r = ringRadius;
         dc.setPenWidth(5);
 
-        if (cachedSunrise == null || cachedSunset == null) {
+        if (cachedPhaseArcs == null) {
+            // Nessun dato di posizione: anello neutro monocromatico.
             dc.setColor(Gfx.COLOR_BLUE, Gfx.COLOR_TRANSPARENT);
             dc.drawCircle(cx, cy, r);
-            drawHourTicks(dc, cx, cy);
+            drawHourTicks(dc);
+            return;
+        }
+
+        for (var i = 0; i < cachedPhaseArcs.size(); i++) {
+            var arc = cachedPhaseArcs[i];
+            dc.setColor(arc[2], Gfx.COLOR_TRANSPARENT);
+            dc.drawArc(cx, cy, r, Gfx.ARC_CLOCKWISE, arc[0], arc[1]);
+        }
+
+        // Tacche orarie bianche sopra i colori (l'indicatore dell'ora corrente
+        // è dinamico e viene disegnato dopo, in onUpdate)
+        drawHourTicks(dc);
+    }
+
+    // Disegna le tacche precalcolate: due soli cambi di stato del dc invece di
+    // uno per tacca.
+    hidden function drawHourTicks(dc) {
+        dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
+        dc.setPenWidth(1);
+        for (var i = 0; i < ticksThin.size(); i += 4) {
+            dc.drawLine(ticksThin[i], ticksThin[i + 1],
+                        ticksThin[i + 2], ticksThin[i + 3]);
+        }
+        dc.setPenWidth(2);
+        for (var j = 0; j < ticksCardinal.size(); j += 4) {
+            dc.drawLine(ticksCardinal[j], ticksCardinal[j + 1],
+                        ticksCardinal[j + 2], ticksCardinal[j + 3]);
+        }
+        dc.setPenWidth(1);
+    }
+
+    // Costruisce l'elenco degli archi dell'anello (una volta al giorno) a
+    // partire dai minuti locali di crepuscolo civile, alba e tramonto.
+    hidden function buildPhaseArcs() {
+        if (cachedSunrise == null || cachedSunset == null) {
+            cachedPhaseArcs = null;
             return;
         }
 
@@ -168,46 +334,28 @@ class FenixWatchfaceView extends Ui.WatchFace {
         var dawn = (cachedCivilDawn != null) ? momentToLocalMin(cachedCivilDawn) : sr;
         var dusk = (cachedCivilDusk != null) ? momentToLocalMin(cachedCivilDusk) : ss;
 
-        drawPhaseArc(dc, cx, cy, r, 0,    dawn, Gfx.COLOR_BLUE);
-        drawPhaseArc(dc, cx, cy, r, dawn, sr,   Gfx.COLOR_RED);
-        drawPhaseArc(dc, cx, cy, r, sr,   ss,   Gfx.COLOR_YELLOW);
-        drawPhaseArc(dc, cx, cy, r, ss,   dusk, Gfx.COLOR_RED);
-        drawPhaseArc(dc, cx, cy, r, dusk, 1440, Gfx.COLOR_BLUE);
+        var segments = [
+            [0,    dawn, Gfx.COLOR_BLUE],
+            [dawn, sr,   Gfx.COLOR_RED],
+            [sr,   ss,   Gfx.COLOR_YELLOW],
+            [ss,   dusk, Gfx.COLOR_RED],
+            [dusk, 1440, Gfx.COLOR_BLUE]
+        ];
 
-        // Tacche orarie bianche sopra i colori (l'indicatore dell'ora corrente
-        // è dinamico e viene disegnato in onUpdate, non nel buffer statico)
-        drawHourTicks(dc, cx, cy);
-    }
-
-    hidden function drawHourTicks(dc, cx, cy) {
-        for (var i = 0; i < 24; i++) {
-            var rad = i * 15.0 * Math.PI / 180.0;
-            var sinA = Math.sin(rad);
-            var cosA = Math.cos(rad);
-            var isCardinal = (i % 6 == 0);
-            var outerR = cx - 6;
-            var innerR = isCardinal ? (cx - 17) : (cx - 11);
-            var x1 = (cx + outerR * sinA).toNumber();
-            var y1 = (cy - outerR * cosA).toNumber();
-            var x2 = (cx + innerR * sinA).toNumber();
-            var y2 = (cy - innerR * cosA).toNumber();
-            dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-            dc.setPenWidth(isCardinal ? 2 : 1);
-            dc.drawLine(x1, y1, x2, y2);
+        var arcs = [];
+        for (var i = 0; i < segments.size(); i++) {
+            var s = segments[i];
+            if (s[1] - s[0] < 1) { continue; }
+            arcs.add([
+                normDeg(90.0 - (s[0] / 4.0)),
+                normDeg(90.0 - (s[1] / 4.0)),
+                s[2]
+            ]);
         }
-        dc.setPenWidth(1);
+        cachedPhaseArcs = arcs;
     }
 
-    hidden function drawPhaseArc(dc, cx, cy, radius, startMin, endMin, color) {
-        if (endMin - startMin < 1) { return; }
-        var ga = normDeg(90.0 - (startMin / 4.0));
-        var gb = normDeg(90.0 - (endMin   / 4.0));
-        dc.setColor(color, Gfx.COLOR_TRANSPARENT);
-        dc.drawArc(cx, cy, radius, Gfx.ARC_CLOCKWISE, ga, gb);
-    }
-
-    hidden function drawNowIndicator(dc, cx, cy, radius) {
-        var clock = Sys.getClockTime();
+    hidden function drawNowIndicator(dc, cx, cy, radius, clock) {
         var nowMin = clock.hour * 60 + clock.min;
         var rad = (nowMin / 4.0) * Math.PI / 180.0;
         var sinA = Math.sin(rad);
@@ -246,9 +394,7 @@ class FenixWatchfaceView extends Ui.WatchFace {
 
     // ----- Centro: orario + data -----
 
-    hidden function drawCenterTime(dc, cx, cy) {
-        var clock = Sys.getClockTime();
-        var is24 = Sys.getDeviceSettings().is24Hour;
+    hidden function drawCenterTime(dc, cx, cy, clock, is24) {
         var hour = clock.hour;
         if (!is24) {
             hour = hour % 12;
@@ -264,93 +410,86 @@ class FenixWatchfaceView extends Ui.WatchFace {
             Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
     }
 
-    // Secondi sopra l'orario, font più piccolo dell'orario. Disegnati solo in
-    // onUpdate: NON vengono ridisegnati in onPartialUpdate.
+    // Secondi sopra l'orario, font più piccolo dell'orario.
     // Mostrati esclusivamente quando l'orologio è sveglio (isAwake): in
     // low-power mode onUpdate viene chiamato al più una volta al minuto, quindi
     // i secondi sarebbero un valore fermo e fuorviante → li nascondiamo.
-    hidden function drawCenterSeconds(dc, cx, cy) {
+    hidden function drawCenterSeconds(dc, cx, cy, clock) {
         if (!isAwake) { return; }
-        var seconds = Sys.getClockTime().sec;
         dc.setColor(Gfx.COLOR_WHITE, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx, cy - 50, Gfx.FONT_MEDIUM, seconds.format("%02d"),
+        dc.drawText(cx, cy - 50, Gfx.FONT_MEDIUM, clock.sec.format("%02d"),
             Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
     }
 
-    hidden function drawCenterDate(dc, cx, cy) {
-        var info = Gregorian.info(Time.now(), Time.FORMAT_SHORT);
-        var days = ["DOM", "LUN", "MAR", "MER", "GIO", "VEN", "SAB"];
-        var dayName = days[info.day_of_week - 1];
-        var dateStr = Lang.format("$1$ $2$/$3$/$4$", [
+    // La stringa della data cambia una volta al giorno: viene rigenerata solo
+    // al cambio giorno invece che a ogni frame.
+    hidden function ensureDateString(dayKey, info) {
+        if (dayKey == lastDateDay) { return; }
+        var dayName = dayNames[info.day_of_week - 1];
+        cachedDateStr = Lang.format("$1$ $2$/$3$/$4$", [
             dayName,
             info.day.format("%02d"),
             info.month.format("%02d"),
             (info.year % 100).format("%02d")
         ]);
+        lastDateDay = dayKey;
+    }
+
+    hidden function drawCenterDate(dc, cx, cy) {
         dc.setColor(0x55BBFF, Gfx.COLOR_TRANSPARENT);
-        dc.drawText(cx, cy + 35, Gfx.FONT_XTINY, dateStr,
+        dc.drawText(cx, cy + 35, Gfx.FONT_XTINY, cachedDateStr,
             Gfx.TEXT_JUSTIFY_CENTER | Gfx.TEXT_JUSTIFY_VCENTER);
     }
 
     // ----- Campi dati -----
 
-    hidden function drawFieldHR(dc, x, y) {
-        var hr = readHeartRate();
-        var hrStr = (hr != null) ? hr.toString() : "--";
+    hidden function drawFieldHR(dc, x, y, activity) {
+        var hr = readHeartRate(activity);
+        var hrStr = (hr != null) ? hr.toString() : strNoValue;
 
         drawHeartIcon(dc, x, y - 8, 6);
         drawValue(dc, x, y + 9, hrStr, Gfx.COLOR_WHITE);
     }
 
-    hidden function drawFieldWeather(dc, x, y) {
-        if (!(Toybox has :Weather)) { return; }
-        var current = Weather.getCurrentConditions();
-        if (current == null) { return; }
+    hidden function drawFieldWeather(dc, x, y, weather, statute) {
+        if (weather == null) { return; }
 
-        var cond = current.condition;
         var tempStr = null;
-        if (current.temperature != null) {
-            var t = current.temperature;
-            if (Sys.getDeviceSettings().temperatureUnits == Sys.UNIT_STATUTE) {
-                t = (t * 9.0 / 5.0) + 32.0;
-            }
-            tempStr = t.toNumber().toString() + "°";
+        if (weather.temperature != null) {
+            tempStr = toDisplayTemp(weather.temperature, statute) + "°";
         }
 
-        WeatherIcons.draw(dc, x, y - 8, 16, cond);
+        WeatherIcons.draw(dc, x, y - 8, 16, weather.condition);
         if (tempStr != null) {
             drawValue(dc, x, y + 11, tempStr, Gfx.COLOR_WHITE);
         }
     }
 
-    // Massima e minima previste per la giornata corrente (Toybox.Weather),
-    // su un'unica riga "max°/min°". Stesso stile icona+valore degli altri campi.
-    hidden function drawFieldTempRange(dc, x, y) {
-        var hiStr = "--";
-        var loStr = "--";
-        if (Toybox has :Weather) {
-            var current = Weather.getCurrentConditions();
-            if (current != null) {
-                var statute = (Sys.getDeviceSettings().temperatureUnits
-                        == Sys.UNIT_STATUTE);
-                if (current.highTemperature != null) {
-                    var hi = current.highTemperature;
-                    if (statute) { hi = (hi * 9.0 / 5.0) + 32.0; }
-                    hiStr = hi.toNumber().toString();
-                }
-                if (current.lowTemperature != null) {
-                    var lo = current.lowTemperature;
-                    if (statute) { lo = (lo * 9.0 / 5.0) + 32.0; }
-                    loStr = lo.toNumber().toString();
-                }
+    // Minima e massima previste per la giornata corrente (Toybox.Weather),
+    // su un'unica riga "min°/max°". Stesso stile icona+valore degli altri campi.
+    hidden function drawFieldTempRange(dc, x, y, weather, statute) {
+        var hiStr = strNoValue;
+        var loStr = strNoValue;
+        if (weather != null) {
+            if (weather.highTemperature != null) {
+                hiStr = toDisplayTemp(weather.highTemperature, statute);
+            }
+            if (weather.lowTemperature != null) {
+                loStr = toDisplayTemp(weather.lowTemperature, statute);
             }
         }
         drawThermometerIcon(dc, x, y - 8, 12);
         drawValue(dc, x, y + 10, loStr + "°/" + hiStr + "°", Gfx.COLOR_WHITE);
     }
 
-    hidden function drawFieldFloors(dc, x, y) {
-        var info = ActivityMonitor.getInfo();
+    // Converte una temperatura in °C nell'unità impostata sull'orologio.
+    hidden function toDisplayTemp(celsius, statute) {
+        var t = celsius;
+        if (statute) { t = (t * 9.0 / 5.0) + 32.0; }
+        return t.toNumber().toString();
+    }
+
+    hidden function drawFieldFloors(dc, x, y, info) {
         var floors = 0;
         var floorGoal = 0;
         if (info != null) {
@@ -365,19 +504,22 @@ class FenixWatchfaceView extends Ui.WatchFace {
         var s = (floorGoal > 0)
             ? Lang.format("$1$/$2$", [floors, floorGoal])
             : floors.toString();
-        drawValue(dc, x, y + 9, s, Gfx.COLOR_WHITE);
+        // Obiettivo raggiunto → valore in verde (feedback immediato a colpo d'occhio)
+        var color = (floorGoal > 0 && floors >= floorGoal)
+            ? Gfx.COLOR_GREEN : Gfx.COLOR_WHITE;
+        drawValue(dc, x, y + 9, s, color);
     }
 
-    hidden function drawFieldSun(dc, x, y) {
+    hidden function drawFieldSun(dc, x, y, now) {
         // La cache di alba/tramonto è aggiornata in onUpdate via ensureSunData()
-        var timeStr = "--:--";
-        var nowVal = Time.now().value();
-        if (cachedSunrise != null && cachedSunrise.value() > nowVal) {
-            timeStr = formatLocalHM(cachedSunrise);
-        } else if (cachedTomorrowSunrise != null) {
-            timeStr = formatLocalHM(cachedTomorrowSunrise);
-        } else if (cachedSunrise != null) {
-            timeStr = formatLocalHM(cachedSunrise);
+        var timeStr = strNoTime;
+        var nowVal = now.value();
+        if (cachedSunriseStr != null && cachedSunrise.value() > nowVal) {
+            timeStr = cachedSunriseStr;
+        } else if (cachedTomorrowSunriseStr != null) {
+            timeStr = cachedTomorrowSunriseStr;
+        } else if (cachedSunriseStr != null) {
+            timeStr = cachedSunriseStr;
         }
 
         drawSunHorizonIcon(dc, x, y - 9, 15, Gfx.COLOR_YELLOW, true);
@@ -386,25 +528,21 @@ class FenixWatchfaceView extends Ui.WatchFace {
 
     hidden function drawFieldSunset(dc, x, y) {
         // La cache di alba/tramonto è aggiornata in onUpdate via ensureSunData()
-        var timeStr = "--:--";
-        if (cachedSunset != null) {
-            timeStr = formatLocalHM(cachedSunset);
-        }
+        var timeStr = (cachedSunsetStr != null) ? cachedSunsetStr : strNoTime;
 
         drawSunHorizonIcon(dc, x, y - 9, 15, Gfx.COLOR_ORANGE, false);
         drawValue(dc, x, y + 9, timeStr, Gfx.COLOR_WHITE);
     }
 
-    hidden function drawFieldAltitude(dc, x, y) {
+    hidden function drawFieldAltitude(dc, x, y, info, settings) {
         var alt = null;
-        var info = Activity.getActivityInfo();
         if (info != null && info has :altitude && info.altitude != null) {
             alt = info.altitude;
         }
-        var altStr = "--";
-        var unit = "m";
+        var altStr = strNoValue;
         if (alt != null) {
-            if (Sys.getDeviceSettings().elevationUnits == Sys.UNIT_STATUTE) {
+            var unit = "m";
+            if (settings.elevationUnits == Sys.UNIT_STATUTE) {
                 alt = alt * 3.28084;
                 unit = "ft";
             }
@@ -414,22 +552,25 @@ class FenixWatchfaceView extends Ui.WatchFace {
         drawValue(dc, x, y + 9, altStr, Gfx.COLOR_WHITE);
     }
 
-    hidden function drawFieldSteps(dc, x, y) {
-        var info = ActivityMonitor.getInfo();
-        var steps = (info != null && info.steps != null) ? info.steps : 0;
+    hidden function drawFieldSteps(dc, x, y, info) {
+        var steps = 0;
+        var goal = 0;
+        if (info != null) {
+            if (info.steps != null) { steps = info.steps; }
+            if (info.stepGoal != null) { goal = info.stepGoal; }
+        }
 
         drawShoeIcon(dc, x, y - 7, 5);
-        drawValue(dc, x, y + 9, steps.toString(), Gfx.COLOR_WHITE);
+        // Obiettivo passi raggiunto → valore in verde, come per i piani.
+        var color = (goal > 0 && steps >= goal) ? Gfx.COLOR_GREEN : Gfx.COLOR_WHITE;
+        drawValue(dc, x, y + 9, steps.toString(), color);
     }
 
-    hidden function drawFieldBattery(dc, x, y) {
-        var stats = Sys.getSystemStats();
+    hidden function drawFieldBattery(dc, x, y, stats) {
         var batt = (stats != null && stats.battery != null) ? stats.battery : 0.0;
         var battInt = batt.toNumber();
 
-        var color = Gfx.COLOR_GREEN;
-        if (battInt <= 20) { color = Gfx.COLOR_RED; }
-        else if (battInt <= 40) { color = Gfx.COLOR_YELLOW; }
+        var color = batteryColor(battInt);
 
         var bw = 18;
         var bh = 9;
@@ -449,17 +590,23 @@ class FenixWatchfaceView extends Ui.WatchFace {
             dc.fillRectangle(bx + 1, by + 1, fillW, bh - 2);
         }
 
-        drawValue(dc, x, y + 9, battInt.toString() + "%", Gfx.COLOR_WHITE);
+        // Il valore percentuale segue il colore della carica: rosso/giallo/verde
+        // rendono lo stato leggibile anche senza guardare il livello di riempimento.
+        drawValue(dc, x, y + 9, battInt.toString() + "%", color);
     }
 
-    hidden function drawFieldBatteryDays(dc, x, y) {
-        var stats = Sys.getSystemStats();
-        var daysStr = "--";
-        if ((stats has :batteryInDays) && stats.batteryInDays != null) {
-            var d = stats.batteryInDays;
-            daysStr = d.format("%.0f");
+    hidden function batteryColor(pct) {
+        if (pct <= 20) { return Gfx.COLOR_RED; }
+        if (pct <= 40) { return Gfx.COLOR_YELLOW; }
+        return Gfx.COLOR_GREEN;
+    }
+
+    hidden function drawFieldBatteryDays(dc, x, y, stats) {
+        var daysStr = strNoValue;
+        if (stats != null && (stats has :batteryInDays) && stats.batteryInDays != null) {
+            daysStr = stats.batteryInDays.format("%.0f");
         }
-        drawValue(dc, x, y - 8, "Giorni", 0x55BBFF);
+        drawValue(dc, x, y - 8, strDays, 0x55BBFF);
         drawValue(dc, x, y + 8, daysStr, Gfx.COLOR_WHITE);
     }
 
@@ -631,8 +778,7 @@ class FenixWatchfaceView extends Ui.WatchFace {
 
     // ----- Helpers HR / Posizione / Sole -----
 
-    hidden function readHeartRate() {
-        var actInfo = Activity.getActivityInfo();
+    hidden function readHeartRate(actInfo) {
         if (actInfo != null && actInfo.currentHeartRate != null) {
             return actInfo.currentHeartRate;
         }
@@ -657,17 +803,15 @@ class FenixWatchfaceView extends Ui.WatchFace {
     //   3) il valore salvato in Storage da una sessione precedente.
     // La prima posizione valida trovata viene messa in cache in Storage e
     // riutilizzata quando le altre fonti non sono disponibili.
-    hidden function getLocation() {
+    // NOTA: chiamata solo quando la cache del sole va rigenerata (cambio giorno
+    // o assenza di dati), MAI a ogni frame.
+    hidden function getLocation(weather) {
         // 1) Località di osservazione del meteo.
-        if (Toybox has :Weather) {
-            var current = Weather.getCurrentConditions();
-            if (current != null
-                    && (current has :observationLocationPosition)
-                    && current.observationLocationPosition != null) {
-                var loc = degreesIfValid(
-                    current.observationLocationPosition.toDegrees());
-                if (loc != null) { return loc; }
-            }
+        if (weather != null
+                && (weather has :observationLocationPosition)
+                && weather.observationLocationPosition != null) {
+            var loc = degreesIfValid(weather.observationLocationPosition.toDegrees());
+            if (loc != null) { return loc; }
         }
 
         // 2) Ultima posizione nota del GPS (nessun consumo: solo l'ultimo fix).
@@ -706,40 +850,59 @@ class FenixWatchfaceView extends Ui.WatchFace {
         App.Storage.setValue("lastLon", lon);
     }
 
-    hidden function ensureSunData() {
-        var loc = getLocation();
-        if (loc != null) {
-            updateSunCache(loc[0], loc[1]);
+    // Aggiorna la cache di alba/tramonto solo quando serve davvero:
+    //  - se i dati del giorno corrente sono già in cache non fa NULLA (nessuna
+    //    lettura di meteo, GPS o Storage);
+    //  - se manca la posizione riprova al massimo una volta al minuto, per non
+    //    interrogare i sensori a ogni frame in attesa della prima sync.
+    hidden function ensureSunData(dayKey, now, weather, is24, clock) {
+        if (dayKey == lastSunCalcDay) { return; }
+        if (clock.min == lastSunAttemptMin) { return; }
+
+        var loc = getLocation(weather);
+        if (loc == null) {
+            // Posizione non ancora disponibile (es. prima installazione, senza
+            // sync con Garmin Connect): riprova al minuto successivo.
+            lastSunAttemptMin = clock.min;
+            return;
         }
+        updateSunCache(loc[0], loc[1], now, dayKey, is24);
     }
 
-    hidden function updateSunCache(lat, lon) {
-        var now = Time.now();
-        var info = Gregorian.info(now, Time.FORMAT_SHORT);
-        var dayKey = info.year * 10000 + info.month * 100 + info.day;
-        if (dayKey != lastSunCalcDay) {
-            var res = SunCalc.compute(lat, lon, now);
-            cachedSunrise = res.get("sunrise");
-            cachedSunset  = res.get("sunset");
+    hidden function updateSunCache(lat, lon, now, dayKey, is24) {
+        var res = SunCalc.compute(lat, lon, now);
+        cachedSunrise = res.get("sunrise");
+        cachedSunset  = res.get("sunset");
 
-            var resTw = SunCalc.computeWithZenith(
-                lat, lon, now, SunCalc.ZENITH_CIVIL);
-            cachedCivilDawn = resTw.get("sunrise");
-            cachedCivilDusk = resTw.get("sunset");
+        var resTw = SunCalc.computeWithZenith(lat, lon, now, SunCalc.ZENITH_CIVIL);
+        cachedCivilDawn = resTw.get("sunrise");
+        cachedCivilDusk = resTw.get("sunset");
 
-            var tomorrow = now.add(new Time.Duration(86400));
-            var resT = SunCalc.compute(lat, lon, tomorrow);
-            cachedTomorrowSunrise = resT.get("sunrise");
+        var tomorrow = now.add(new Time.Duration(86400));
+        var resT = SunCalc.compute(lat, lon, tomorrow);
+        cachedTomorrowSunrise = resT.get("sunrise");
 
-            lastSunCalcDay = dayKey;
-        }
+        // Stringhe e archi dell'anello: derivano dai momenti appena calcolati,
+        // quindi si precalcolano qui una volta al giorno.
+        refreshSunStrings(is24);
+        buildPhaseArcs();
+
+        lastSunCalcDay = dayKey;
     }
 
-    hidden function formatLocalHM(moment) {
+    hidden function refreshSunStrings(is24) {
+        cachedSunriseStr = (cachedSunrise != null)
+            ? formatLocalHM(cachedSunrise, is24) : null;
+        cachedSunsetStr = (cachedSunset != null)
+            ? formatLocalHM(cachedSunset, is24) : null;
+        cachedTomorrowSunriseStr = (cachedTomorrowSunrise != null)
+            ? formatLocalHM(cachedTomorrowSunrise, is24) : null;
+    }
+
+    hidden function formatLocalHM(moment, is24) {
         var info = Gregorian.info(moment, Time.FORMAT_SHORT);
-        var is24 = Sys.getDeviceSettings().is24Hour;
         var h = info.hour;
-        if (!is24) {
+        if (is24 == false) {
             h = h % 12;
             if (h == 0) { h = 12; }
         }
@@ -750,27 +913,18 @@ class FenixWatchfaceView extends Ui.WatchFace {
 
     // Calcola la fase lunare a partire dalla sola data corrente: puro calcolo
     // astronomico, NESSUN sensore, GPS o chiamata di rete. Eseguito UNA SOLA
-    // VOLTA AL GIORNO (guardia sul day-key, come ensureSunData): il risultato
-    // resta in cache e viene riusato a ogni onUpdate senza ricalcolare.
+    // VOLTA AL GIORNO (guardia sul day-key, come ensureSunData): il risultato,
+    // compreso il poligono del glifo, resta in cache e viene riusato a ogni
+    // onUpdate senza ricalcolare.
     //
     // FORMULA: si misura l'"età" della luna come tempo trascorso da un
     // novilunio di riferimento noto, riportato nel mese sinodico medio
     // (~29.53 giorni). La frazione del ciclo (0..1) dà fase e illuminazione.
-    hidden function ensureMoonData() {
-        var now = Time.now();
-        var info = Gregorian.info(now, Time.FORMAT_SHORT);
-        var dayKey = info.year * 10000 + info.month * 100 + info.day;
+    hidden function ensureMoonData(dayKey, now) {
         if (dayKey == lastMoonCalcDay) { return; }
 
-        // Novilunio di riferimento: 6 gennaio 2000, 18:14 UTC (JD ~2451550.1),
-        // istante di novilunio comunemente usato come epoca nei calcoli lunari.
-        var refNewMoon = Gregorian.moment({
-            :year => 2000, :month => 1, :day => 6,
-            :hour => 18, :minute => 14, :second => 0
-        });
-
-        // Giorni trascorsi dal novilunio di riferimento.
-        var elapsedDays = now.subtract(refNewMoon).value() / 86400.0;
+        // Giorni trascorsi dal novilunio di riferimento (entrambi in UTC).
+        var elapsedDays = (now.value() - REF_NEW_MOON_EPOCH) / 86400.0;
 
         // Frazione del ciclo sinodico corrente: phase in [0, 1).
         //   0   = novilunio, 0.5 = plenilunio.
@@ -783,32 +937,22 @@ class FenixWatchfaceView extends Ui.WatchFace {
         // Crescente nella prima metà del ciclo (limbo illuminato a destra),
         // calante nella seconda metà (limbo a sinistra).
         cachedMoonWaxing = (phase < 0.5);
-        // Indice 0..7 delle 8 fasi canoniche (0 = novilunio, 1 = crescente,
-        // 2 = primo quarto, 3 = gibbosa crescente, 4 = plenilunio,
-        // 5 = gibbosa calante, 6 = ultimo quarto, 7 = calante).
-        cachedMoonPhaseIndex = (Math.floor(phase * 8.0 + 0.5)).toNumber() % 8;
 
+        buildMoonPolygon();
         lastMoonCalcDay = dayKey;
     }
 
-    // Disegna il glifo della luna nella fase corrente, vettorialmente con dc:
-    // disco in ombra + regione illuminata costruita come un unico poligono
-    // delimitato dal limbo circolare e dal terminatore (semi-ellisse). In low
-    // power mode resta leggero (nessun calcolo: legge solo la cache).
+    // Costruisce il poligono della regione illuminata: si scende lungo il limbo
+    // circolare e si risale lungo il terminatore (semi-ellisse di semilarghezza
+    // k volte quella del limbo a ciascuna quota). Dipende solo da dati che
+    // cambiano una volta al giorno → si calcola qui, non a ogni frame.
     //
     // POSIZIONE E DIMENSIONE: per spostare/ridimensionare l'icona modifica
     // "mx"/"my" (centro) e "R" (raggio) qui sotto.
-    hidden function drawMoonPhase(dc, cx, cy) {
-        var mx = cx;          // centro X: colonna centrale
-        var my = cy + 62;     // centro Y: spazio libero sotto la data
-        var R  = 13;          // raggio del disco lunare
-
-        // Disco in ombra + contorno (sempre visibile, anche al novilunio).
-        dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_BLACK);
-        dc.fillCircle(mx, my, R);
-        dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
-        dc.setPenWidth(1);
-        dc.drawCircle(mx, my, R);
+    hidden function buildMoonPolygon() {
+        var mx = centerX;          // centro X: colonna centrale
+        var my = centerY + 62;     // centro Y: spazio libero sotto la data
+        var R  = 13;               // raggio del disco lunare
 
         var f = cachedMoonFraction;
         // k: posizione orizzontale del terminatore relativa al limbo (-1..1).
@@ -818,9 +962,6 @@ class FenixWatchfaceView extends Ui.WatchFace {
         var k = 1.0 - 2.0 * f;
         var sign = cachedMoonWaxing ? 1.0 : -1.0;   // crescente → lato destro
 
-        // Regione illuminata come poligono unico: si scende lungo il limbo
-        // circolare e si risale lungo il terminatore (semi-ellisse di
-        // semilarghezza k volte quella del limbo a ciascuna quota).
         var N = 16;
         var pts = new [2 * (N + 1)];
         for (var i = 0; i <= N; i++) {
@@ -838,10 +979,26 @@ class FenixWatchfaceView extends Ui.WatchFace {
             pts[N + 1 + i] = [ (mx + sign * k * xlt).toNumber(),
                                (my + yt).toNumber() ];
         }
+        cachedMoonPoly = pts;
+    }
+
+    // Disegna il glifo della luna nella fase corrente: disco in ombra +
+    // poligono illuminato già pronto in cache (nessun calcolo per frame).
+    hidden function drawMoonPhase(dc) {
+        if (cachedMoonPoly == null) { return; }
+        var mx = centerX;
+        var my = centerY + 62;
+        var R  = 13;
+
+        // Disco in ombra + contorno (sempre visibile, anche al novilunio).
+        dc.setColor(Gfx.COLOR_DK_GRAY, Gfx.COLOR_BLACK);
+        dc.fillCircle(mx, my, R);
+        dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
+        dc.setPenWidth(1);
+        dc.drawCircle(mx, my, R);
 
         dc.setColor(Gfx.COLOR_LT_GRAY, Gfx.COLOR_TRANSPARENT);
-        dc.fillPolygon(pts);
-        dc.setPenWidth(1);
+        dc.fillPolygon(cachedMoonPoly);
     }
 
     // ----- Icona telefono connesso -----
@@ -849,9 +1006,9 @@ class FenixWatchfaceView extends Ui.WatchFace {
     // Disegna un'icona "smartphone" vettoriale (nessuna PNG) sopra l'orario,
     // SOLO quando il telefono è connesso. Quando non è connesso non viene
     // mostrato alcun indicatore.
-    hidden function drawPhoneIcon(dc, cx, cy) {
-        var ds = Sys.getDeviceSettings();
-        var connected = (ds has :phoneConnected) ? (ds.phoneConnected == true) : false;
+    hidden function drawPhoneIcon(dc, cx, cy, settings) {
+        var connected = (settings has :phoneConnected)
+            ? (settings.phoneConnected == true) : false;
         if (!connected) { return; }
 
         var w = 14;              // larghezza del corpo del telefono
