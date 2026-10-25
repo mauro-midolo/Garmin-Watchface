@@ -1,14 +1,16 @@
 <?xml version="1.0"?>
 <strings>
     <string id="AppName">Fenix 6 Pro Watchface</string>
-    <string id="StepsLabel">PASSI</string>
-    <string id="BatteryLabel">BATT</string>
-    <string id="FloorsLabel">PIANI</string>
-    <string id="SunriseLabel">ALBA</string>
-    <string id="SunsetLabel">TRAM</string>
-    <string id="DaysLabel">Giorni</string>
     <string id="NoData">--:--</string>
     <string id="NoValue">--</string>
+
+    <!-- Unità di misura e suffissi dei valori dei campi. -->
+    <string id="UnitMeters">m</string>
+    <string id="UnitFeet">ft</string>
+    <string id="UnitPercent">%</string>
+    <string id="UnitDegree">°</string>
+    <!-- Suffisso dei giorni di autonomia residua (es. "12g"). -->
+    <string id="UnitDays">g</string>
 
     <!-- Abbreviazioni dei giorni della settimana, nell'ordine restituito da
          Gregorian.info().day_of_week (1 = domenica). -->
