@@ -10,32 +10,32 @@ Watchface Connect IQ per **Garmin Fenix 6 Pro** con un layout radiale che mostra
 
 | Elemento | Descrizione |
 |----------|-------------|
-| Orario | Ora corrente in formato 24h o 12h (segue l'impostazione dell'orologio) |
-| Secondi | Mostrati sopra l'orario, solo quando l'orologio è "sveglio" (high-power mode); nascosti in risparmio energetico per non mostrare un valore fermo |
+| Orario | Ora corrente in formato 24h o 12h (segue l'impostazione dell'orologio), in caratteri grandi |
+| Secondi | Mostrati sopra l'orario in caratteri piccoli e grigi, solo quando l'orologio è "sveglio" (high-power mode); nascosti in risparmio energetico per non mostrare un valore fermo |
 | Data | Giorno della settimana abbreviato + data `GG/MM/AA` (es. `MER 25/06/26`), sotto un separatore blu |
-| Fase lunare 🌙 | Glifo vettoriale della fase lunare corrente, disegnato sotto la data (calcolo astronomico, aggiornato una volta al giorno) |
+| Fase lunare 🌙 | Glifo vettoriale della fase lunare corrente, disegnato sotto la data (calcolo astronomico, aggiornato una volta al giorno; orientato secondo l'emisfero) |
 | Telefono connesso 📱 | Icona dello smartphone sopra l'orario, mostrata **solo** quando il telefono è connesso |
 
 ### Campi radiali
 
-I campi sono disposti in senso orario nelle posizioni a mezz'ora attorno al quadrante:
+I campi sono disposti in senso orario nelle posizioni a mezz'ora attorno al quadrante. Ogni campo ha un'icona con il valore sotto; i valori più lunghi stanno nei due campi in alto, dove c'è più spazio:
 
 | Posizione | Informazione |
 |-----------|-------------|
-| 1:30 | Condizioni meteo attuali + temperatura ☀ |
-| 2:30 | Temperatura min/max prevista per la giornata 🌡 (`min°/max°`) |
+| 1:30 | Temperatura min/max prevista per la giornata 🌡 (`min°/max°`) |
+| 2:30 | Condizioni meteo attuali + temperatura ☀ |
 | 3:30 | Altitudine attuale ▲ (m o ft) |
 | 4:30 | Passi effettuati oggi 👟 (in verde al raggiungimento dell'obiettivo) |
 | 5:30 | Tramonto 🌇 |
 | 6:30 | Alba 🌅 (la prossima disponibile) |
 | 7:30 | Piani saliti oggi 🪜 (`saliti/obiettivo`, in verde al raggiungimento dell'obiettivo) |
-| 8:30 | Autonomia residua della batteria in giorni |
-| 9:30 | Batteria residua 🔋 (percentuale, colore verde/giallo/rosso) |
-| 10:30 | Frequenza cardiaca ❤ |
+| 8:30 | Notifiche ✉ (numero di notifiche non lette) |
+| 9:30 | Frequenza cardiaca ❤ |
+| 10:30 | Batteria residua 🔋 (percentuale e giorni di autonomia, es. `87% 12g`; colore verde/giallo/rosso) |
 
 ### Anello delle fasi del giorno
 
-Attorno al bordo è presente un **anello 24h delle fasi del giorno**: archi colorati mostrano la durata di notte (**blu**), crepuscolo civile (**rosso**) e luce piena (**giallo**), calcolati in base ad alba/tramonto. Le tacche orarie bianche segnano le ore; una **barretta bianca** evidenzia l'ora corrente.
+Attorno al bordo è presente un **anello 24h delle fasi del giorno**: archi colorati mostrano la durata di notte (**blu**), crepuscolo civile (**arancione**) e luce piena (**giallo**), calcolati in base ad alba/tramonto. Le tacche orarie bianche segnano le ore; una **barretta bianca** evidenzia l'ora corrente.
 
 ---
 
@@ -59,11 +59,12 @@ Attorno al bordo è presente un **anello 24h delle fasi del giorno**: archi colo
 ## Note sull'utilizzo
 
 - **Alba/tramonto**: la posizione usata per il calcolo è ricavata dai dati meteo (località di osservazione), quindi richiede la sincronizzazione con Garmin Connect. Alla prima installazione potrebbe apparire `--:--` finché i dati meteo non sono disponibili; la posizione viene poi salvata e riutilizzata automaticamente. Il campo "alba" mostra la prossima alba (di domani se quella di oggi è già passata).
-- **Fase lunare**: calcolata astronomicamente dalla sola data, senza sensori, GPS o rete; il glifo viene aggiornato una volta al giorno.
+- **Fase lunare**: calcolata astronomicamente dalla sola data, senza sensori, GPS o rete; il glifo viene aggiornato una volta al giorno. Nell'emisfero sud (ricavato dalla posizione usata per alba/tramonto) il lato illuminato è invertito.
 - **Meteo**: i dati meteo richiedono che l'orologio sia sincronizzato con Garmin Connect tramite Bluetooth. Temperatura e unità di misura seguono le impostazioni dell'orologio (°C / °F).
 - **Frequenza cardiaca**: visualizza la frequenza cardiaca in tempo reale durante un'attività; a riposo mostra l'ultimo campione disponibile.
+- **Notifiche**: numero di notifiche ricevute dal telefono; l'icona è grigia quando non ce ne sono.
 - **Piani saliti**: rilevati tramite l'altimetro barometrico del Fenix 6 Pro; il contatore si azzera ogni mezzanotte.
-- **Altitudine**: ricavata dall'altimetro barometrico; mostrata in metri o piedi secondo le impostazioni dell'orologio.
-- **Batteria**: oltre alla percentuale residua, viene mostrata anche la stima dell'autonomia rimanente in giorni.
+- **Altitudine**: ricavata dall'altimetro barometrico; mostrata in metri o piedi secondo le impostazioni dell'orologio. Se il valore è troppo lungo per lo spazio disponibile (es. quote alte in piedi) l'unità viene omessa.
+- **Batteria**: oltre alla percentuale residua, viene mostrata anche la stima dell'autonomia rimanente in giorni (`g`), quando è disponibile e c'è spazio.
 - **Secondi**: mostrati solo quando l'orologio è attivo; in modalità risparmio energetico vengono nascosti per non visualizzare un valore non aggiornato.
-- **Consumo**: il disegno è ottimizzato per il budget energetico di una watchface. Le letture di sistema (impostazioni, meteo, attività, batteria, orario) vengono fatte **una sola volta per frame**; posizione GPS/meteo, alba/tramonto, fase lunare e stringa della data sono ricalcolati **una volta al giorno**; le coordinate di tacche orarie e campi radiali sono precalcolate all'avvio, così in `onUpdate` non resta alcuna trigonometria su angoli costanti.
+- **Consumo**: il disegno è ottimizzato per il budget energetico di una watchface. Le letture di sistema (impostazioni, meteo, attività, batteria, orario) vengono fatte **una sola volta per frame**; posizione GPS/meteo, alba/tramonto, fase lunare e stringa della data sono ricalcolati **una volta al giorno**; le coordinate di tacche orarie, campi radiali e icone vettoriali sono precalcolate all'avvio, così in `onUpdate` non resta alcuna trigonometria su angoli costanti.

@@ -1,5 +1,4 @@
 using Toybox.Graphics as Gfx;
-using Toybox.Math;
 using Toybox.Weather;
 
 // Disegna icone meteo semplici a partire dalle condizioni di Toybox.Weather.
@@ -106,19 +105,24 @@ module WeatherIcons {
         else                                  { drawUnknown(dc, cx, cy, size); }
     }
 
+    // Direzioni [cos, sin] degli 8 raggi del sole (multipli di 45°): costanti,
+    // così il disegno a ogni frame non richiede trigonometria.
+    const SUN_RAYS = [
+        [1.0, 0.0], [0.7071, 0.7071], [0.0, 1.0], [-0.7071, 0.7071],
+        [-1.0, 0.0], [-0.7071, -0.7071], [0.0, -1.0], [0.7071, -0.7071]
+    ];
+
     function drawSun(dc, cx, cy, size) {
         var r = size / 4;
         dc.setColor(Gfx.COLOR_YELLOW, Gfx.COLOR_TRANSPARENT);
         dc.fillCircle(cx, cy, r);
         dc.setPenWidth(2);
+        var inner = r + 2;
         var outer = (size / 2) - 1;
-        for (var i = 0; i < 8; i++) {
-            var a = i * Math.PI / 4.0;
-            var x1 = cx + (r + 2) * Math.cos(a);
-            var y1 = cy + (r + 2) * Math.sin(a);
-            var x2 = cx + outer * Math.cos(a);
-            var y2 = cy + outer * Math.sin(a);
-            dc.drawLine(x1, y1, x2, y2);
+        for (var i = 0; i < SUN_RAYS.size(); i++) {
+            var c = SUN_RAYS[i][0];
+            var s = SUN_RAYS[i][1];
+            dc.drawLine(cx + inner * c, cy + inner * s, cx + outer * c, cy + outer * s);
         }
         dc.setPenWidth(1);
     }
