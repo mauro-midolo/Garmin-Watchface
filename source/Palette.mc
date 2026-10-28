@@ -14,10 +14,9 @@ module Palette {
     // Azzurro chiaro: data.
     const ACCENT_LIGHT = 0x55AAFF;
 
-    // Anello 24h delle fasi del giorno. Il crepuscolo è arancione come l'icona
-    // del tramonto: il rosso resta riservato a cuore e batteria scarica.
+    // Anello 24h delle fasi del giorno: notte blu, crepuscolo rosso, giorno giallo.
     const RING_NIGHT    = Gfx.COLOR_BLUE;
-    const RING_TWILIGHT = Gfx.COLOR_ORANGE;
+    const RING_TWILIGHT = Gfx.COLOR_RED;
     const RING_DAY      = Gfx.COLOR_YELLOW;
 
     // Valore di un campo con obiettivo raggiunto (passi, piani).

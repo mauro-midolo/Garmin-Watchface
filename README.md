@@ -35,7 +35,7 @@ I campi sono disposti in senso orario nelle posizioni a mezz'ora attorno al quad
 
 ### Anello delle fasi del giorno
 
-Attorno al bordo è presente un **anello 24h delle fasi del giorno**: archi colorati mostrano la durata di notte (**blu**), crepuscolo civile (**arancione**) e luce piena (**giallo**), calcolati in base ad alba/tramonto. Le tacche orarie bianche segnano le ore; una **barretta bianca** evidenzia l'ora corrente.
+Attorno al bordo è presente un **anello 24h delle fasi del giorno**: archi colorati mostrano la durata di notte (**blu**), crepuscolo civile (**rosso**) e luce piena (**giallo**), calcolati in base ad alba/tramonto. Le tacche orarie bianche segnano le ore; una **barretta bianca** evidenzia l'ora corrente.
 
 ---
 
