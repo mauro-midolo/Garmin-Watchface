@@ -29,7 +29,7 @@ I campi sono disposti in senso orario nelle posizioni a mezz'ora attorno al quad
 | 5:30 | Tramonto 🌇 |
 | 6:30 | Alba 🌅 (la prossima disponibile) |
 | 7:30 | Piani saliti oggi 🪜 (`saliti/obiettivo`, in verde al raggiungimento dell'obiettivo) |
-| 8:30 | Notifiche ✉ (numero di notifiche non lette) |
+| 8:30 | Minuti di attività intensa della settimana ⚡ (`fatti/obiettivo`, in verde al raggiungimento dell'obiettivo) |
 | 9:30 | Frequenza cardiaca ❤ |
 | 10:30 | Batteria residua 🔋 (percentuale e giorni di autonomia, es. `87% 12g`; colore verde/giallo/rosso) |
 
@@ -62,7 +62,7 @@ Attorno al bordo è presente un **anello 24h delle fasi del giorno**: archi colo
 - **Fase lunare**: calcolata astronomicamente dalla sola data, senza sensori, GPS o rete; il glifo viene aggiornato una volta al giorno. Nell'emisfero sud (ricavato dalla posizione usata per alba/tramonto) il lato illuminato è invertito.
 - **Meteo**: i dati meteo richiedono che l'orologio sia sincronizzato con Garmin Connect tramite Bluetooth. Temperatura e unità di misura seguono le impostazioni dell'orologio (°C / °F).
 - **Frequenza cardiaca**: visualizza la frequenza cardiaca in tempo reale durante un'attività; a riposo mostra l'ultimo campione disponibile.
-- **Notifiche**: numero di notifiche ricevute dal telefono; l'icona è grigia quando non ce ne sono.
+- **Minuti di attività intensa**: totale della settimana calcolato come in Garmin Connect (i minuti vigorosi contano doppio); si azzera all'inizio della settimana. Se `fatti/obiettivo` non entra nello spazio disponibile viene mostrato solo il totale.
 - **Piani saliti**: rilevati tramite l'altimetro barometrico del Fenix 6 Pro; il contatore si azzera ogni mezzanotte.
 - **Altitudine**: ricavata dall'altimetro barometrico; mostrata in metri o piedi secondo le impostazioni dell'orologio. Se il valore è troppo lungo per lo spazio disponibile (es. quote alte in piedi) l'unità viene omessa.
 - **Batteria**: oltre alla percentuale residua, viene mostrata anche la stima dell'autonomia rimanente in giorni (`g`), quando è disponibile e c'è spazio.

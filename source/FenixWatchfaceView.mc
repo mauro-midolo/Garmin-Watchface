@@ -24,7 +24,7 @@ class FenixWatchfaceView extends Ui.WatchFace {
         SLOT_SUNSET,         // 165°
         SLOT_SUNRISE,        // 195°
         SLOT_FLOORS,         // 225°
-        SLOT_NOTIFICATIONS,  // 255°
+        SLOT_INTENSITY,      // 255°
         SLOT_HR,             // 285°
         SLOT_BATTERY         // 315°
     }
@@ -69,6 +69,7 @@ class FenixWatchfaceView extends Ui.WatchFace {
     hidden var iconThermometer = null;
     hidden var iconSunrise = null;
     hidden var iconSunset = null;
+    hidden var iconBolt = null;
 
     // Funzioni di disegno dei campi, una per slot (indice = slot).
     hidden var fieldRenderers = null;
@@ -121,7 +122,7 @@ class FenixWatchfaceView extends Ui.WatchFace {
             method(:drawFieldSunset),
             method(:drawFieldSunrise),
             method(:drawFieldFloors),
-            method(:drawFieldNotifications),
+            method(:drawFieldIntensity),
             method(:drawFieldHR),
             method(:drawFieldBattery)
         ];
@@ -226,6 +227,7 @@ class FenixWatchfaceView extends Ui.WatchFace {
         iconThermometer = Icons.buildThermometer(fieldX[SLOT_TEMP_RANGE], iconY(SLOT_TEMP_RANGE), 12);
         iconSunrise     = Icons.buildSunHorizon(fieldX[SLOT_SUNRISE], iconY(SLOT_SUNRISE), 15, true);
         iconSunset      = Icons.buildSunHorizon(fieldX[SLOT_SUNSET], iconY(SLOT_SUNSET), 15, false);
+        iconBolt        = Icons.buildBolt(fieldX[SLOT_INTENSITY], iconY(SLOT_INTENSITY), 7);
     }
 
     // Orario grande (FONT_NUMBER_HOT) se ci sta tra i campi radiali alla sua
@@ -630,15 +632,26 @@ class FenixWatchfaceView extends Ui.WatchFace {
         return (goal > 0 && value >= goal) ? Palette.GOAL : Gfx.COLOR_WHITE;
     }
 
-    function drawFieldNotifications(dc, slot) {
-        var count = 0;
-        if ((frameSettings has :notificationCount) && frameSettings.notificationCount != null) {
-            count = frameSettings.notificationCount;
+    // Minuti di attività intensa della settimana, come in Garmin Connect: i
+    // minuti vigorosi contano doppio (ActiveMinutes.total = moderati +
+    // 2 x vigorosi). "fatti/obiettivo", o solo i fatti se non c'è spazio.
+    function drawFieldIntensity(dc, slot) {
+        var info = frameActMon;
+        var minutes = 0;
+        var goal = 0;
+        if (info != null) {
+            if ((info has :activeMinutesWeek) && info.activeMinutesWeek != null
+                    && info.activeMinutesWeek.total != null) {
+                minutes = info.activeMinutesWeek.total;
+            }
+            if ((info has :activeMinutesWeekGoal) && info.activeMinutesWeekGoal != null) {
+                goal = info.activeMinutesWeekGoal;
+            }
         }
-        // Busta grigia senza notifiche, bianca quando ce ne sono.
-        var color = (count > 0) ? Gfx.COLOR_WHITE : Gfx.COLOR_LT_GRAY;
-        Icons.drawEnvelope(dc, fieldX[slot], iconY(slot), color);
-        drawFieldValue(dc, slot, count.toString(), color);
+        Icons.drawBolt(dc, iconBolt);
+        var s = minutes.toString();
+        var full = (goal > 0) ? Lang.format("$1$/$2$", [minutes, goal]) : s;
+        drawFitValue(dc, slot, full, s, goalColor(minutes, goal));
     }
 
     // Batteria: percentuale e, se c'è spazio, giorni di autonomia stimati
