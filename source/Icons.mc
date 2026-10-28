@@ -226,19 +226,24 @@ module Icons {
         }
     }
 
-    // ----- Busta (notifiche) -----
+    // ----- Fulmine (minuti di attività intensa) -----
 
-    function drawEnvelope(dc, cx, cy, color) {
-        var w = 16;
-        var h = 11;
-        var x = cx - w / 2;
-        var y = cy - h / 2;
-        dc.setColor(color, Gfx.COLOR_TRANSPARENT);
-        dc.setPenWidth(1);
-        dc.drawRectangle(x, y, w, h);
-        // Lembo: due diagonali dagli angoli alti al centro della busta
-        dc.drawLine(x, y, cx, cy + 1);
-        dc.drawLine(x + w - 1, y, cx - 1, cy + 1);
+    // Fulmine stilizzato; size = mezza-altezza in pixel.
+    function buildBolt(cx, cy, size) {
+        var s = size.toFloat() / 7.0;
+        return [
+            [cx + (2.0 * s).toNumber(), cy - (7.0 * s).toNumber()],  // punta alta
+            [cx - (4.0 * s).toNumber(), cy + (1.0 * s).toNumber()],
+            [cx,                        cy + (1.0 * s).toNumber()],
+            [cx - (2.0 * s).toNumber(), cy + (7.0 * s).toNumber()],  // punta bassa
+            [cx + (4.0 * s).toNumber(), cy - (1.0 * s).toNumber()],
+            [cx,                        cy - (1.0 * s).toNumber()]
+        ];
+    }
+
+    function drawBolt(dc, pts) {
+        dc.setColor(Gfx.COLOR_ORANGE, Gfx.COLOR_TRANSPARENT);
+        dc.fillPolygon(pts);
     }
 
     // ----- Telefono connesso -----
